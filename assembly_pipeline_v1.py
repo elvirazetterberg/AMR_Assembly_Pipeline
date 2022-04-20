@@ -47,6 +47,7 @@ def __main__():
     lines += 'New directory created:' + finalpath
 
     log.writelines(lines)
+    # change
 
 
 
