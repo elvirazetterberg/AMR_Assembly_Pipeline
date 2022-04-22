@@ -1,6 +1,7 @@
 import sys
 import os
 from datetime import datetime
+import gzip
 
 #import fastp
 
@@ -44,16 +45,20 @@ def directory(date, time):
 def fastp_func(rawreads):
     loglines = 'Fastp started'
 
-    read = ''
-    for i, line in enumerate(rawreads):
-        if line[0] == '@' and i != 0:
-            read1 = read
-            read = ''
-        read += line
+    with gzip.open(rawreads, 'rt') as r:
+        read = ''
+        for i, line in enumerate(r):
+            if line[0] == '@' and i != 0:
+                read1 = open('read1.fq.qz', 'w')
+                read1.writelines(read)
+                read = ''
+            read += line
     
-    read2 = read
+        read2 = open('read2.fq.gz', 'w')
+        read2.writelines(read)
 
-    var = os.system(f'fastp -i {read1} -I {read2} -o out.R1.fq.gz -O out.R2.fq.gz')
+
+    var = os.system(f'fastp -i read1.fq.qz -I read2.fq.qz -o out.R1.fq.gz -O out.R2.fq.gz')
 
     loglines += 'Fastp complete'
     return var, loglines
