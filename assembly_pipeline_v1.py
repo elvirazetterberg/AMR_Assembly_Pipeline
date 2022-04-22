@@ -13,7 +13,7 @@ import gzip
 
 #os.system("ls")
 
-# OBS ge fastq-info så den kan sättas in i pandas-tabellen (info) också
+# OBS ge fastq-info sa den kan sattas in i pandas-tabellen (info) ocksa
 
 ''' Function to create directory where all outputs from the pipeline are placed. 
 Date and time specific'''
