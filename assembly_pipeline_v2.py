@@ -203,7 +203,7 @@ def main():
         log.writelines(time)
 
         spades_lines = spades_func(infile1, infile2, path_spades, common_name, finalpath)
-        log.writelines(spades_lines+)
+        log.writelines(spades_lines)
 
 # Pilon
     time = currenttime()
