@@ -30,7 +30,7 @@ def directory(date, time):
         ans = input(['Please write y or n: [y/n]: '])
     if ans == 'y':
         path = input('New path: ')
-    else:
+    elif ans != 'y':
         path = os.getcwd()
 
     # Rename directory with date and time
@@ -49,7 +49,7 @@ def fastp_func(rawreads):
         read = ''
         for i, line in enumerate(r):
             if line[0] == '@' and i != 0:
-                read1 = open('read1.fq.qz', 'w')
+                read1 = open('read1.fq.gz', 'w')
                 read1.writelines(read)
                 read = ''
             read += line
@@ -58,16 +58,16 @@ def fastp_func(rawreads):
         read2.writelines(read)
 
 
-    var = os.system(f'fastp -i read1.fq.qz -I read2.fq.qz -o out.R1.fq.gz -O out.R2.fq.gz')
+    var = os.system('fastp -i read1.fq.gz -I read2.fq.gz -o out.R1.fq.gz -O out.R2.fq.gz')
 
     loglines += 'Fastp complete'
     return var, loglines
 
 def info(assembly_fasta):
-    # Output som pandas table för att sätta ihop alla strains till en sammanställd csv-fil, 
+    # Output som pandas table for att satta ihop alla strains till en sammanstalld csv-fil, 
     # och varje strain till var sin csv-fil
 
-    loglines = f'Looking at the metrics of {assembly_fasta}'
+    loglines = 'Looking at the metrics of assembly_fasta'
 
     number_of_contigs, bases_in_contig, total_consensus = 0, 0, 0
 	#@contig_lengths = ""
@@ -99,7 +99,7 @@ def main():
 
     lines = 'LOGFILE' + '\n\n'
     lines += 'New directory created with the adress ' + finalpath +'\n'
-    lines += f'Directory created at {time} on {date}'
+    lines += 'Directory created at '+ time+ ' on '+ date
     lines += 'All outputs will be saved in the new directory.'
     log.writelines(lines)
 
@@ -110,7 +110,7 @@ def main():
 
 # Close and move the logfile to the correct directory
     log.close()
-    os.system(f"mv logfile {finalpath}")
+    os.system('mv logfile '+str(finalpath))
 
 if __name__ == '__main__':
     main()  
