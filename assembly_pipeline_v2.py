@@ -2,10 +2,11 @@ import sys
 import os
 from datetime import datetime
 import gzip
+import re
 
 # Start by parsing the following command through the terminal, choosing only one option in each case:
 # 'python assembly_pipeline_v2.py infile1/folder(???) infile2/none(???) here/there regular/parallel trim/notrim kraken/nokraken ariba/noariba spades/nospades(or wanted coverage?) pilon/nopilon'
-# go to:
+# go-to:
 # python assembly_pipeline_v2.py SRR18825428_1.fastq.gz SRR18825428_2.fastq.gz here regular trim kraken ariba spades pilon'
 
 '''OPTIONS'''
@@ -53,8 +54,8 @@ def currenttime():
     return time
 
 def shortname(filename):
-    short = filename.split('.')
-    return short[0]
+    short = re.search('[a-zA-Z1-9]+', filename).group()
+    return short
 
 def fastp_func(infile1, infile2, common_name):
 
@@ -91,7 +92,7 @@ def spades_func(file1, file2, path_spades, common_name, finalpath):
     loglines = 'SPAdes started'
     # To make sure X_spades output is in the correct output directory
     assembly_path = f'{finalpath}/{common_name}_spades'
-    commandline = f'python {path_spades}/spades.py --careful -o assembly_path --pe1-1 {file1} --pe1-2 {file2} -t'
+    commandline = f'python {path_spades}/spades.py --careful -o assembly_path --pe1-1 {file1} --pe1-2 {file2}'
     os.system(commandline)
     #"spades.py --careful -o $filename1_short\_$wanted_coverage\X_spades --pe1-1 $read1_output --pe1-2 $read2_output -t $threads_available -m $RAM_available"
 
