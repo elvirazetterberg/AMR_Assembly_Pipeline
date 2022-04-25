@@ -49,14 +49,18 @@ def fastp_func(rawreads):
         read = ''
         for i, line in enumerate(r):
             if line[0] == '@' and i != 0:
-                read1 = open('read1.fq.gz', 'w')
-                read1.writelines(read)
+                with gzip.open('read1.fq.gz', 'w') as one:
+                    comp = gzip.compress(read)    
+                    one.write(comp)
+               # read1 = open('read1.fq.gz', 'w')
+               # read1.writelines(read)
                 read = ''
             read += line
     
-        read2 = open('read2.fq.gz', 'w')
-        read2.writelines(read)
-
+       # read2 = open('read2.fq.gz', 'w')
+       # read2.writelines(read)
+        with gzip.open('read2.fq.gz', 'w') as two:
+            two.writelines(read)
 
     var = os.system('fastp -i read1.fq.gz -I read2.fq.gz -o out.R1.fq.gz -O out.R2.fq.gz')
 
