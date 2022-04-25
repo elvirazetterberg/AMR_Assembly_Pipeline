@@ -3,7 +3,12 @@ import os
 from datetime import datetime
 import gzip
 
-#import fastp
+# Parsing through the terminal:
+# Start with python assembly_pipeline_v1.py here/there regular/parallel trim/notrim kraken/nokraken ariba/noariba pilon/nopilon
+# - here/there: Where should all outputs be saved? If 'here' a new directory is created in 
+# the current directory. If 'there' a path will be asked for.
+# - regular/parallel: regular means running only one strain, parallel means running multiple strains
+# - trim/notrim: trim means we run fastp, notrim means that we don't
 
 # pipeline tar in short reads
 # tar in huruvida vi vill assembla
@@ -17,20 +22,16 @@ import gzip
 
 ''' Function to create directory where all outputs from the pipeline are placed. 
 Date and time specific'''
-def directory(date, time):
+def directory(date, time, there = False):
 
     # Change the format of time from eg. 09:13:07.186006 to 09h13m07s
     stringtime = time[:2]+'h'+time[3:5]+'m'+time[6:8]+'s'
 
     # Choose path of directory
-    print('The default path to all output files is a new directory in your current path.')
-    print('Do you want to save all files in another directory?')
-    ans = input('[y/n]: ')
-    while ans not in ['y', 'n']:
-        ans = input(['Please write y or n: [y/n]: '])
-    if ans == 'y':
+    if there:
+        print('You requested to save all output files in another directory.')
         path = input('New path: ')
-    elif ans != 'y':
+    else:
         path = os.getcwd()
 
     # Rename directory with date and time
@@ -43,9 +44,6 @@ def directory(date, time):
     return finalpath
 
 def fastp_func(infile1, infile2):
-    # format = input('Interleaved or two files?: [i/2]')
-    # if format == 'i':
-
 
     loglines = f'Fastp started with {infile1} and {infile2}\n'
 
@@ -99,13 +97,28 @@ def info(assembly_fasta):
     return loglines
 
 
+# function that runs multiple strains in parallel. Inputs are all sys.argv[]
+# Return lines for logfile?
+def parallelize():
+    pass
+
+# function that runs everything for only one strain. Inputs are all sys.argv[]
+# Return lines for logfile?
+def regular():
+    pass
+
+
 def main():
     time = str(datetime.time(datetime.now()))
     date = str(datetime.date(datetime.now()))
     
-    finalpath = directory(date, time)
+    if sys.argv[1] == 'there':
+        there = True
+        finalpath = directory(date, time, there)
+    else:
+        finalpath = directory(date, time)
 
-    # Create log file
+# Create log file
     filename = 'logfile'
     log = open(filename, 'w')
 
@@ -116,16 +129,21 @@ def main():
     lines += 'All outputs will be saved in the new directory.\n\n'
     log.writelines(lines)
 
+# Parallel
+    # if sys.argv[1] == 'parallel':
+    #     parallelize()
+    # else:
+    #     continue
+
 # Fastp
     infile1 = input('Give the fastq, gzipped forward file you want for fastp: ')
     infile2 = input('Give the fastq, gzipped reverse file you want for fastp: ')
+
     outfile1, outfile2, loglines = fastp_func(infile1, infile2)
     log.writelines(loglines)
+
     os.system('mv ' + outfile1 + ' ' + outfile2 + ' fastp.html fastp.json ' + str(finalpath))
-    log.writelines('Fastp output files moved to directory')
-    # os.system('mv' + outfile2 +str(finalpath))
-    # os.system('mv fastp.html' +str(finalpath))
-    # os.system('mv fastp.json' +str(finalpath))
+    log.writelines('Fastp output files moved to directory\n')
 
 
 
