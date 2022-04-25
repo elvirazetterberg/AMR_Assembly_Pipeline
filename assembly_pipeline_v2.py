@@ -3,8 +3,13 @@ import os
 from datetime import datetime
 import gzip
 
-# Parsing through the terminal:
-# Start with python assembly_pipeline_v1.py here/there regular/parallel trim/notrim kraken/nokraken ariba/noariba pilon/nopilon
+# Start by parsing the following command through the terminal, choosing only one option in each case:
+# 'python assembly_pipeline_v2.py infile1/folder(???) infile2/none(???) here/there regular/parallel trim/notrim kraken/nokraken ariba/noariba spades/nospades(or wanted coverage?) pilon/nopilon'
+# go to:
+# python assembly_pipeline_v2.py SRR18825428_1.fastq.gz SRR18825428_2.fastq.gz here regular trim kraken ariba spades pilon'
+
+'''OPTIONS'''
+# infile1
 # - here/there: Where should all outputs be saved? If 'here' a new directory is created in 
 # the current directory. If 'there' a path will be asked for.
 # - regular/parallel: regular means running only one strain, parallel means running multiple strains
@@ -43,7 +48,15 @@ def directory(date, time, there = False):
     
     return finalpath
 
-def fastp_func(infile1, infile2):
+def currenttime():
+    time = str(datetime.time(datetime.now()))
+    return time
+
+def shortname(filename):
+    short = filename.split('.')
+    return short[0]
+
+def fastp_func(infile1, infile2, common_name):
 
     loglines = f'Fastp started with {infile1} and {infile2}\n'
 
@@ -62,8 +75,8 @@ def fastp_func(infile1, infile2):
         # with gzip.open('read2.fq.gz', 'wt') as two:
         #     two.writelines(read)
 
-    outfile1 = 'out.R1.fq.gz'
-    outfile2 = 'out.R2.fq.gz'
+    outfile1 = f'out_fastp_{common_name}_1.fq.gz'
+    outfile2 = f'out_fastp_{common_name}_2.fq.gz'
 
     fastpinput = 'fastp -i ' + infile1 + ' -I ' + infile2 + ' -o ' + outfile1 + ' -O ' + outfile2
 
@@ -72,6 +85,21 @@ def fastp_func(infile1, infile2):
     loglines += 'Fastp complete. Four output files returned:\n'
     loglines += f'{outfile1} \n{outfile2} \nfastp.html \nfastp.json \n'
     return outfile1, outfile2, loglines
+
+def spades_func(file1, file2, path_spades, common_name, finalpath):
+
+    loglines = 'SPAdes started'
+    # To make sure X_spades output is in the correct output directory
+    assembly_path = f'{finalpath}/{common_name}_spades'
+    commandline = f'python {path_spades}/spades.py --careful -o assembly_path --pe1-1 {file1} --pe1-2 {file2} -t'
+    os.system(commandline)
+    #"spades.py --careful -o $filename1_short\_$wanted_coverage\X_spades --pe1-1 $read1_output --pe1-2 $read2_output -t $threads_available -m $RAM_available"
+
+    # rename from contigs.fasta to .fasta
+    # os.system(f'mv {assembly_path}.contigs.fasta {assembly_path}.fasta')
+
+    loglines += 'SPAdes finished'
+    return loglines
 
 def info(assembly_fasta):
     # Output som pandas table for att satta ihop alla strains till en sammanstalld csv-fil, 
@@ -109,18 +137,37 @@ def regular():
 
 
 def main():
-    time = str(datetime.time(datetime.now()))
+    infile1 = sys.argv[1]
+    infile2 = sys.argv[2]
+    common_name = shortname(infile1) # until here only work if not parallel
+    new_location = sys.argv[3] == 'there' # will ask for directory location if True
+    parallel = sys.argv[4] == 'parallel' # TO BE MODIFIED to run strains in parallel if True
+    run_fastp = sys.argv[5] == 'trim' # will run fastp if True
+    kraken = sys.argv[6] == 'kraken'
+    ariba = sys.argv[7] == 'ariba'
+    spades = sys.argv[8] == 'spades'
+    pilon = sys.argv[9] == 'pilon'
+
+
+
+
+    
+
+    path_tools = '/proj/uppmax2022-2-14/private/campy_pipeline/assembly/verktyg'
+    path_spades = path_tools + '/SPAdes-3.15.4-Linux/bin'
+    
+    # get filename from original file?
+
+    time = currenttime()
     date = str(datetime.date(datetime.now()))
     
-    if sys.argv[1] == 'there':
-        there = True
-        finalpath = directory(date, time, there)
-    else:
-        finalpath = directory(date, time)
+    # make directory for output
+    finalpath = directory(date, time, new_location)
+    
 
 # Create log file
-    filename = 'logfile'
-    log = open(filename, 'w')
+    logname = 'logfile'
+    log = open(logname, 'w')
 
     lines = 15*'-' + 'LOGFILE' + 15*'-' + '\n\n'
 
@@ -130,22 +177,39 @@ def main():
     log.writelines(lines)
 
 # Parallel
-    # if sys.argv[1] == 'parallel':
-    #     parallelize()
-    # else:
-    #     continue
+    # if parallel:
+    # parallelize()
 
 # Fastp
-    infile1 = input('Give the fastq, gzipped forward file you want for fastp: ')
-    infile2 = input('Give the fastq, gzipped reverse file you want for fastp: ')
+    if run_fastp:
+        time = currenttime()
+        log.writelines(time)
 
-    outfile1, outfile2, loglines = fastp_func(infile1, infile2)
-    log.writelines(loglines)
+        # infile1 = input('Give the fastq, gzipped forward file you want for fastp: ')
+        # infile2 = input('Give the fastq, gzipped reverse file you want for fastp: ')
 
-    os.system('mv ' + outfile1 + ' ' + outfile2 + ' fastp.html fastp.json ' + str(finalpath))
-    log.writelines('Fastp output files moved to directory\n')
+        outfile1, outfile2, fastp_lines = fastp_func(infile1, infile2, common_name)
+        log.writelines(fastp_lines)
 
+        os.system('mv ' + outfile1 + ' ' + outfile2 + ' fastp.html fastp.json ' + str(finalpath))
+        log.writelines('Fastp output files moved to directory\n')
 
+# Kraken
+    if kraken:
+        time = currenttime()
+        log.writelines(time)
+
+# Spades
+    if spades:
+        time = currenttime()
+        log.writelines(time)
+
+        spades_lines = spades_func(infile1, infile2, path_spades, common_name, finalpath)
+        log.writelines(spades_lines)
+
+# Pilon
+    time = currenttime()
+    log.writelines(time)
 
 # Close and move the logfile to the correct directory
     log.close()
