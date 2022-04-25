@@ -42,32 +42,37 @@ def directory(date, time):
     
     return finalpath
 
-def fastp_func(rawreads):
+def fastp_func(infile1, infile2):
     # format = input('Interleaved or two files?: [i/2]')
     # if format == 'i':
 
 
-    loglines = 'Fastp started'
+    loglines = f'Fastp started with {infile1} and {infile2}'
 
-    with gzip.open(rawreads, 'rt') as r:
-        read = ''
-        for i, line in enumerate(r):
-            if line[0] == '@' and i != 0:
-                with gzip.open('read1.fq.gz', 'wt') as one:
-                # read1 = open('read1.fq.gz', 'w')
-                    one.write(read)
-                read = ''
-            read += line
+    # with gzip.open(rawreads, 'rt') as r:
+    #     read = ''
+    #     for i, line in enumerate(r):
+    #         if line[0] == '@' and i != 0:
+    #             with gzip.open('read1.fq.gz', 'wt') as one:
+    #             # read1 = open('read1.fq.gz', 'w')
+    #                 one.write(read)
+    #             read = ''
+    #         read += line
     
-        # read2 = open('read2.fq.gz', 'w')
-        with gzip.open('read2.fq.gz', 'wt') as two:
-            two.writelines(read)
+        # # read2 = open('read2.fq.gz', 'w')
+        # with gzip.open('read2.fq.gz', 'wt') as two:
+        #     two.writelines(read)
+
+    outfile1 = 'out.R1.fq.gz'
+    outfile2 = 'out.R2.fq.gz'
+
+    fastpinput = 'fastp -i ' + infile1 + ' -I ' + infile2 + ' -o ' + outfile1 + ' -O ' + outfile2
+
+    os.system(fastpinput)
 
 
-    var = os.system('fastp -i read1.fq.gz -I read2.fq.gz -o out.R1.fq.gz -O out.R2.fq.gz')
-
-    loglines += 'Fastp complete'
-    return var, loglines
+    loglines += 'Fastp complete\n\n'
+    return outfile1, outfile2, loglines
 
 def info(assembly_fasta):
     # Output som pandas table for att satta ihop alla strains till en sammanstalld csv-fil, 
@@ -109,9 +114,17 @@ def main():
     lines += 'All outputs will be saved in the new directory.'
     log.writelines(lines)
 
-    rawreads = input('Give the fastq, gzipped file you want for fastp: ')
-    output, loglines = fastp_func(rawreads)
-    
+# Fastp
+    infile1 = input('Give the fastq, gzipped forward file you want for fastp: ')
+    infile2 = input('Give the fastq, gzipped reverse file you want for fastp: ')
+    outfile1, outfile2, loglines = fastp_func(infile1, infile2)
+    log.writelines(loglines)
+    os.system('mv ' + outfile1 + ' ' + outfile2 + ' fastp.html fastp.json ' + str(finalpath))
+    log.writelines('Fastp output files moved to directory')
+    # os.system('mv' + outfile2 +str(finalpath))
+    # os.system('mv fastp.html' +str(finalpath))
+    # os.system('mv fastp.json' +str(finalpath))
+
 
 
 # Close and move the logfile to the correct directory
