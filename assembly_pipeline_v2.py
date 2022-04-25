@@ -7,7 +7,7 @@ import re
 # Start by parsing the following command through the terminal, choosing only one option in each case:
 # 'python assembly_pipeline_v2.py infile1/folder(???) infile2/none(???) here/there regular/parallel trim/notrim kraken/nokraken ariba/noariba spades/nospades(or wanted coverage?) pilon/nopilon'
 # go-to:
-# python assembly_pipeline_v2.py SRR18825428_1.fastq.gz SRR18825428_2.fastq.gz here regular trim kraken ariba spades pilon'
+# python assembly_pipeline_v2.py SRR18825428_1.fastq.gz SRR18825428_2.fastq.gz here regular trim kraken ariba spades pilon
 
 '''OPTIONS'''
 # infile1
@@ -16,15 +16,6 @@ import re
 # - regular/parallel: regular means running only one strain, parallel means running multiple strains
 # - trim/notrim: trim means we run fastp, notrim means that we don't
 
-# pipeline tar in short reads
-# tar in huruvida vi vill assembla
-
-
-#fastp -i in.R1.fq.gz -I in.R2.fq.gz -o out.R1.fq.gz -O out.R2.fq.gz
-
-#os.system("ls")
-
-# OBS ge fastq-info sa den kan sattas in i pandas-tabellen (info) ocksa
 
 ''' Function to create directory where all outputs from the pipeline are placed. 
 Date and time specific'''
@@ -84,23 +75,29 @@ def fastp_func(infile1, infile2, common_name):
     os.system(fastpinput)
 
     loglines += 'Fastp complete. Four output files returned:\n'
-    loglines += f'{outfile1} \n{outfile2} \nfastp.html \nfastp.json \n'
+    loglines += f'{outfile1} \n{outfile2} \nfastp.html \nfastp.json \n\n'
     return outfile1, outfile2, loglines
 
 def spades_func(file1, file2, path_spades, common_name, finalpath):
 
-    loglines = 'SPAdes started'
+    loglines = 'SPAdes started\n'
     # To make sure X_spades output is in the correct output directory
     assembly_path = f'{finalpath}/{common_name}_spades'
-    commandline = f'python {path_spades}/spades.py --careful -o assembly_path --pe1-1 {file1} --pe1-2 {file2}'
+    commandline = f'python {path_spades}/spades.py --careful -o {assembly_path} --pe1-1 {file1} --pe1-2 {file2}'
     os.system(commandline)
     #"spades.py --careful -o $filename1_short\_$wanted_coverage\X_spades --pe1-1 $read1_output --pe1-2 $read2_output -t $threads_available -m $RAM_available"
 
-    # rename from contigs.fasta to .fasta
-    # os.system(f'mv {assembly_path}.contigs.fasta {assembly_path}.fasta')
+    # rename from contigs.fasta to fasta
+    os.system(f'cp {assembly_path}/contigs.fasta {assembly_path}/{common_name}.fasta')
+    loglines += f'"contigs.fasta"-file copied and renamed to be called "{common_name}.fasta"'
 
-    loglines += 'SPAdes finished'
+    loglines += 'SPAdes finished.\n'
+    loglines += f'All output files can be found here: {assembly_path}\n\n'
+
     return loglines
+
+def pilon_func():
+    pass
 
 def info(assembly_fasta):
     # Output som pandas table for att satta ihop alla strains till en sammanstalld csv-fil, 
@@ -183,7 +180,7 @@ def main():
 
 # Fastp
     if run_fastp:
-        time = currenttime()
+        time = currenttime()+'\n'
         log.writelines(time)
 
         # infile1 = input('Give the fastq, gzipped forward file you want for fastp: ')
@@ -193,20 +190,20 @@ def main():
         log.writelines(fastp_lines)
 
         os.system('mv ' + outfile1 + ' ' + outfile2 + ' fastp.html fastp.json ' + str(finalpath))
-        log.writelines('Fastp output files moved to directory\n')
+        log.writelines('Fastp output files moved to directory\n\n')
 
 # Kraken
     if kraken:
-        time = currenttime()
+        time = currenttime()+'\n'
         log.writelines(time)
 
 # Spades
     if spades:
-        time = currenttime()
+        time = currenttime()+'\n'
         log.writelines(time)
 
         spades_lines = spades_func(infile1, infile2, path_spades, common_name, finalpath)
-        log.writelines(spades_lines)
+        log.writelines(spades_lines+)
 
 # Pilon
     time = currenttime()
