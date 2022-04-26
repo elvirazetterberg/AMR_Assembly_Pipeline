@@ -7,7 +7,7 @@ import re
 # Start by parsing the following command through the terminal, choosing only one option in each case:
 # 'python assembly_pipeline_v2.py infile1/folder(???) infile2/none(???) here/there regular/parallel trim/notrim kraken/nokraken ariba/noariba wanted_coverage genome_size pilon/nopilon threads RAM'
 # go-to:
-# python assembly_pipeline_v2.py SRR18825428_1.fastq.gz SRR18825428_2.fastq.gz here regular trim kraken ariba 0 0 pilon 0 0
+# python assembly_pipeline_v2.py SRR18825428_1.fastq.gz SRR18825428_2.fastq.gz here regular trim kraken ariba 40 124000 pilon 0 0
 
 '''OPTIONS'''
 # infile1
@@ -116,12 +116,42 @@ def reads_for_coverage(fastq_file, wanted_coverage, genome_size):
 
     return coverage, reads_needed, loglines
 
-def spades_func(file1, file2, path_spades, common_name, finalpath):
+def trim_fastq(fastq1_file, fastq2_file, reads_needed, common_name):
+    
+    lines_needed = reads_needed*4
+    newname1 = f'X_{common_name}_1.fq.gz'
+    newname2 = f'X_{common_name}_2.fq.gz'
+    
+    with gzip.open(fastq1_file, 'rt') as trim_me:
+        newfile = ''
+        for i, line in enumerate(trim_me):
+            newfile += line
+            if i == lines_needed:
+                break
+    
+    with gzip.open(newname1, 'wt') as one:
+        one.write(newfile)
+
+    with gzip.open(fastq2_file, 'rt') as trim_me:
+        newfile = ''
+        for i, line in enumerate(trim_me):
+            newfile += line
+            if i == lines_needed:
+                break
+
+    with gzip.open(newname2, 'wt') as one:
+        one.write(newfile)
+
+    return newname1, newname2
+
+def spades_func(file1, file2, path_spades, common_name, finalpath): # threads, RAM
 
     loglines = 'SPAdes started\n'
+
     # To make sure X_spades output is in the correct output directory
     assembly_path = f'{finalpath}/{common_name}_spades'
-    # commandline = '#SBATCH -p node -n 1 \n'
+
+    commandline = '#SBATCH -p node -n 1 \n'
     commandline += f'python {path_spades}/spades.py --careful -o {assembly_path} --pe1-1 {file1} --pe1-2 {file2}'
     os.system(commandline)
     #"spades.py --careful -o $filename1_short\_$wanted_coverage\X_spades --pe1-1 $read1_output --pe1-2 $read2_output -t $threads_available -m $RAM_available"
@@ -176,32 +206,30 @@ def regular():
 def main():
     infile1 = sys.argv[1]
     infile2 = sys.argv[2]
-    common_name = shortname(infile1) # until here only work if not parallel
     new_location = sys.argv[3] == 'there' # will ask for directory location if True
     parallel = sys.argv[4] == 'parallel' # TO BE MODIFIED to run strains in parallel if True
     run_fastp = sys.argv[5] == 'trim' # will run fastp if True
     kraken = sys.argv[6] == 'kraken'
     ariba = sys.argv[7] == 'ariba'
-    spades = sys.argv[8] != '0' # if wanted coverage == 0, then don't run spades
+    wanted_coverage = int(sys.argv[8]) # if wanted coverage == 0, then don't run spades
     genome_size = sys.argv[9]
     pilon = sys.argv[10] == 'pilon'
     threads = sys.argv[11]
     RAM = sys.argv[12]
 
+    run_spades = wanted_coverage != 0
+    common_name = shortname(infile1) # until here only work if not parallel
 
-
-
-    
-
+# Hardcoded
     path_tools = '/proj/uppmax2022-2-14/private/campy_pipeline/assembly/verktyg'
     path_spades = path_tools + '/SPAdes-3.15.4-Linux/bin'
-    
+
+# Let's start this pipeline!
     time = currenttime()
     date = str(datetime.date(datetime.now()))
     
-    # make directory for output
+# make directory for output
     finalpath = directory(date, time, new_location)
-    
 
 # Create log file
     logname = 'logfile'
@@ -226,11 +254,11 @@ def main():
         # infile1 = input('Give the fastq, gzipped forward file you want for fastp: ')
         # infile2 = input('Give the fastq, gzipped reverse file you want for fastp: ')
 
-        outfile1, outfile2, fastp_lines = fastp_func(infile1, infile2, common_name)
+        outfile1_trim, outfile2_trim, fastp_lines = fastp_func(infile1, infile2, common_name)
         log.writelines(fastp_lines)
 
-        infile1 = outfile1
-        infile2 = outfile2
+        infile1 = outfile1_trim
+        infile2 = outfile2_trim
 
 # Kraken
     if kraken:
@@ -238,14 +266,21 @@ def main():
         log.writelines(time)
 
 # Number of reads to match the wanted coverage
-    if spades:
+    if run_spades:
         time = currenttime()+'\n'
         log.writelines(time)
         coverage, reads_needed, coverage_lines = reads_for_coverage()
         log.writelines(coverage_lines)
+    else:
+        coverage = 0
+
+    if coverage != wanted_coverage:
+        outfile1, outfile2 = trim_fastq(infile1, infile2, common_name)
+        infile1 = outfile1
+        infile2 = outfile2
 
 # Spades
-    if spades:
+    if run_spades:
         time = currenttime()+'\n'
         log.writelines(time)
 
@@ -258,8 +293,8 @@ def main():
 
 
 # Move files to correct folder
-    os.system('mv ' + outfile1 + ' ' + outfile2 + ' fastp.html fastp.json ' + str(finalpath))
-    log.writelines('Fastp output files moved to directory\n\n')
+    os.system('mv ' + outfile1_trim + ' ' + outfile2_trim + ' fastp.html fastp.json ' + str(finalpath))
+    log.writelines('Trimmed fastp output files moved to directory\n\n')
 
 # Close and move the logfile to the correct directory
     log.close()
