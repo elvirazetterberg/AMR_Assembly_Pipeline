@@ -70,13 +70,51 @@ def fastp_func(infile1, infile2, common_name):
     loglines += f'{outfile1} \n{outfile2} \nfastp.html \nfastp.json \n\n'
     return outfile1, outfile2, loglines
 
-def reads_for_coverage(wanted_coverage, genome_size):
+def reads_for_coverage(fastq_file, wanted_coverage, genome_size):
     bases_needed = int(wanted_coverage*genome_size/2)
     
     loglines = f'To achieve {wanted_coverage} X, {bases_needed} bases are needed from each fastq-file\n'
 
+    total_bases = 0
+    read_counter = 0
+    row_counter = 1 # goes between 1 and 4
+    
+    with open(fastq_file, 'r') as file:
+        for line in file:
+            if '@' in line:
+                lenlist = re.findall('(length=)[1-9]+', line)
+                if len(lenlist) > 0:
+                    lenlist2 = lenlist.split('=')
+                    readlength = int(lenlist[1])
+                    total_bases += readlength
 
-    return loglines
+            elif readlength == 0 and row_counter == 2:
+                readlength = len(line)
+                total_bases += readlength
+
+            elif row_counter == 4:
+                readlength = 0
+                read_counter += 1
+
+        # Give log output if the coverage can be achieved
+            if total_bases >= bases_needed:
+                loglines += f'Needed bases: {bases_needed} (per direction) which amounts to {read_counter} reads from fastq_1 which is {total_bases} bases\n\n'
+                coverage = wanted_coverage
+                break
+
+            row_counter = row_counter%4 + 1 # makes the counter loop between 1 and 4
+
+
+    # Give log output if the coverage CANNOT be achieved, and estimate new coverage
+    if total_bases < bases_needed:
+        loglines += f'There are not enough bases to achieve {wanted_coverage} X coverage.\n\n"'
+        available_coverage = int(2*total_bases/genome_size)
+        loglines += f'Using an estimated coverage of {available_coverage} X instead which amounts to {read_counter} reads from fastq_1 which is {total_bases} bases\n\n'
+        coverage = available_coverage
+
+    reads_needed = read_counter
+
+    return coverage, reads_needed, loglines
 
 def spades_func(file1, file2, path_spades, common_name, finalpath):
 
@@ -201,7 +239,11 @@ def main():
 
 # Number of reads to match the wanted coverage
     if spades:
-        pass
+        time = currenttime()+'\n'
+        log.writelines(time)
+        coverage, reads_needed, coverage_lines = reads_for_coverage()
+        log.writelines(coverage_lines)
+
 # Spades
     if spades:
         time = currenttime()+'\n'
