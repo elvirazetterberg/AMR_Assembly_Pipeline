@@ -157,7 +157,7 @@ def main():
 
     path_tools = '/proj/uppmax2022-2-14/private/campy_pipeline/assembly/verktyg'
     path_spades = path_tools + '/SPAdes-3.15.4-Linux/bin'
-    path_kraken = path_tools + '/minikraken_20171101_8GB_dustmasked.tgz/bin'
+    path_kraken = path_tools + '/minikraken2_v1_8GB'
     
     time = currenttime()
     date = str(datetime.date(datetime.now()))
@@ -203,7 +203,7 @@ def main():
         time = currenttime()+'\n'
         log.writelines(time)
             
-        if path_kraken: # If path_kraken exists do thing, maybe it should be os.path.exists('kraken_db') instead?
+        if path_kraken: # If path_kraken exists do thing, maybe it should be os.path.exists('kraken_db') instead? Does this even has to be an if statement at all?
         
             loglines = f'Kraken started with {infile1} and {infile2}\n' #unclear if "filename" is right
             #system ("kraken2 --db $kraken_DB --threads $threads_available --output $filename1_short.kraken.out --report $filename1_short.kraken.report --paired $fastqfile1 $fastqfile2");
