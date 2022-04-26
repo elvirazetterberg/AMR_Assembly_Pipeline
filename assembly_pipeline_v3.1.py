@@ -197,25 +197,25 @@ def main():
 # Kraken
     if kraken:
 
-	#chdir "$path_assembly";
+        #chdir "$path_assembly";
 
-    time = currenttime()+'\n'
-    log.writelines(time)
-		
-	if kraken_DB: # If krakendb exists gör grej, kanske ska vara os.path.exists('kraken_db') istället?
-	
-        loglines = f'Kraken started with {infile1} and {infile2}\n' #oklart om "filename" är rätt
-		#system ("kraken2 --db $kraken_DB --threads $threads_available --output $filename1_short.kraken.out --report $filename1_short.kraken.report --paired $fastqfile1 $fastqfile2");
-        # Add later lol --threads {threads_available}
-        # Add --paired ??
-        krakeninput = f'python kraken2 --db {kraken_DB} --output {filename1_short.kraken.out} --report {filename1_short.kraken.report} --paired {fastqfile1} {fastqfile2}'
-        os.system(krakeninput)
-
-        time = currenttime()
+        time = currenttime()+'\n'
         log.writelines(time)
+            
+        if kraken_DB: # If krakendb exists gör grej, kanske ska vara os.path.exists('kraken_db') istället?
+        
+            loglines = f'Kraken started with {infile1} and {infile2}\n' #oklart om "filename" är rätt
+            #system ("kraken2 --db $kraken_DB --threads $threads_available --output $filename1_short.kraken.out --report $filename1_short.kraken.report --paired $fastqfile1 $fastqfile2");
+            # Add later lol --threads {threads_available}
+            # Add --paired ??
+            krakeninput = f'python kraken2 --db {kraken_DB} --output {filename1_short.kraken.out} --report {filename1_short.kraken.report} --paired {fastqfile1} {fastqfile2}'
+            os.system(krakeninput)
 
-		with open('filename1_short.kraken.report', 'r') as kraken_report: # add "or die" or similar? see old pipeline
-            kraken_report.readlines()
+            time = currenttime()
+            log.writelines(time)
+
+            with open('filename1_short.kraken.report', 'r') as kraken_report: # add "or die" or similar? see old pipeline
+                kraken_report.readlines()
 
 # Number of reads to match the wanted coverage
     if spades:
