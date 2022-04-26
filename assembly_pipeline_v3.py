@@ -7,7 +7,7 @@ import re
 # Start by parsing the following command through the terminal, choosing only one option in each case:
 # 'python assembly_pipeline_v2.py infile1/folder(???) infile2/none(???) here/there regular/parallel trim/notrim kraken/nokraken ariba/noariba spades/nospades(or wanted coverage?) pilon/nopilon'
 # go-to:
-# python assembly_pipeline_v2.py SRR18825428_1.fastq.gz SRR18825428_2.fastq.gz here regular trim kraken ariba spades pilon
+# python assembly_pipeline_v2.py SRR18825428_1.fastq.gz SRR18825428_2.fastq.gz here regular trim kraken noariba 0 0 nopilon
 
 '''OPTIONS'''
 # infile1
