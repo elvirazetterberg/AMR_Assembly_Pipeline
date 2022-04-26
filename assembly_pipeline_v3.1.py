@@ -199,12 +199,15 @@ def main():
 
         #chdir "$path_assembly";
 
+        #define pathway to kraken database (update when necessary)
+        kraken_DB = "/proj/uppmax2022-2-14/private/campy_pipeline/assembly/verktyg"
+
         time = currenttime()+'\n'
         log.writelines(time)
             
-        if kraken_DB: # If krakendb exists gör grej, kanske ska vara os.path.exists('kraken_db') istället?
+        if kraken_DB: # If krakendb exists do thing, maybe it should be os.path.exists('kraken_db') instead?
         
-            loglines = f'Kraken started with {infile1} and {infile2}\n' #oklart om "filename" är rätt
+            loglines = f'Kraken started with {infile1} and {infile2}\n' #unclear if "filename" is right
             #system ("kraken2 --db $kraken_DB --threads $threads_available --output $filename1_short.kraken.out --report $filename1_short.kraken.report --paired $fastqfile1 $fastqfile2");
             # Add later lol --threads {threads_available}
             # Add --paired ??
