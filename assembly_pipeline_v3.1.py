@@ -157,7 +157,7 @@ def main():
 
     path_tools = '/proj/uppmax2022-2-14/private/campy_pipeline/assembly/verktyg'
     path_spades = path_tools + '/SPAdes-3.15.4-Linux/bin'
-    path_kraken = path_tools + '/minikraken_20171101_8GB_dustmasked.tgz/bin'
+    path_kraken = path_tools + '/minikraken_20171101_8GB_dustmasked/bin'
     
     time = currenttime()
     date = str(datetime.date(datetime.now()))
