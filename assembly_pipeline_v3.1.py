@@ -157,6 +157,7 @@ def main():
 
     path_tools = '/proj/uppmax2022-2-14/private/campy_pipeline/assembly/verktyg'
     path_spades = path_tools + '/SPAdes-3.15.4-Linux/bin'
+    path_kraken = path_tools + '/minikraken_20171101_8GB_dustmasked.tgz/bin'
     
     time = currenttime()
     date = str(datetime.date(datetime.now()))
@@ -199,19 +200,16 @@ def main():
 
         #chdir "$path_assembly";
 
-        #define pathway to kraken database (update when necessary)
-        kraken_DB = "/proj/uppmax2022-2-14/private/campy_pipeline/assembly/verktyg"
-
         time = currenttime()+'\n'
         log.writelines(time)
             
-        if kraken_DB: # If krakendb exists do thing, maybe it should be os.path.exists('kraken_db') instead?
+        if path_kraken: # If path_kraken exists do thing, maybe it should be os.path.exists('kraken_db') instead?
         
             loglines = f'Kraken started with {infile1} and {infile2}\n' #unclear if "filename" is right
             #system ("kraken2 --db $kraken_DB --threads $threads_available --output $filename1_short.kraken.out --report $filename1_short.kraken.report --paired $fastqfile1 $fastqfile2");
             # Add later lol --threads {threads_available}
             # in the old pipeline they have two names for the input (fastqfile1 and filename1_short) and I do not know why
-            krakeninput = f'python kraken2 --db {kraken_DB} --output output_test.kraken.out --report output_test.kraken.report --paired {infile1} {infile2}'
+            krakeninput = f'python kraken2 --db {path_kraken} --output output_test.kraken.out --report output_test.kraken.report --paired {infile1} {infile2}'
             os.system(krakeninput)
 
             time = currenttime()
