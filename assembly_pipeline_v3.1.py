@@ -217,7 +217,7 @@ def main():
             time = currenttime()
             log.writelines(time)
 
-            with open('filename1_short.kraken.report', 'r') as kraken_report: # add "or die" or similar? see old pipeline
+            with open('output_test.kraken.report', 'r') as kraken_report: # add "or die" or similar? see old pipeline
                 kraken_report.readlines()
 
 # Number of reads to match the wanted coverage
