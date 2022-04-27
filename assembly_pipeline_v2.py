@@ -9,6 +9,9 @@ import re
 # test run:
 # python assembly_pipeline_v2.py SRR18825428_1.fastq.gz SRR18825428_2.fastq.gz here regular trim kraken ariba 40 124000000 pilon 0 0
 
+# Snabbare?
+# python assembly_pipeline_v2.py SRR18825428_1.fastq.gz SRR18825428_2.fastq.gz here regular trim kraken ariba 40 124000000 pilon 0 0 #SBATCH -p node -n 1
+
 '''OPTIONS'''
 # infile1
 # - here/there: Where should all outputs be saved? If 'here' a new directory is created in 
@@ -71,6 +74,10 @@ def fastp_func(infile1, infile2, common_name):
     return outfile1, outfile2, loglines
 
 def reads_for_coverage(fastq_file, wanted_coverage, genome_size):
+    
+    loglines = (f'Running: reads_for_coverage')
+    loglines += f'Checking if coverage can be achieved \n\n'
+
     bases_needed = int(wanted_coverage*genome_size/2)
     
     loglines = f'To achieve {wanted_coverage} X, {bases_needed} bases are needed from each fastq-file\n'
@@ -113,11 +120,15 @@ def reads_for_coverage(fastq_file, wanted_coverage, genome_size):
         coverage = available_coverage
 
     reads_needed = read_counter
+    
+    loglines += f'Function finished.\nOutputs: coverage {coverage}, reads needed {reads_needed}\n\n'
 
     return coverage, reads_needed, loglines
 
-def trim_fastq(fastq1_file, fastq2_file, reads_needed, common_name):
+def shorten_fastq(fastq1_file, fastq2_file, reads_needed, common_name):
     
+    loglines = f'shorten_fastq started to shorten {fastq1_file} and {fastq2_file} to only match wanted coverage.\n\n'
+
     lines_needed = reads_needed*4
     newname1 = f'X_{common_name}_1.fq.gz'
     newname2 = f'X_{common_name}_2.fq.gz'
@@ -142,7 +153,9 @@ def trim_fastq(fastq1_file, fastq2_file, reads_needed, common_name):
     with gzip.open(newname2, 'wt') as one:
         one.write(newfile)
 
-    return newname1, newname2
+    loglines += f'Shortening complete.\nOutputs: {newname1}, {newname2}.\n\n'
+
+    return newname1, newname2, loglines
 
 def spades_func(file1, file2, path_spades, common_name, finalpath): # threads, RAM
 
@@ -151,8 +164,8 @@ def spades_func(file1, file2, path_spades, common_name, finalpath): # threads, R
     # To make sure X_spades output is in the correct output directory
     assembly_path = f'{finalpath}/{common_name}_spades'
 
-    commandline = '#SBATCH -p node -n 1 \n'
-    commandline += f'python {path_spades}/spades.py --careful -o {assembly_path} --pe1-1 {file1} --pe1-2 {file2}'
+    # commandline = '#SBATCH -p node -n 1 \n'
+    commandline = f'python {path_spades}/spades.py --careful -o {assembly_path} --pe1-1 {file1} --pe1-2 {file2}'
     os.system(commandline)
     #"spades.py --careful -o $filename1_short\_$wanted_coverage\X_spades --pe1-1 $read1_output --pe1-2 $read2_output -t $threads_available -m $RAM_available"
 
@@ -204,6 +217,9 @@ def regular():
 
 
 def main():
+
+    # os.system('SBATCH -p node -n 1')
+
     infile1 = sys.argv[1]
     infile2 = sys.argv[2]
     new_location = sys.argv[3] == 'there' # will ask for directory location if True
@@ -274,10 +290,16 @@ def main():
     else:
         coverage = 0
 
+# Shortening fastq-files if the coverage can be reached with less
     if coverage != wanted_coverage:
-        outfile1, outfile2 = trim_fastq(infile1, infile2, reads_needed, common_name)
-        infile1 = outfile1
-        infile2 = outfile2
+        time = currenttime()+'\n'
+        log.writelines(time)
+       
+        outfile1_shorten, outfile2_shorten, shorten_lines = shorten_fastq(infile1, infile2, reads_needed, common_name)
+        log.writelines(shorten_lines)
+        
+        infile1 = outfile1_shorten
+        infile2 = outfile2_shorten
 
 # Spades
     if run_spades:
@@ -291,10 +313,15 @@ def main():
     time = currenttime()
     log.writelines(time)
 
+    # input file found here: finalpath/SRR18825428_spades/SRR18825428.fasta
+    
 
 # Move files to correct folder
     os.system('mv ' + outfile1_trim + ' ' + outfile2_trim + ' fastp.html fastp.json ' + str(finalpath))
     log.writelines('Trimmed fastp output files moved to directory\n\n')
+
+    os.system(f'mv {outfile1_shorten} {outfile2_shorten} {finalpath}')
+    log.writelines(f'Shortened fastq files from shorten_fastq function moved to directory\n\n')
 
 # Close and move the logfile to the correct directory
     log.close()
