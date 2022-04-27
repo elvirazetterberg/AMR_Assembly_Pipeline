@@ -85,7 +85,7 @@ def reads_for_coverage(fastq_file, wanted_coverage, genome_size):
                 lenlist = re.findall('(length=)[1-9]+', line)
                 if len(lenlist) > 0:
                     lenlist2 = lenlist[0].split('=')
-                    readlength = int(lenlist[1])
+                    readlength = int(lenlist2[1])
                     total_bases += readlength
 
             elif readlength == 0 and row_counter == 2:
