@@ -218,7 +218,7 @@ def main():
             log.writelines(time)
 
             with open('report_kraken.csv', 'rb') as kraken_report: # add "or die" or similar? see old pipeline
-                result_reader = csv.reader(kraken_report, delimiter='  ')
+                result_reader = csv.reader(kraken_report, delimiter=' ')
                 result_reader.next()
                 for row in result_reader:
                     for (i,v) in enumerate(row):
