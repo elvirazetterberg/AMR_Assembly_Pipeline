@@ -228,9 +228,10 @@ def main():
             #print(columns[0])
 
                 df = pd.read_csv(kraken_report, header=None)
-                column1 = df.iloc[:,1]
-                column3 = df.iloc[:,3]
-                column6 = df.iloc[:,6]
+                #Due to python indexing, the enumerating of the columns starts at 0
+                column1 = df.iloc[:,0]
+                column3 = df.iloc[:,2]
+                column6 = df.iloc[:,5]
 
                 short_report = pd.concat([column1, column3, column6], axis=1)
 
