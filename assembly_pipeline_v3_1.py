@@ -232,7 +232,7 @@ def main():
                 column3 = df.iloc[:,3]
                 column6 = df.iloc[:,6]
 
-                short_report = pd.concat([column1, column3, column6] axis=1)
+                short_report = pd.concat([column1, column3, column6], axis=1)
 
                 print(short_report)
 
