@@ -79,7 +79,7 @@ def reads_for_coverage(fastq_file, wanted_coverage, genome_size):
     read_counter = 0
     row_counter = 1 # goes between 1 and 4
     
-    with open(fastq_file, 'rt') as file:
+    with open(fastq_file, 'rb') as file:
         for line in file:
             if '@' in line:
                 lenlist = re.findall('(length=)[1-9]+', line)
@@ -122,7 +122,7 @@ def trim_fastq(fastq1_file, fastq2_file, reads_needed, common_name):
     newname1 = f'X_{common_name}_1.fq.gz'
     newname2 = f'X_{common_name}_2.fq.gz'
     
-    with gzip.open(fastq1_file, 'rt') as trim_me:
+    with gzip.open(fastq1_file, 'rt') as trim_me: # maybe change to 'rb'
         newfile = ''
         for i, line in enumerate(trim_me):
             newfile += line
