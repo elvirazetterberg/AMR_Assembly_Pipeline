@@ -6,7 +6,7 @@ import re
 
 # Start by parsing the following command through the terminal, choosing only one option in each case:
 # 'python assembly_pipeline_v2.py infile1/folder(???) infile2/none(???) here/there regular/parallel trim/notrim kraken/nokraken ariba/noariba wanted_coverage genome_size pilon/nopilon threads RAM'
-# go-to:
+# test run:
 # python assembly_pipeline_v2.py SRR18825428_1.fastq.gz SRR18825428_2.fastq.gz here regular trim kraken ariba 40 124000000 pilon 0 0
 
 '''OPTIONS'''
@@ -79,7 +79,7 @@ def reads_for_coverage(fastq_file, wanted_coverage, genome_size):
     read_counter = 0
     row_counter = 1 # goes between 1 and 4
     
-    with open(fastq_file, 'r') as file:
+    with open(fastq_file, 'rt') as file:
         for line in file:
             if '@' in line:
                 lenlist = re.findall('(length=)[1-9]+', line)
