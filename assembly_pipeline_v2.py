@@ -79,7 +79,7 @@ def reads_for_coverage(fastq_file, wanted_coverage, genome_size):
     read_counter = 0
     row_counter = 1 # goes between 1 and 4
     
-    with open(fastq_file, 'rb') as file:
+    with gzip.open(fastq_file, 'rt') as file:
         for line in file:
             if '@' in line:
                 lenlist = re.findall('(length=)[1-9]+', line)
