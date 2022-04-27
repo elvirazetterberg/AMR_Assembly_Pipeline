@@ -7,7 +7,7 @@ import re
 # Start by parsing the following command through the terminal, choosing only one option in each case:
 # 'python assembly_pipeline_v2.py infile1/folder(???) infile2/none(???) here/there regular/parallel trim/notrim kraken/nokraken ariba/noariba wanted_coverage genome_size pilon/nopilon threads RAM'
 # go-to:
-# python assembly_pipeline_v2.py SRR18825428_1.fastq.gz SRR18825428_2.fastq.gz here regular trim kraken ariba 40 124000 pilon 0 0
+# python assembly_pipeline_v2.py SRR18825428_1.fastq.gz SRR18825428_2.fastq.gz here regular trim kraken ariba 40 124000000 pilon 0 0
 
 '''OPTIONS'''
 # infile1
@@ -269,13 +269,13 @@ def main():
     if run_spades:
         time = currenttime()+'\n'
         log.writelines(time)
-        coverage, reads_needed, coverage_lines = reads_for_coverage()
+        coverage, reads_needed, coverage_lines = reads_for_coverage(infile1, wanted_coverage, genome_size)
         log.writelines(coverage_lines)
     else:
         coverage = 0
 
     if coverage != wanted_coverage:
-        outfile1, outfile2 = trim_fastq(infile1, infile2, common_name)
+        outfile1, outfile2 = trim_fastq(infile1, infile2, reads_needed, common_name)
         infile1 = outfile1
         infile2 = outfile2
 
