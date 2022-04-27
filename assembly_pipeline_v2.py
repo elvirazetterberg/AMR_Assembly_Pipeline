@@ -373,6 +373,8 @@ def main():
     from_spades = f'{assembly_path}/{common_name}.fasta'
     
     info_df, infolines = info(from_spades)
+
+    log.writelines(infolines)
     # If we have multiple info_df then use pd.concat([info_df1, info_df2], axis=0) to stack the 2nd below the 1st.
     # This is useful when running in parallel.
     
