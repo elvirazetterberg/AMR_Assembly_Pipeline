@@ -4,6 +4,8 @@ from datetime import datetime
 import gzip
 import re
 import csv
+import pandas as pd
+
 
 # Start by parsing the following command through the terminal, choosing only one option in each case:
 # 'python assembly_pipeline_v2.py infile1/folder(???) infile2/none(???) here/there regular/parallel trim/notrim kraken/nokraken ariba/noariba wanted_coverage genome_size pilon/nopilon threads RAM'
@@ -218,15 +220,22 @@ def main():
             log.writelines(time)
 
             with open('report_kraken.csv', 'rb') as kraken_report: # add "or die" or similar? see old pipeline
-                result_reader = csv.reader(kraken_report, delimiter=' ')
-               # result_reader.next()
-                for row in result_reader:
-                    for (i,v) in enumerate(row):
-                        columns[i].append(v)
-            print(columns[0])
+            #    result_reader = csv.reader(kraken_report, delimiter=' ')
+            #   # result_reader.next()
+            #    for row in result_reader:
+            #        for (i,v) in enumerate(row):
+            #            columns[i].append(v)
+            #print(columns[0])
 
+                df = pd.read_csv(kraken_report, header=None)
+                column1 = df.iloc[:,1]
+                column3 = df.iloc[:,3]
+                column6 = df.iloc[:,6]
 
-            
+                short_report = pd.concat([column1, column3, column6] axis=1)
+
+                print(short_report)
+
             #    kraken_report.readlines()
 
 # Number of reads to match the wanted coverage
