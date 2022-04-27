@@ -1,8 +1,11 @@
+from email.mime import base
 import sys
 import os
 from datetime import datetime
 import gzip
 import re
+from matplotlib.colors import from_levels_and_colors
+import pandas as pd
 
 # Start by parsing the following command through the terminal, choosing only one option in each case:
 # 'python assembly_pipeline_v2.py infile1/folder(???) infile2/none(???) here/there regular/parallel trim/notrim kraken/nokraken ariba/noariba wanted_coverage genome_size pilon/nopilon threads RAM'
@@ -176,33 +179,75 @@ def spades_func(file1, file2, path_spades, common_name, finalpath): # threads, R
     loglines += 'SPAdes finished.\n'
     loglines += f'All output files can be found here: {assembly_path}\n\n'
 
-    return loglines
+    return assembly_path, loglines
 
 def pilon_func():
     pass
 
-def info(assembly_fasta):
+def info(spades_assembly):
     # Output som pandas table for att satta ihop alla strains till en sammanstalld csv-fil, 
     # och varje strain till var sin csv-fil
 
-    loglines = 'Looking at the metrics of assembly_fasta'
+    loglines = 'Looking at the metrics of assembly_fasta\n\n'
 
-    number_of_contigs, bases_in_contig, total_consensus = 0, 0, 0
-	#@contig_lengths = ""
-    N50, non_base, number_AT, number_GC = 0, 0, 0, 0
-	#@GC = ""
-	#@sequence = "";
-    a, b = 0, 0
-	#@sorted_contig_lengths = ""
-    temp, N50_temp_var, contigs_over_1000, total_number_bases = 0, 0, 0, 0
+    number_of_contigs, bases_in_contig, total_bases = 0, 0, 0
+    contig_lengths = []
+    non_base, number_AT, number_GC = 0, 0, 0, 0
+    contigs_over_1000 = 0
 
-    assembly = open(assembly_fasta, 'r')
-    for line in assembly:
-        if '>' in line:
-            # bla...
-            pass
+    # Loop through and get metrics
+    with open(spades_assembly, 'r') as s:
+        for line in s:
+            if '>' in line:
+                number_of_contigs += 1
+                total_bases += bases_in_contig
 
-    return loglines
+                if bases_in_contig != 0:
+                    contig_lengths.append(bases_in_contig)
+                    if bases_in_contig >= 1000:
+                        contigs_over_1000 += 1
+
+                bases_in_contig = 0 # resets
+
+            else:
+                bases_in_contig += len(line)
+                for base in line:
+                    if base == 'A' or base == 'T':
+                        number_AT += 1
+                    elif base == 'G' or base == 'C':
+                        number_GC += 1
+                    else:
+                        non_base += 1
+    
+    loglines += f'The number of contigs: {number_of_contigs}, the total number of bases: {total_bases}\n\n'
+
+    sorted_contig_lengths = contig_lengths.sort()
+    longest = sorted_contig_lengths[0]
+    loglines += f'Longest contig: {longest}\n'
+    loglines += f'Contigs longer than 1 kb: {contigs_over_1000}'
+
+    # N50
+    temp = 0
+    while temp <= total_bases/2:
+        for length in sorted_contig_lengths:
+            temp += length
+            N_50 = length
+    
+    loglines += f'N50: {N_50}\n'
+
+    # GC-content
+    GC = number_GC/(number_GC + number_AT)*100
+    loglines += f'The GC-content of the sequence is {GC}. {non_base} non-base characters were excluded from GC-calculation\n'
+
+    loglines += f'-----------------------Metrics finished-----------------------'
+
+    # PLACE ALL INFO IN PANDAS TABLE
+    data = {'Total nr bases': total_bases, 'Nr contigs': number_of_contigs, 'Longest contig': longest, 
+    'Nr contigs > 1kb': contigs_over_1000, 'N50':N_50, 'GC-content': GC}
+
+    info_df = pd.DataFrame(data)
+
+    return info_df, loglines
 
 
 # function that runs multiple strains in parallel. Inputs are all sys.argv[]
@@ -236,6 +281,11 @@ def main():
     run_spades = wanted_coverage != 0
     common_name = shortname(infile1) # until here only work if not parallel
 
+    if pilon and run_spades == False: # Since pilon requires spades output, this 
+        pilon = False
+        pilon_lines = 'Pilon not run since SPAdes was not run'
+
+    ''' -------------------CHANGE !?!?!?!----------------------- '''
 # Hardcoded
     path_tools = '/proj/uppmax2022-2-14/private/campy_pipeline/assembly/verktyg'
     path_spades = path_tools + '/SPAdes-3.15.4-Linux/bin'
@@ -258,7 +308,7 @@ def main():
     lines += 'All outputs will be saved in the new directory.\n\n'
     log.writelines(lines)
 
-# Parallel
+# Run in parallel
     # if parallel:
     # parallelize()
 
@@ -306,14 +356,25 @@ def main():
         time = currenttime()+'\n'
         log.writelines(time)
 
-        spades_lines = spades_func(infile1, infile2, path_spades, common_name, finalpath)
+        assembly_path, spades_lines = spades_func(infile1, infile2, path_spades, common_name, finalpath)
         log.writelines(spades_lines)
 
 # Pilon
-    time = currenttime()
+    time = currenttime()+'\n'
     log.writelines(time)
+    pilon_lines += '---Write something here---'
 
     # input file found here: finalpath/SRR18825428_spades/SRR18825428.fasta
+
+# Info/metrics
+    time = currenttime()+'\n'
+    log.writelines(time)
+
+    from_spades = f'{assembly_path}/{common_name}.fasta'
+    
+    info_df, infolines = info(from_spades)
+    # If we have multiple info_df then use pd.concat([info_df1, info_df2], axis=0) to stack the 2nd below the 1st.
+    # This is useful when running in parallel.
     
 
 # Move files to correct folder
@@ -322,6 +383,10 @@ def main():
 
     os.system(f'mv {outfile1_shorten} {outfile2_shorten} {finalpath}')
     log.writelines(f'Shortened fastq files from shorten_fastq function moved to directory\n\n')
+
+    # OBS OBS convert to csv later instead
+    os.system(f'mv {info_df} {finalpath}')
+    log.writelines(f'Dataframe moved')
 
 # Close and move the logfile to the correct directory
     log.close()
