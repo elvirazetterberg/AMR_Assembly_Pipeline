@@ -3,6 +3,7 @@ import os
 from datetime import datetime
 import gzip
 import re
+import csv
 
 # Start by parsing the following command through the terminal, choosing only one option in each case:
 # 'python assembly_pipeline_v2.py infile1/folder(???) infile2/none(???) here/there regular/parallel trim/notrim kraken/nokraken ariba/noariba wanted_coverage genome_size pilon/nopilon threads RAM'
@@ -209,14 +210,24 @@ def main():
             #system ("kraken2 --db $kraken_DB --threads $threads_available --output $filename1_short.kraken.out --report $filename1_short.kraken.report --paired $fastqfile1 $fastqfile2");
             # Add later lol --threads {threads_available}
             # in the old pipeline they have two names for the input (fastqfile1 and filename1_short) and I do not know why
-            krakeninput = f'kraken2 --db {path_kraken} --output output_test.kraken.out --report output_test.kraken.report --paired {infile1} {infile2}'
+            #krakeninput = f'kraken2 --db {path_kraken} --output output_test.kraken.out --report output_test.kraken.report --paired {infile1} {infile2}'
+            krakeninput = f'kraken2 --db {path_kraken} --output out_kraken.csv --report report_kraken.csv --paired {infile1} {infile2}'
             os.system(krakeninput)
 
             time = currenttime()
             log.writelines(time)
 
-            with open('output_test.kraken.report', 'r') as kraken_report: # add "or die" or similar? see old pipeline
-                kraken_report.readlines()
+            with open('report_kraken.csv', 'rb') as kraken_report: # add "or die" or similar? see old pipeline
+                result_reader = csv.reader(kraken_report, delimiter='  ')
+                result_reader.next()
+                for row in result_reader:
+                    for (i,v) in enumerate(row):
+                        columns[i].append(v)
+            print(columns[0])
+
+
+            
+            #    kraken_report.readlines()
 
 # Number of reads to match the wanted coverage
     if spades:
