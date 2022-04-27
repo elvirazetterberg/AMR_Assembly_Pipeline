@@ -212,7 +212,7 @@ def main():
     kraken = sys.argv[6] == 'kraken'
     ariba = sys.argv[7] == 'ariba'
     wanted_coverage = int(sys.argv[8]) # if wanted coverage == 0, then don't run spades
-    genome_size = sys.argv[9]
+    genome_size = int(sys.argv[9])
     pilon = sys.argv[10] == 'pilon'
     threads = sys.argv[11]
     RAM = sys.argv[12]
