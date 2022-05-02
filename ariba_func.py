@@ -62,7 +62,37 @@ def shortname(filename):
     return short
 
 
+def ariba(infile1,infile2,db_ariba):
+    for db_name in db_ariba[1:-1].split(','): #klumpigt? as sysargv makes input a string, it is separated into a list here.
+        
+        #OBS when making parallell the naming of files must take this into account. Right now Im deleting the privious runs
 
+        #if there's allready an existing db, lite fult gjort?
+        # In the pearlpipeline it says "$test_CARD = "CARD_reference_dataset_downloaded"; What does it mean? 
+
+        if os.path.exists(f'out.{db_name}.fa'): 
+            loglines=f'{currenttime()}: Database {db_name} allready downloaded\n'
+            os.system(f"rm -rf out.run.{db_name}") # är detta smart sätt att göra det?
+
+        else: # if database not downloaded. troligen onädigt i framtiden
+            rm_db=input(f'Please note that running this will remove all existing files starting with "out.{db_name}". [y]/n?') 
+            if rm_db.lower().startswith("y")==False:
+                
+                exit() 
+            else:
+                os.system(f"rm -rf out.{db_name}*")
+
+            loglines= f'{currenttime()} Downloading database {db_name}\n'
+            os.system(f"ariba getref {db_name} out.{db_name}")
+
+            loglines+=f'{currenttime()} Preparing references with prefix out.{db_name} \n'
+            os.system(f"ariba prepareref -f out.{db_name}.fa -m out.{db_name}.tsv out.{db_name}.prepareref")
+
+        loglines +=f'{currenttime()}: Running ariba on {db_name}\n'
+        os.system(f"ariba run out.{db_name}.prepareref {infile1} {infile2} out.run.{db_name}")
+
+    loglines+=f'{currenttime()}: Ariba done.\n'
+    return loglines
 #-------------------------------------------------------------------------------------------------------
  #Pipeline
 #-------------------------------------------------------------------------------------------------------
@@ -103,37 +133,7 @@ def main():
 
     if ariba:
         log.writelines(f'=================================\n{currenttime()}: Ariba\n=================================\n')
-
-        for db_name in db_ariba[1:-1].split(','): #klumpigt? as sysargv makes input a string, it is separated into a list here.
-            
-            #OBS when making parallell the naming of files must take this into account. Right now Im deleting the privious runs
-
-            #if there's allready an existing db, lite fult gjort?
-            # In the pearlpipeline it says "$test_CARD = "CARD_reference_dataset_downloaded"; What does it mean? 
-
-            if os.path.exists(f'out.{db_name}.fa'): # detta funkar inte xd
-                log.writelines(f'{currenttime()}: Database {db_name} allready downloaded\n')
-                print('already downloaded')
-                os.system(f"rm -rf out.run.{db_name}") # är detta smart sätt att göra det?
-
-            else: # if database not downloaded. troligen onädigt i framtiden
-                rm_db=input(f'Please note that running this will remove all existing files starting with "out.{db_name}". [y]/n?') 
-                if rm_db.lower().startswith("y")==False:
-                    
-                    exit() 
-                else:
-                    os.system(f"rm -rf out.{db_name}*")
-
-                log.writelines( f'{currenttime()} Downloading database {db_name}\n')
-                os.system(f"ariba getref {db_name} out.{db_name}")
-
-                log.writelines(f'{currenttime()} Preparing references with prefix out.{db_name} \n')
-                os.system(f"ariba prepareref -f out.{db_name}.fa -m out.{db_name}.tsv out.{db_name}.prepareref")
-
-            log.writelines(f'{currenttime()}: Running ariba on {db_name}\n')
-            os.system(f"ariba run out.{db_name}.prepareref {infile1} {infile2} out.run.{db_name}")
-
-    log.writelines(f'{currenttime()}: Ariba done.\n')
+        log.writelines(ariba(infile1,infile2, db_ariba))
 
 
 
