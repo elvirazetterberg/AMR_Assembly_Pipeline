@@ -238,7 +238,7 @@ def main():
 
                 #df = pd.read_csv(out_filename, header=None)
                 print(df.shape)
-                print(out_filename.shape)
+                #print(out_filename.shape)
 
                 #Due to python indexing, the enumerating of the columns starts at 0
                 short_report = out_filename.iloc[:, [0, 2, 5]]
