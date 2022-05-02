@@ -213,7 +213,7 @@ def main():
             # Add later lol --threads {threads_available}
             # in the old pipeline they have two names for the input (fastqfile1 and filename1_short) and I do not know why
             #krakeninput = f'kraken2 --db {path_kraken} --output output_test.kraken.out --report output_test.kraken.report --paired {infile1} {infile2}'
-            krakeninput = f'kraken2 --db {path_kraken} --output out_kraken.out --report report_kraken.txt --paired {infile1} {infile2}'
+            krakeninput = f'kraken2 --db {path_kraken} --output out_kraken.out --report report_kraken.report --paired {infile1} {infile2}'
             os.system(krakeninput)
 
             time = currenttime()
@@ -221,7 +221,7 @@ def main():
 
             #csv_kraken = r"kraken_report.csv"
 
-            with open('report_kraken.txt', 'r') as kraken_report: # add "or die" or similar? see old pipeline
+            with open('report_kraken.report', 'rb') as kraken_report: # add "or die" or similar? see old pipeline
             #    result_reader = csv.reader(kraken_report, delimiter=' ')
             #   # result_reader.next()
             #    for row in result_reader:
