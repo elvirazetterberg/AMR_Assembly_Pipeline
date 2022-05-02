@@ -401,14 +401,15 @@ def main():
         log.writelines(spades_lines)
 
 # Pilon
-    time = currenttime()+'\n'
-    log.writelines(time)
+    if pilon:
+        time = currenttime()+'\n'
+        log.writelines(time)
 
-    fastafile = f'{assembly_path}/{common_name}.fasta'
-    pilon_lines = pilon_func(fastafile, infile1, infile2, common_name, threads, assembly_path)
-    
-    log.writelines(pilon_lines)
-    # input file found here: assembly_path/SRR18825428.fasta
+        fastafile = f'{assembly_path}/{common_name}.fasta'
+        pilon_lines = pilon_func(fastafile, infile1, infile2, common_name, threads, assembly_path)
+        
+        log.writelines(pilon_lines)
+        # input file found here: assembly_path/SRR18825428.fasta
 
 # Info/metrics
     time = currenttime()+'\n'
