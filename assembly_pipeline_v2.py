@@ -1,38 +1,36 @@
-from email.mime import base
 import sys
 import os
 from datetime import datetime
 import gzip
 import re
-from matplotlib.colors import from_levels_and_colors
 import pandas as pd
 
 # Start by parsing the following command through the terminal, choosing only one option in each case:
 # 'python assembly_pipeline_v2.py infile1/folder(???) infile2/none(???) here/there regular/parallel trim/notrim kraken/nokraken ariba/noariba wanted_coverage genome_size pilon/nopilon threads RAM'
-# test run:
-# python assembly_pipeline_v2.py SRR18825428_1.fastq.gz SRR18825428_2.fastq.gz here regular trim kraken ariba 40 124000000 pilon 0 0
 
-# Snabbare?
-# python assembly_pipeline_v2.py SRR18825428_1.fastq.gz SRR18825428_2.fastq.gz here regular trim kraken ariba 40 124000000 pilon 0 0 #SBATCH -p node -n 1
+# test run:
+# python assembly_pipeline_v2.py SRR18825428_1.fastq.gz SRR18825428_2.fastq.gz here regular trim kraken ariba 40 124000000 pilon 40 0
 
 '''OPTIONS'''
-# infile1
+# infile1 / folder?? HOW DOES GENOME COVERAGE WORK THEN?
+# infile2 / None ??
 # - here/there: Where should all outputs be saved? If 'here' a new directory is created in 
 # the current directory. If 'there' a path will be asked for.
 # - regular/parallel: regular means running only one strain, parallel means running multiple strains
 # - trim/notrim: trim means we run fastp, notrim means that we don't
-# - kraken/nokraken
-# - ariba/noariba
-# - wanted_coverage
-# - genome_size
-# - pilon/nopilon
-# - threads
-# - RAM
+# - kraken/nokraken: choose whether kraken should be run or not
+# - ariba/noariba: choose whether to align AMR-genes with ariba
+# - wanted_coverage: what coverage is requested? If 0, no assembly is performed
+# - genome_size: what is the genome size of the input raw reads?
+# - pilon/nopilon: choose whether to run pilon or not. Does not run if spades does not run (0 wanted coverage)
+# - threads: maximum threads available
+# - RAM: how much RAM that is available
 
 
-''' Function to create directory where all outputs from the pipeline are placed. 
-Date and time specific'''
 def directory(date, time, there = False):
+    
+    ''' Function to create directory where all outputs from the pipeline are placed. 
+    Date and time specific'''
 
     # Change the format of time from eg. 09:13:07.186006 to 09h13m07s
     stringtime = time[:2]+'h'+time[3:5]+'m'+time[6:8]+'s'
@@ -54,14 +52,19 @@ def directory(date, time, there = False):
     return finalpath
 
 def currenttime():
+    '''Function that returns a string with the current time.'''
     time = str(datetime.time(datetime.now()))
     return time
 
 def shortname(filename):
+    '''Function that take a filename and returns a shorter version 
+    including only the first continuous word-number sequence.'''
     short = re.search('[a-zA-Z1-9]+', filename).group()
     return short
 
 def fastp_func(infile1, infile2, common_name):
+    '''Function that takes two raw reads fastq files, one forward (1, right) and one reverse(2, left)
+    and returns two trimmed fastq files as well as quality control documentation.'''
 
     loglines = f'Fastp started with {infile1} and {infile2}\n'
 
@@ -77,7 +80,8 @@ def fastp_func(infile1, infile2, common_name):
     return outfile1, outfile2, loglines
 
 def reads_for_coverage(fastq_file, wanted_coverage, genome_size):
-    
+    '''Function that checks whether the requested coverage can be reached with the input
+    files, returning the maximum coverage if this is not the case.'''
     loglines = (f'Running: reads_for_coverage')
     loglines += f'Checking if coverage can be achieved \n\n'
 
@@ -129,7 +133,9 @@ def reads_for_coverage(fastq_file, wanted_coverage, genome_size):
     return coverage, reads_needed, loglines
 
 def shorten_fastq(fastq1_file, fastq2_file, reads_needed, common_name):
-    
+    '''Function that shortens the fastq files to only be long enough to reach 
+    the requested coverage.'''
+
     loglines = f'shorten_fastq started to shorten {fastq1_file} and {fastq2_file} to only match wanted coverage.\n\n'
 
     lines_needed = reads_needed*4
@@ -160,7 +166,8 @@ def shorten_fastq(fastq1_file, fastq2_file, reads_needed, common_name):
 
     return newname1, newname2, loglines
 
-def spades_func(file1, file2, path_spades, common_name, finalpath): # threads, RAM
+def spades_func(file1, file2, path_spades, common_name, finalpath, threads): # threads, RAM
+    '''Function that runs SPAdes to assemble contigs from short reads.'''
 
     loglines = 'SPAdes started\n'
 
@@ -168,7 +175,7 @@ def spades_func(file1, file2, path_spades, common_name, finalpath): # threads, R
     assembly_path = f'{finalpath}/{common_name}_spades'
 
     # commandline = '#SBATCH -p node -n 1 \n'
-    commandline = f'python {path_spades}/spades.py --careful -o {assembly_path} --pe1-1 {file1} --pe1-2 {file2}'
+    commandline = f'python {path_spades}/spades.py --careful -o {assembly_path} --pe1-1 {file1} --pe1-2 {file2} -t {threads}'
     os.system(commandline)
     #"spades.py --careful -o $filename1_short\_$wanted_coverage\X_spades --pe1-1 $read1_output --pe1-2 $read2_output -t $threads_available -m $RAM_available"
 
@@ -181,10 +188,25 @@ def spades_func(file1, file2, path_spades, common_name, finalpath): # threads, R
 
     return assembly_path, loglines
 
-def pilon_func():
-    pass
+def pilon_func(fastafile, fasta1, fasta2, common_name, threads):
+    '''Function that runs Pilon on contigs-file from SPAdes to 
+    polish and assemble further.'''
+
+    loglines = 'Pilon started\n'
+    loglines += f'Input files: {fastafile}, {fasta1}, {fasta2}\n'
+
+    bowtie_build = f'bowtie2-build -f --threads {threads} --quiet {fastafile} {common_name}'
+
+    # inputs the two shortened fasta-files, if available
+    bowtie = f'bowtie2 -x {common_name} -1 {fasta1} -2 {fasta2} -S $filename1_short.sam --phred33 --very-sensitive-local --no-unal -p {threads}'
+
+
+    return loglines
 
 def info(spades_assembly):
+    '''Function that uses an assembly-file from SPAdes of Pilon 
+    and returns the metrics of that assembly.'''
+
     # Output som pandas table for att satta ihop alla strains till en sammanstalld csv-fil, 
     # och varje strain till var sin csv-fil
 
@@ -283,10 +305,10 @@ def main():
 
     if pilon and run_spades == False: # Since pilon requires spades output, this 
         pilon = False
-        pilon_lines = 'Pilon not run since SPAdes was not run'
+        pilon_lines = 'Pilon not run since SPAdes was not run (!)\n\n'
 
     ''' -------------------CHANGE !?!?!?!----------------------- '''
-# Hardcoded
+# Hardcoded, location of non-conda tools
     path_tools = '/proj/uppmax2022-2-14/private/campy_pipeline/assembly/verktyg'
     path_spades = path_tools + '/SPAdes-3.15.4-Linux/bin'
 
@@ -316,9 +338,6 @@ def main():
     if run_fastp:
         time = currenttime()+'\n'
         log.writelines(time)
-
-        # infile1 = input('Give the fastq, gzipped forward file you want for fastp: ')
-        # infile2 = input('Give the fastq, gzipped reverse file you want for fastp: ')
 
         outfile1_trim, outfile2_trim, fastp_lines = fastp_func(infile1, infile2, common_name)
         log.writelines(fastp_lines)
@@ -356,7 +375,7 @@ def main():
         time = currenttime()+'\n'
         log.writelines(time)
 
-        assembly_path, spades_lines = spades_func(infile1, infile2, path_spades, common_name, finalpath)
+        assembly_path, spades_lines = spades_func(infile1, infile2, path_spades, common_name, finalpath, threads)
         log.writelines(spades_lines)
 
 # Pilon
