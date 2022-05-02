@@ -219,9 +219,9 @@ def main():
             time = currenttime()
             log.writelines(time)
 
-            csv_kraken = r"kraken_report.csv"
+            #csv_kraken = r"kraken_report.csv"
 
-            with open(report_kraken.report, 'r') as kraken_report: # add "or die" or similar? see old pipeline
+            with open(report_kraken.report, 'rb') as kraken_report: # add "or die" or similar? see old pipeline
             #    result_reader = csv.reader(kraken_report, delimiter=' ')
             #   # result_reader.next()
             #    for row in result_reader:
@@ -230,7 +230,7 @@ def main():
             #print(columns[0])
 
             #with open(txt_file, "r") as in_text:
-                out_filename= 'kraken_report.csv'
+                out_filename= 'kraken_csv.csv'
                 
                 df = pd.read_csv(kraken_report, sep="/t")
                 df.to_csv(out_filename, index=False)
