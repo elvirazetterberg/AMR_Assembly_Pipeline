@@ -4,6 +4,8 @@ from datetime import datetime
 import gzip
 import re
 import csv
+import pandas as pd
+
 
 # Start by parsing the following command through the terminal, choosing only one option in each case:
 # 'python assembly_pipeline_v2.py infile1/folder(???) infile2/none(???) here/there regular/parallel trim/notrim kraken/nokraken ariba/noariba wanted_coverage genome_size pilon/nopilon threads RAM'
@@ -211,22 +213,38 @@ def main():
             # Add later lol --threads {threads_available}
             # in the old pipeline they have two names for the input (fastqfile1 and filename1_short) and I do not know why
             #krakeninput = f'kraken2 --db {path_kraken} --output output_test.kraken.out --report output_test.kraken.report --paired {infile1} {infile2}'
-            krakeninput = f'kraken2 --db {path_kraken} --output out_kraken.csv --report report_kraken.csv --paired {infile1} {infile2}'
+            krakeninput = f'kraken2 --db {path_kraken} --output out_kraken.out --report report_kraken.report --paired {infile1} {infile2}'
             os.system(krakeninput)
 
             time = currenttime()
             log.writelines(time)
 
-            with open('report_kraken.csv', 'rb') as kraken_report: # add "or die" or similar? see old pipeline
-                result_reader = csv.reader(kraken_report, delimiter=' ')
-               # result_reader.next()
-                for row in result_reader:
-                    for (i,v) in enumerate(row):
-                        columns[i].append(v)
-            print(columns[0])
+            #csv_kraken = r"kraken_report.csv"
 
+            with open(report_kraken.report, 'rb') as kraken_report: # add "or die" or similar? see old pipeline
+            #    result_reader = csv.reader(kraken_report, delimiter=' ')
+            #   # result_reader.next()
+            #    for row in result_reader:
+            #        for (i,v) in enumerate(row):
+            #            columns[i].append(v)
+            #print(columns[0])
 
-            
+            #with open(txt_file, "r") as in_text:
+                out_filename= 'kraken_csv.csv'
+                
+                df = pd.read_csv(kraken_report, sep="/t")
+                df.to_csv(out_filename, index=False)
+
+                df = pd.read_csv(out_filename, header=None)
+                #Due to python indexing, the enumerating of the columns starts at 0
+                column1 = df.iloc[:,0]
+                column3 = df.iloc[:,2]
+                column6 = df.iloc[:,5]
+
+                short_report = pd.concat([column1, column3, column6], axis=1)
+
+                print(short_report)
+
             #    kraken_report.readlines()
 
 # Number of reads to match the wanted coverage
