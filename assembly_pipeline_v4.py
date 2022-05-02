@@ -249,7 +249,7 @@ def info(spades_assembly):
 
     number_of_contigs, bases_in_contig, total_bases = 0, 0, 0
     contig_lengths = []
-    non_base, number_AT, number_GC = 0, 0, 0, 0
+    non_base, number_AT, number_GC = 0, 0, 0
     contigs_over_1000 = 0
 
     # Loop through and get metrics
