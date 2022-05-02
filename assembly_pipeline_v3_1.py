@@ -233,7 +233,7 @@ def main():
                 out_filename= 'kraken_csv.csv'
                 
                 df = pd.read_csv(kraken_report, sep="/t")
-                df.to_csv(out_filename, index=False)
+                df.to_csv(out_filename, index=False, sep=",")
 
                 df = pd.read_csv(out_filename, header=None)
                 print(df.shape)
