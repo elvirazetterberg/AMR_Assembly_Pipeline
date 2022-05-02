@@ -188,18 +188,39 @@ def spades_func(file1, file2, path_spades, common_name, finalpath, threads): # t
 
     return assembly_path, loglines
 
-def pilon_func(fastafile, fasta1, fasta2, common_name, threads):
+def pilon_func(fastafile, fasta1, fasta2, common_name, threads, finalpath):
     '''Function that runs Pilon on contigs-file from SPAdes to 
     polish and assemble further.'''
-
+    
+    current = os.getcwd()
+    
+    os.chdir(finalpath)
+    
     loglines = 'Pilon started\n'
     loglines += f'Input files: {fastafile}, {fasta1}, {fasta2}\n'
 
     bowtie_build = f'bowtie2-build -f --threads {threads} --quiet {fastafile} {common_name}'
+    os.system(bowtie_build)
 
     # inputs the two shortened fasta-files, if available
-    bowtie = f'bowtie2 -x {common_name} -1 {fasta1} -2 {fasta2} -S $filename1_short.sam --phred33 --very-sensitive-local --no-unal -p {threads}'
+    bowtie = f'bowtie2 -x {common_name} -1 {fasta1} -2 {fasta2} -S {common_name}.sam --phred33 --very-sensitive-local --no-unal -p {threads}'
+    os.system(bowtie)
 
+    os.system(f'samtools view -bh {common_name}.sam > {common_name}.bam')
+    os.system(f'samtools sort {common_name}.bam -o {common_name}.sorted.bam')
+    os.system(f'samtools index {common_name}.sorted.bam')
+
+    time = currenttime()+'\n'
+    loglines += f'Pilon 1.24 started at {time}'
+    
+    os.system(f'pilon --genome {common_name}.fasta --frags {common_name}.sorted.bam --output {common_name}.pilon --changes --threads {threads}')
+    
+    time = currenttime()+'\n'
+    loglines += f'Pilon finished at {time}\n'
+    
+    loglines += f'Corrected fasta file created: {common_name}.pilon.fasta'
+
+    os.chdir(current)
 
     return loglines
 
