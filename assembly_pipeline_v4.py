@@ -79,6 +79,19 @@ def fastp_func(infile1, infile2, common_name):
     loglines += f'{outfile1} \n{outfile2} \nfastp.html \nfastp.json \n\n'
     return outfile1, outfile2, loglines
 
+def kraken(infile1, infile2, threads):
+    ''' Kraken osv'''
+
+        time = currenttime()+'\n'
+        log.writelines(time)
+                
+        loglines = f'Kraken started with {infile1} and {infile2} as input with {threads} threads available \n' 
+        krakeninput = f'kraken2 --db {path_kraken} --threads {threads} --output out_kraken.out --report report_kraken.report --paired {infile1} {infile2}'
+        os.system(krakeninput)
+
+        time = currenttime()
+        log.writelines(time)
+
 def reads_for_coverage(fastq_file, wanted_coverage, genome_size):
     '''Function that checks whether the requested coverage can be reached with the input
     files, returning the maximum coverage if this is not the case.'''
@@ -236,7 +249,7 @@ def info(spades_assembly):
 
     number_of_contigs, bases_in_contig, total_bases = 0, 0, 0
     contig_lengths = []
-    non_base, number_AT, number_GC = 0, 0, 0, 0
+    non_base, number_AT, number_GC = 0, 0, 0
     contigs_over_1000 = 0
 
     # Loop through and get metrics
