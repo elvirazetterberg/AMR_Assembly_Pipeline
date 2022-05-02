@@ -171,8 +171,9 @@ def spades_func(file1, file2, path_spades, common_name, finalpath, threads): # t
 
     loglines = 'SPAdes started\n'
 
-    # To make sure X_spades output is in the correct output directory
-    assembly_path = f'{finalpath}/{common_name}_spades'
+    # To make sure X_spades output is in the correct output directory. 
+    # Pilon output will also be added here
+    assembly_path = f'{finalpath}/{common_name}_assembly'
 
     # commandline = '#SBATCH -p node -n 1 \n'
     commandline = f'python {path_spades}/spades.py --careful -o {assembly_path} --pe1-1 {file1} --pe1-2 {file2} -t {threads}'
@@ -188,13 +189,13 @@ def spades_func(file1, file2, path_spades, common_name, finalpath, threads): # t
 
     return assembly_path, loglines
 
-def pilon_func(fastafile, fasta1, fasta2, common_name, threads, finalpath):
+def pilon_func(fastafile, fasta1, fasta2, common_name, threads, assembly_path):
     '''Function that runs Pilon on contigs-file from SPAdes to 
     polish and assemble further.'''
     
     current = os.getcwd()
     
-    os.chdir(finalpath)
+    os.chdir(assembly_path)
     
     loglines = 'Pilon started\n'
     loglines += f'Input files: {fastafile}, {fasta1}, {fasta2}\n'
@@ -402,9 +403,12 @@ def main():
 # Pilon
     time = currenttime()+'\n'
     log.writelines(time)
-    pilon_lines += '---Write something here---'
 
-    # input file found here: finalpath/SRR18825428_spades/SRR18825428.fasta
+    fastafile = f'{assembly_path}/{common_name}.fasta'
+    pilon_lines = pilon_func(fastafile, infile1, infile2, common_name, threads, assembly_path)
+    
+    log.writelines(pilon_lines)
+    # input file found here: assembly_path/SRR18825428.fasta
 
 # Info/metrics
     time = currenttime()+'\n'
