@@ -221,7 +221,7 @@ def main():
 
             #csv_kraken = r"kraken_report.csv"
 
-            with open(report_kraken.report, 'rb') as kraken_report: # add "or die" or similar? see old pipeline
+            with open('report_kraken.report', 'rb') as kraken_report: # add "or die" or similar? see old pipeline
             #    result_reader = csv.reader(kraken_report, delimiter=' ')
             #   # result_reader.next()
             #    for row in result_reader:
@@ -233,15 +233,18 @@ def main():
                 out_filename= 'kraken_csv.csv'
                 
                 df = pd.read_csv(kraken_report, sep="/t")
-                df.to_csv(out_filename, index=False)
+                df.to_csv(out_filename, index=False, sep=",")
 
                 df = pd.read_csv(out_filename, header=None)
+                print(df.shape)
                 #Due to python indexing, the enumerating of the columns starts at 0
-                column1 = df.iloc[:,0]
-                column3 = df.iloc[:,2]
-                column6 = df.iloc[:,5]
+                short_report = df.iloc[:, [0, 2, 5]]
+                print(short_report.shape)
+                #column1 = df.iloc[:,0]
+                #column3 = df.iloc[:,2]
+                #column6 = df.iloc[:,5]
 
-                short_report = pd.concat([column1, column3, column6], axis=1)
+                #short_report = pd.concat([column1, column3, column6], axis=1)
 
                 print(short_report)
 
