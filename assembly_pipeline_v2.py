@@ -192,9 +192,9 @@ def pilon_func(fastafile, fasta1, fasta2, common_name, threads, finalpath):
     '''Function that runs Pilon on contigs-file from SPAdes to 
     polish and assemble further.'''
     
-    current = os.system{'pwd'}
+    current = os.getcwd()
     
-    os.system(f'cd {finalpath}')
+    os.chdir(finalpath)
     
     loglines = 'Pilon started\n'
     loglines += f'Input files: {fastafile}, {fasta1}, {fasta2}\n'
@@ -219,6 +219,8 @@ def pilon_func(fastafile, fasta1, fasta2, common_name, threads, finalpath):
     loglines += f'Pilon finished at {time}\n'
     
     loglines += f'Corrected fasta file created: {common_name}.pilon.fasta'
+
+    os.chdir(current)
 
     return loglines
 
