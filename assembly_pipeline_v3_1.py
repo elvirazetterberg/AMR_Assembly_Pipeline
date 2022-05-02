@@ -232,13 +232,16 @@ def main():
             #with open(txt_file, "r") as in_text:
                 out_filename= 'kraken_csv.csv'
                 
+                # Something with this part does not work. When printing the shape of df, it is size (157,1) which isn't right
                 df = pd.read_csv(kraken_report, sep="/t")
-                df.to_csv(out_filename, index=False, sep=",")
+                df.to_csv(out_filename, index=False, sep=",") 
 
-                df = pd.read_csv(out_filename, header=None)
+                #df = pd.read_csv(out_filename, header=None)
                 print(df.shape)
+                #print(out_filename.shape)
+
                 #Due to python indexing, the enumerating of the columns starts at 0
-                short_report = df.iloc[:, [0, 2, 5]]
+                short_report = out_filename.iloc[:, [0, 2, 5]]
                 print(short_report.shape)
                 #column1 = df.iloc[:,0]
                 #column3 = df.iloc[:,2]
