@@ -235,7 +235,7 @@ def main():
                 df = pd.read_csv(kraken_report, sep="/t")
                 df.to_csv(out_filename, index=False, sep=",")
 
-                df = pd.read_csv(out_filename, header=None)
+                #df = pd.read_csv(out_filename, header=None)
                 print(df.shape)
                 #Due to python indexing, the enumerating of the columns starts at 0
                 short_report = df.iloc[:, [0, 2, 5]]
