@@ -73,9 +73,10 @@ def fastp_func(infile1, infile2, common_name):
 
     fastpinput = 'fastp -i ' + infile1 + ' -I ' + infile2 + ' -o ' + outfile1 + ' -O ' + outfile2
 
-    terminaltext = ' 2>&1 | tee logfile.txt'
+    terminaltext = ' >> logfile.txt'
 
     os.system(fastpinput+terminaltext)
+    os.system('cat logfile.txt')
 
     loglines += 'Fastp complete. Four output files returned:\n'
     loglines += f'{outfile1} \n{outfile2} \nfastp.html \nfastp.json \n\n'
