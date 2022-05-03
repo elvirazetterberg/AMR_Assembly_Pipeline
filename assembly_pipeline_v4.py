@@ -73,11 +73,13 @@ def fastp_func(infile1, infile2, common_name):
 
     fastpinput = 'fastp -i ' + infile1 + ' -I ' + infile2 + ' -o ' + outfile1 + ' -O ' + outfile2
 
-    os.system(fastpinput)
+    terminaltext = ' | tee fastp_func.txt'
+
+    os.system(fastpinput+terminaltext)
 
     loglines += 'Fastp complete. Four output files returned:\n'
     loglines += f'{outfile1} \n{outfile2} \nfastp.html \nfastp.json \n\n'
-    return outfile1, outfile2, loglines
+    return outfile1, outfile2, loglines, 'fastp_func.txt'
 
 def kraken_func(infile1, infile2, threads, common_name, path_kraken):
     ''' Function that runs Kraken on two raw reads fastq files, one forward (1, right) and one reverse(2, left), 
@@ -380,8 +382,9 @@ def main():
         time = currenttime()+'\n'
         log.writelines(time)
 
-        outfile1_trim, outfile2_trim, fastp_lines = fastp_func(infile1, infile2, common_name)
+        outfile1_trim, outfile2_trim, fastp_lines, terminaltext = fastp_func(infile1, infile2, common_name)
         log.writelines(fastp_lines)
+        os.system(f'mv {terminaltext} {finalpath}')
 
         infile1 = outfile1_trim
         infile2 = outfile2_trim
