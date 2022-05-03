@@ -26,7 +26,6 @@ import pandas as pd
 # - threads: maximum threads available
 # - RAM: how much RAM that is available
 
-
 def directory(date, time, there = False):
     
     ''' Function to create directory where all outputs from the pipeline are placed. 
@@ -73,10 +72,8 @@ def fastp_func(infile1, infile2, common_name):
 
     fastpinput = 'fastp -i ' + infile1 + ' -I ' + infile2 + ' -o ' + outfile1 + ' -O ' + outfile2
 
-    terminaltext = ' >> logfile.txt'
 
-    os.system(fastpinput+terminaltext)
-    os.system('cat logfile.txt')
+    os.system(fastpinput)
 
     loglines += 'Fastp complete. Four output files returned:\n'
     loglines += f'{outfile1} \n{outfile2} \nfastp.html \nfastp.json \n\n'
