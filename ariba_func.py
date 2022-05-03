@@ -62,7 +62,7 @@ def shortname(filename):
     return short
 
 
-def ariba(infile1,infile2,db_ariba):
+def ariba_fun(infile1,infile2,db_ariba):
     for db_name in db_ariba[1:-1].split(','): #klumpigt? as sysargv makes input a string, it is separated into a list here.
         
         #OBS when making parallell the naming of files must take this into account. Right now Im deleting the privious runs
@@ -84,6 +84,7 @@ def ariba(infile1,infile2,db_ariba):
 
             loglines= f'{currenttime()} Downloading database {db_name}\n'
             os.system(f"ariba getref {db_name} out.{db_name}")
+#            os.system(f"ariba getref {db_name} out.{db_name} > lograder ") måste pipea, men vet inte riktigt hur           
 
             loglines+=f'{currenttime()} Preparing references with prefix out.{db_name} \n'
             os.system(f"ariba prepareref -f out.{db_name}.fa -m out.{db_name}.tsv out.{db_name}.prepareref")
@@ -97,7 +98,7 @@ def ariba(infile1,infile2,db_ariba):
  #Pipeline
 #-------------------------------------------------------------------------------------------------------
 
-#call : python3 ariba_test.py /home/alma/Documents/kandidat/genomes/SRR18825428_1.fastq /home/alma/Documents/kandidat/genomes/SRR18825428_2.fastq ariba [vfdb_core]
+#call : python3 ariba_fun.py /home/alma/Documents/kandidat/genomes/SRR18825428_1.fastq /home/alma/Documents/kandidat/genomes/SRR18825428_2.fastq ariba [vfdb_core]
 def main():
     infile1 = sys.argv[1]
     infile2 = sys.argv[2]
@@ -131,9 +132,11 @@ def main():
 #Ariba----------------------------------------------------------------------
 #("Available databases: argannot, card, ncbi, megares, plasmidfinder, resfinder, srst2_argannot, vfdb_core, vfdb_full, virulencefinder")
 
+    #Need to add the output from de command line as part of the logfile
+    #logfile name should be unique aswell!
     if ariba:
         log.writelines(f'=================================\n{currenttime()}: Ariba\n=================================\n')
-        log.writelines(ariba(infile1,infile2, db_ariba))
+        log.writelines(ariba_fun(infile1,infile2, db_ariba))
 
 
 
