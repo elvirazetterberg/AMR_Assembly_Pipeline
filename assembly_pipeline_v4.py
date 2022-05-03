@@ -79,18 +79,19 @@ def fastp_func(infile1, infile2, common_name):
     loglines += f'{outfile1} \n{outfile2} \nfastp.html \nfastp.json \n\n'
     return outfile1, outfile2, loglines
 
-def kraken(infile1, infile2, threads):
-    ''' Kraken osv'''
-
-        time = currenttime()+'\n'
-        log.writelines(time)
+def kraken_func(infile1, infile2, threads, common_name, path_kraken):
+    ''' Function that runs Kraken on two raw reads fastq files, one forward (1, right) and one reverse(2, left), 
+    in order to assign taxonomic labels to the sequences'''
                 
-        loglines = f'Kraken started with {infile1} and {infile2} as input with {threads} threads available \n' 
-        krakeninput = f'kraken2 --db {path_kraken} --threads {threads} --output out_kraken.out --report report_kraken.report --paired {infile1} {infile2}'
-        os.system(krakeninput)
-
-        time = currenttime()
-        log.writelines(time)
+    loglines = f'Kraken started with {infile1} and {infile2} as input with {threads} threads available \n' 
+    kraken_output = f'out_kraken_{common_name}.out'
+    kraken_report = f'report_kraken_{common_name}.report'
+    krakeninput = f'kraken2 --db {path_kraken} --threads {threads} --output {kraken_output} --report {kraken_report} --paired {infile1} {infile2}'
+    
+    os.system(krakeninput)
+    loglines += f'Kraken run finished. Two output files returned:\n'
+    loglines += f'{kraken_output} \n{kraken_report}'
+    return kraken_output, kraken_report, loglines
 
 def reads_for_coverage(fastq_file, wanted_coverage, genome_size):
     '''Function that checks whether the requested coverage can be reached with the input
@@ -346,6 +347,7 @@ def main():
 # Hardcoded, location of non-conda tools
     path_tools = '/proj/uppmax2022-2-14/private/campy_pipeline/assembly/verktyg'
     path_spades = path_tools + '/SPAdes-3.15.4-Linux/bin'
+    path_kraken = path_tools + '/minikraken2_v1_8GB'
 
 # Let's start this pipeline!
     time = currenttime()
@@ -384,6 +386,7 @@ def main():
     if kraken:
         time = currenttime()+'\n'
         log.writelines(time)
+        kraken_func(infile1, infile2, threads, common_name, path_kraken)
 
 # Number of reads to match the wanted coverage
     if run_spades:
