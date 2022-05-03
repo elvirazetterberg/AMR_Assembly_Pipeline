@@ -6,10 +6,10 @@ import re
 import pandas as pd
 
 # Start by parsing the following command through the terminal, choosing only one option in each case:
-# 'python assembly_pipeline_v2.py infile1/folder(???) infile2/none(???) here/there regular/parallel trim/notrim kraken/nokraken ariba/noariba wanted_coverage genome_size pilon/nopilon threads RAM'
+# 'python assembly_pipeline_v4.py infile1/folder(???) infile2/none(???) here/there regular/parallel trim/notrim kraken/nokraken ariba/noariba wanted_coverage genome_size pilon/nopilon threads RAM'
 
 # test run:
-# python assembly_pipeline_v2.py SRR18825428_1.fastq.gz SRR18825428_2.fastq.gz here regular trim kraken ariba 40 124000000 pilon 40 0
+# python assembly_pipeline_v4.py SRR18825428_1.fastq.gz SRR18825428_2.fastq.gz here regular trim kraken ariba 40 124000000 pilon 40 0
 
 '''OPTIONS'''
 # infile1 / folder?? HOW DOES GENOME COVERAGE WORK THEN?
