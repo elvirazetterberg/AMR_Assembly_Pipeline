@@ -412,6 +412,7 @@ def main():
         
         infile1 = outfile1_shorten
         infile2 = outfile2_shorten
+        shortened = True
 
 # Spades
     if run_spades:
@@ -450,18 +451,22 @@ def main():
     
 
 # Move files to correct folder
-    os.system('mv ' + outfile1_trim + ' ' + outfile2_trim + ' fastp.html fastp.json ' + str(finalpath))
-    log.writelines('Trimmed fastp output files moved to directory\n\n')
+    if run_fastp:
+        os.system('mv ' + outfile1_trim + ' ' + outfile2_trim + ' fastp.html fastp.json ' + str(finalpath))
+        log.writelines('Trimmed fastp output files moved to directory\n\n')
+    
+    if shortened:
+        os.system(f'mv {outfile1_shorten} {outfile2_shorten} {finalpath}')
+        log.writelines(f'Shortened fastq files from shorten_fastq function moved to directory\n\n')
 
-    os.system(f'mv {outfile1_shorten} {outfile2_shorten} {finalpath}')
-    log.writelines(f'Shortened fastq files from shorten_fastq function moved to directory\n\n')
-
-    os.system(f'mv {kraken_report} {kraken_output} {finalpath}')
-    log.writelines(f'Kraken report and Kraken output moved to directory\n\n')
+    if kraken:
+        os.system(f'mv {kraken_report} {kraken_output} {finalpath}')
+        log.writelines(f'Kraken report and Kraken output moved to directory\n\n')
 
     # OBS OBS convert to csv later instead
-    os.system(f'mv {info_df} {finalpath}')
-    log.writelines(f'Dataframe moved')
+    # if run_spades:
+    # os.system(f'mv {info_df} {finalpath}')
+    # log.writelines(f'Dataframe moved')
 
 # Close and move the logfile to the correct directory
     log.close()
