@@ -340,6 +340,7 @@ def main():
     RAM = sys.argv[12]
 
     run_spades = wanted_coverage != 0
+    shortened = False # Changed to True if fastq-files are shortened for spades
     common_name = shortname(infile1) # until here only work if not parallel
 
     if pilon and run_spades == False: # Since pilon requires spades output, this 
