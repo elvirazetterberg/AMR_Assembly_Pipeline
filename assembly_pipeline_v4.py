@@ -444,6 +444,9 @@ def main():
     # If we have multiple info_df then use pd.concat([info_df1, info_df2], axis=0) to stack the 2nd below the 1st.
     # This is useful when running in parallel.
     
+    # Save info_df somewhere
+    info_df.to_csv(os.PathLike(f'{finalpath}/{common_name}_metrics'))
+    
 
 # Move files to correct folder
     os.system('mv ' + outfile1_trim + ' ' + outfile2_trim + ' fastp.html fastp.json ' + str(finalpath))
