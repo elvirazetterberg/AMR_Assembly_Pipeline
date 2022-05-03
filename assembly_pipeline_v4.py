@@ -433,19 +433,20 @@ def main():
         # input file found here: assembly_path/SRR18825428.fasta
 
 # Info/metrics
-    time = currenttime()+'\n'
-    log.writelines(time)
+    if run_spades:
+        time = currenttime()+'\n'
+        log.writelines(time)
 
-    from_spades = f'{assembly_path}/{common_name}.fasta'
-    
-    info_df, infolines = info(from_spades)
+        from_spades = f'{assembly_path}/{common_name}.fasta'
+        
+        info_df, infolines = info(from_spades)
 
-    log.writelines(infolines)
-    # If we have multiple info_df then use pd.concat([info_df1, info_df2], axis=0) to stack the 2nd below the 1st.
-    # This is useful when running in parallel.
-    
-    # Save info_df somewhere
-    info_df.to_csv(os.PathLike(f'{finalpath}/{common_name}_metrics'))
+        log.writelines(infolines)
+        # If we have multiple info_df then use pd.concat([info_df1, info_df2], axis=0) to stack the 2nd below the 1st.
+        # This is useful when running in parallel.
+        
+        # Save info_df
+        info_df.to_csv(os.PathLike(f'{finalpath}/{common_name}_metrics'))
     
 
 # Move files to correct folder
