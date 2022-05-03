@@ -84,11 +84,14 @@ def kraken_func(infile1, infile2, threads, common_name, path_kraken):
     in order to assign taxonomic labels to the sequences'''
                 
     loglines = f'Kraken started with {infile1} and {infile2} as input with {threads} threads available \n' 
+
     kraken_output = f'out_kraken_{common_name}.out'
     kraken_report = f'report_kraken_{common_name}.report'
+
     krakeninput = f'kraken2 --db {path_kraken} --threads {threads} --output {kraken_output} --report {kraken_report} --paired {infile1} {infile2}'
     
     os.system(krakeninput)
+
     loglines += f'Kraken run finished. Two output files returned:\n'
     loglines += f'{kraken_output} \n{kraken_report}'
     return kraken_output, kraken_report, loglines
@@ -386,7 +389,9 @@ def main():
     if kraken:
         time = currenttime()+'\n'
         log.writelines(time)
-        kraken_func(infile1, infile2, threads, common_name, path_kraken)
+
+        kraken_output, kraken_report, kraken_lines = kraken_func(infile1, infile2, threads, common_name, path_kraken)
+        log.writelines(kraken_lines)
 
 # Number of reads to match the wanted coverage
     if run_spades:
@@ -446,6 +451,9 @@ def main():
 
     os.system(f'mv {outfile1_shorten} {outfile2_shorten} {finalpath}')
     log.writelines(f'Shortened fastq files from shorten_fastq function moved to directory\n\n')
+
+    os.system(f'mv {kraken_report} {kraken_output} {finalpath}')
+    log.writelines(f'Kraken report and Kraken output moved to directory\n\n')
 
     # OBS OBS convert to csv later instead
     os.system(f'mv {info_df} {finalpath}')
