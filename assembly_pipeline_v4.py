@@ -73,24 +73,30 @@ def fastp_func(infile1, infile2, common_name):
 
     fastpinput = 'fastp -i ' + infile1 + ' -I ' + infile2 + ' -o ' + outfile1 + ' -O ' + outfile2
 
-    os.system(fastpinput)
+    terminaltext = ' | tee fastp_func.txt'
+
+    os.system(fastpinput+terminaltext)
 
     loglines += 'Fastp complete. Four output files returned:\n'
     loglines += f'{outfile1} \n{outfile2} \nfastp.html \nfastp.json \n\n'
-    return outfile1, outfile2, loglines
+    return outfile1, outfile2, loglines, 'fastp_func.txt'
 
-def kraken(infile1, infile2, threads):
-    ''' Kraken osv'''
-
-        time = currenttime()+'\n'
-        log.writelines(time)
+def kraken_func(infile1, infile2, threads, common_name, path_kraken):
+    ''' Function that runs Kraken on two raw reads fastq files, one forward (1, right) and one reverse(2, left), 
+    in order to assign taxonomic labels to the sequences'''
                 
-        loglines = f'Kraken started with {infile1} and {infile2} as input with {threads} threads available \n' 
-        krakeninput = f'kraken2 --db {path_kraken} --threads {threads} --output out_kraken.out --report report_kraken.report --paired {infile1} {infile2}'
-        os.system(krakeninput)
+    loglines = f'Kraken started with {infile1} and {infile2} as input with {threads} threads available \n' 
 
-        time = currenttime()
-        log.writelines(time)
+    kraken_output = f'out_kraken_{common_name}.out'
+    kraken_report = f'report_kraken_{common_name}.report'
+
+    krakeninput = f'kraken2 --db {path_kraken} --threads {threads} --output {kraken_output} --report {kraken_report} --paired {infile1} {infile2}'
+    
+    os.system(krakeninput)
+
+    loglines += f'Kraken run finished. Two output files returned:\n'
+    loglines += f'{kraken_output} \n{kraken_report}'
+    return kraken_output, kraken_report, loglines
 
 def reads_for_coverage(fastq_file, wanted_coverage, genome_size):
     '''Function that checks whether the requested coverage can be reached with the input
@@ -336,6 +342,7 @@ def main():
     RAM = sys.argv[12]
 
     run_spades = wanted_coverage != 0
+    shortened = False # Changed to True if fastq-files are shortened for spades
     common_name = shortname(infile1) # until here only work if not parallel
 
     if pilon and run_spades == False: # Since pilon requires spades output, this 
@@ -346,6 +353,7 @@ def main():
 # Hardcoded, location of non-conda tools
     path_tools = '/proj/uppmax2022-2-14/private/campy_pipeline/assembly/verktyg'
     path_spades = path_tools + '/SPAdes-3.15.4-Linux/bin'
+    path_kraken = path_tools + '/minikraken2_v1_8GB'
 
 # Let's start this pipeline!
     time = currenttime()
@@ -374,8 +382,9 @@ def main():
         time = currenttime()+'\n'
         log.writelines(time)
 
-        outfile1_trim, outfile2_trim, fastp_lines = fastp_func(infile1, infile2, common_name)
+        outfile1_trim, outfile2_trim, fastp_lines, terminaltext = fastp_func(infile1, infile2, common_name)
         log.writelines(fastp_lines)
+        os.system(f'mv {terminaltext} {finalpath}')
 
         infile1 = outfile1_trim
         infile2 = outfile2_trim
@@ -384,6 +393,9 @@ def main():
     if kraken:
         time = currenttime()+'\n'
         log.writelines(time)
+
+        kraken_output, kraken_report, kraken_lines = kraken_func(infile1, infile2, threads, common_name, path_kraken)
+        log.writelines(kraken_lines)
 
 # Number of reads to match the wanted coverage
     if run_spades:
@@ -404,6 +416,7 @@ def main():
         
         infile1 = outfile1_shorten
         infile2 = outfile2_shorten
+        shortened = True
 
 # Spades
     if run_spades:
@@ -425,28 +438,39 @@ def main():
         # input file found here: assembly_path/SRR18825428.fasta
 
 # Info/metrics
-    time = currenttime()+'\n'
-    log.writelines(time)
+    if run_spades:
+        time = currenttime()+'\n'
+        log.writelines(time)
 
-    from_spades = f'{assembly_path}/{common_name}.fasta'
-    
-    info_df, infolines = info(from_spades)
+        from_spades = f'{assembly_path}/{common_name}.fasta'
+        
+        info_df, infolines = info(from_spades)
 
-    log.writelines(infolines)
-    # If we have multiple info_df then use pd.concat([info_df1, info_df2], axis=0) to stack the 2nd below the 1st.
-    # This is useful when running in parallel.
+        log.writelines(infolines)
+        # If we have multiple info_df then use pd.concat([info_df1, info_df2], axis=0) to stack the 2nd below the 1st.
+        # This is useful when running in parallel.
+        
+        # Save info_df
+        info_df.to_csv(os.PathLike(f'{finalpath}/{common_name}_metrics'))
     
 
 # Move files to correct folder
-    os.system('mv ' + outfile1_trim + ' ' + outfile2_trim + ' fastp.html fastp.json ' + str(finalpath))
-    log.writelines('Trimmed fastp output files moved to directory\n\n')
+    if run_fastp:
+        os.system('mv ' + outfile1_trim + ' ' + outfile2_trim + ' fastp.html fastp.json ' + str(finalpath))
+        log.writelines('Trimmed fastp output files moved to directory\n\n')
+    
+    if shortened:
+        os.system(f'mv {outfile1_shorten} {outfile2_shorten} {finalpath}')
+        log.writelines(f'Shortened fastq files from shorten_fastq function moved to directory\n\n')
 
-    os.system(f'mv {outfile1_shorten} {outfile2_shorten} {finalpath}')
-    log.writelines(f'Shortened fastq files from shorten_fastq function moved to directory\n\n')
+    if kraken:
+        os.system(f'mv {kraken_report} {kraken_output} {finalpath}')
+        log.writelines(f'Kraken report and Kraken output moved to directory\n\n')
 
     # OBS OBS convert to csv later instead
-    os.system(f'mv {info_df} {finalpath}')
-    log.writelines(f'Dataframe moved')
+    # if run_spades:
+    # os.system(f'mv {info_df} {finalpath}')
+    # log.writelines(f'Dataframe moved')
 
 # Close and move the logfile to the correct directory
     log.close()
