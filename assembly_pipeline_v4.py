@@ -473,7 +473,7 @@ def main():
 
 # Close and move the logfile to the correct directory
     log.close()
-    os.system('mv logfile '+str(finalpath))
+    os.system('mv logfile.txt '+str(finalpath))
     
 
 if __name__ == '__main__':
