@@ -26,7 +26,6 @@ import pandas as pd
 # - threads: maximum threads available
 # - RAM: how much RAM that is available
 
-
 def directory(date, time, there = False):
     
     ''' Function to create directory where all outputs from the pipeline are placed. 
@@ -73,13 +72,12 @@ def fastp_func(infile1, infile2, common_name):
 
     fastpinput = 'fastp -i ' + infile1 + ' -I ' + infile2 + ' -o ' + outfile1 + ' -O ' + outfile2
 
-    terminaltext = ' | tee fastp_func.txt'
 
-    os.system(fastpinput+terminaltext)
+    os.system(fastpinput)
 
     loglines += 'Fastp complete. Four output files returned:\n'
     loglines += f'{outfile1} \n{outfile2} \nfastp.html \nfastp.json \n\n'
-    return outfile1, outfile2, loglines, 'fastp_func.txt'
+    return outfile1, outfile2, loglines
 
 def kraken_func(infile1, infile2, threads, common_name, path_kraken):
     ''' Function that runs Kraken on two raw reads fastq files, one forward (1, right) and one reverse(2, left), 
@@ -363,7 +361,7 @@ def main():
     finalpath = directory(date, time, new_location)
 
 # Create log file
-    logname = 'logfile'
+    logname = 'logfile.txt'
     log = open(logname, 'w')
 
     lines = 15*'-' + 'LOGFILE' + 15*'-' + '\n\n'
@@ -382,9 +380,8 @@ def main():
         time = currenttime()+'\n'
         log.writelines(time)
 
-        outfile1_trim, outfile2_trim, fastp_lines, terminaltext = fastp_func(infile1, infile2, common_name)
+        outfile1_trim, outfile2_trim, fastp_lines = fastp_func(infile1, infile2, common_name)
         log.writelines(fastp_lines)
-        os.system(f'mv {terminaltext} {finalpath}')
 
         infile1 = outfile1_trim
         infile2 = outfile2_trim
@@ -474,7 +471,7 @@ def main():
 
 # Close and move the logfile to the correct directory
     log.close()
-    os.system('mv logfile '+str(finalpath))
+    os.system('mv logfile.txt '+str(finalpath))
     
 
 if __name__ == '__main__':
