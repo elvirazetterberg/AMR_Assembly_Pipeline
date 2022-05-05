@@ -7,13 +7,13 @@ import re
 import pandas as pd
 
 # Start by parsing the following command through the terminal, choosing only one option in each case:
-# 'python assembly_pipeline_v5.py infile1/folder(???) infile2/none(???) here/there regular/parallel trim/notrim kraken/nokraken ariba/noariba wanted_coverage genome_size pilon/nopilon threads RAM'
+# 'python assembly_pipeline_v5.py infile1/folder(???) infile2/None(???) here/there trim/notrim kraken/nokraken ariba/noariba wanted_coverage genome_size pilon/nopilon threads RAM'
 
 # test run:
-# python assembly_pipeline_v5.py SRR18825428_1.fastq.gz SRR18825428_2.fastq.gz here regular trim kraken noariba [vfdb_core] 40 124000000 pilon 40 0
+# python assembly_pipeline_v5.py SRR18825428_1.fastq.gz SRR18825428_2.fastq.gz here trim kraken noariba [vfdb_core] 40 124000000 pilon 40 0
 # 
 #Lokal Alma:
-# python Pipeline/assembly_pipeline_v5.py /home/alma/Documents/kandidat/genomes/SRR18825428_1.fastq /home/alma/Documents/kandidat/genomes/SRR18825428_2.fastq here nregular ntrim nkraken ariba [vfdb_core] 40 124000000 npilon 40 0
+# python Pipeline/assembly_pipeline_v5.py /home/alma/Documents/kandidat/genomes/SRR18825428_1.fastq /home/alma/Documents/kandidat/genomes/SRR18825428_2.fastq here ntrim nkraken ariba [vfdb_core] 40 124000000 npilon 40 0
 
 
 '''OPTIONS'''
@@ -21,11 +21,10 @@ import pandas as pd
 # infile2 / None ??
 # - here/there: Where should all outputs be saved? If 'here' a new directory is created in 
 # the current directory. If 'there' a path will be asked for.
-# - regular/parallel: regular means running only one strain, parallel means running multiple strains
 # - trim/notrim: trim means we run fastp, notrim means that we don't
 # - kraken/nokraken: choose whether kraken should be run or not
 # - ariba/noariba: choose whether to align AMR-genes with ariba
-# - wanted_coverage: what coverage is requested? If 0, no assembly is performed
+# - wanted_coverage: what coverage is requested? If 0, no assembly is performed.
 # - genome_size: what is the genome size of the input raw reads?
 # - pilon/nopilon: choose whether to run pilon or not. Does not run if spades does not run (0 wanted coverage)
 # - threads: maximum threads available
@@ -331,15 +330,6 @@ def info(spades_assembly):
 
     return info_df
 
-# function that runs multiple strains in parallel. Inputs are all sys.argv[]
-# Return lines for logfile?
-def parallelize():
-    pass
-
-# function that runs everything for only one strain. Inputs are all sys.argv[]
-# Return lines for logfile?
-def regular():
-    pass
 
 def ariba_fun(infile1,infile2,db_ariba):
     for db_name in db_ariba[1:-1].split(','): #klumpigt? as sysargv makes input a string, it is separated into a list here. Also parallell should do all db at same time?
@@ -375,7 +365,7 @@ def ariba_fun(infile1,infile2,db_ariba):
     log_parse(f'Ariba done.\n')
     return
 
-def create_log(finalpath, time, date):
+def create_log(finalpath, time, date, logname):
 
     lines = 15*'-' + 'LOGFILE' + 15*'-' + '\n\n'
     lines += f'New directory created with the adress {finalpath}\n'
@@ -385,58 +375,31 @@ def create_log(finalpath, time, date):
     
     return
 
-def log_parse(string):
+def log_parse(string, logname):
     time = currenttime()
     os.system(f"echo {time}: '{string}\n' >> {logname}")
     return
 
-def main():
-    # os.system('SBATCH -p node -n 1')
-    """
-    path/to/file1 path/to/file2 here nopar notrim nokraken ariba [db1, db2] 0 size nopilon thr ram
-    """
-    infile1 = sys.argv[1]
-    infile2 = sys.argv[2]
-    new_location = sys.argv[3] == 'there' # will ask for directory location if True
-    parallel = sys.argv[4] == 'parallel' # TO BE MODIFIED to run strains in parallel if True
-    run_fastp = sys.argv[5] == 'trim' # will run fastp if True
-    kraken = sys.argv[6] == 'kraken'
-    ariba = sys.argv[7] == 'ariba'
-    db_ariba = sys.argv[8] 
-    wanted_coverage = int(sys.argv[9]) # if wanted coverage == 0, then don't run spades
-    genome_size = int(sys.argv[10])
-    pilon = sys.argv[11] == 'pilon'
-    threads = sys.argv[12]
-    RAM = sys.argv[13]
+# function that runs everything for only one strain. Inputs are all sys.argv[]
+# Return lines for logfile?
 
-    run_spades = wanted_coverage != 0
-    shortened = False # Changed to True if fastq-files are shortened for spades
-    common_name = shortname(infile1) # until here only work if not parallel
-
-    if pilon and run_spades == False: # Since pilon requires spades output, this 
-        pilon = False
-        pilon_lines = 'Pilon not run since SPAdes was not run (!)\n\n'
-
-    ''' -------------------CHANGE !?!?!?!----------------------- '''
-# Hardcoded, location of non-conda tools
+def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, run_spades, shortened, common_name):
+    
+    time = currenttime()
+    date = str(datetime.date(datetime.now()))
 
     path_tools = '/proj/uppmax2022-2-14/private/campy_pipeline/assembly/verktyg'
     path_spades = path_tools + '/SPAdes-3.15.4-Linux/bin'
     path_kraken = path_tools + '/minikraken2_v1_8GB'
 
-# Let's start this pipeline!
-    time = currenttime()
-    date = str(datetime.date(datetime.now()))
-    
-# make directory for output
-    finalpath = directory(date, time, new_location)
+    os.system(f'cd {path}')
 
-# Create log file
-    global logname # maybe not the smartest when parallell? but otherwise need to feed it into every function
+    # Create log file
+    logname = 'logfile.txt' # maybe not the smartest when parallell? but otherwise need to feed it into every function
     # Rename log file with date and time
     stringtime = time[:2]+'h'+time[3:5]+'m'+time[6:8]+'s'
-    logname = 'LOGFILE_' + date + '_' + stringtime
-    create_log(finalpath,time,date)
+    logname = 'LOGFILE' + date + '_' + stringtime
+    create_log(path,time,date)
     print(f'Pipeline started, please refer to logfile "{logname}" for updates.') # add path to logfile later 
 
 # Ariba 
@@ -444,10 +407,6 @@ def main():
         header= '\n'+'='*15 +'ARIBA'+ '='*15 +'\n'
         log_parse(header)
         ariba_fun(infile1,infile2, db_ariba)
-    
-# Run in parallel
-    if parallel:
-        parallelize()
 
 # Fastp
     if run_fastp:
@@ -483,7 +442,7 @@ def main():
     if run_spades:
         header= '\n'+'='*15 +'SPADES'+ '='*15 +'\n'
         log_parse(header)
-        assembly_path = spades_func(infile1, infile2, path_spades, common_name, finalpath, threads)
+        assembly_path = spades_func(infile1, infile2, path_spades, common_name, path, threads)
 
 # Pilon
     if pilon:
@@ -528,6 +487,62 @@ def main():
     if kraken:
         os.system(f'mv {kraken_report} {kraken_output} {finalpath}')
         log_parse(f'Kraken report and Kraken output moved to directory\n')
+
+# function that runs multiple strains in parallel. Inputs are all sys.argv[]
+# Return lines for logfile?
+def parallelize(finalpath):
+    
+    # create list with directories for each regular() output that correspond to the input short filename
+    dirlist = ['dir1', 'dir2']
+    # loops through directories and gives a path that regular() can place all output in
+    for dir in dirlist:
+        path = f'{finalpath}/{dir}'
+        # call regular(path....) with path. PARALLELIZE
+
+    pass
+
+def main():
+    # os.system('SBATCH -p node -n 1')
+    """
+    path/to/file1 path/to/file2 here nopar notrim nokraken ariba [db1, db2] 0 size nopilon thr ram
+    """
+    infile1 = sys.argv[1] # 
+    infile2 = sys.argv[2]
+    new_location = sys.argv[3] == 'there' # will ask for directory location if True
+    run_fastp = sys.argv[4] == 'trim' # will run fastp if True
+    kraken = sys.argv[5] == 'kraken'
+    ariba = sys.argv[6] == 'ariba'
+    db_ariba = sys.argv[7] 
+    wanted_coverage = int(sys.argv[8]) # if wanted coverage == 0, then don't run spades
+    genome_size = int(sys.argv[9])
+    pilon = sys.argv[10] == 'pilon'
+    threads = sys.argv[11]
+    RAM = sys.argv[12] # this has not been implemented
+
+    run_spades = wanted_coverage != 0
+    shortened = False # Changed to True if fastq-files are shortened for spades
+    common_name = shortname(infile1) # until here only work if not parallel
+
+    if pilon and run_spades == False: # Since pilon requires spades output, this 
+        pilon = False
+        pilon_lines = 'Pilon not run since SPAdes was not run (!)\n\n'
+
+    ''' -------------------CHANGE !?!?!?!----------------------- '''
+# Hardcoded, location of non-conda tools
+
+
+# Let's start this pipeline!
+    time = currenttime()
+    date = str(datetime.date(datetime.now()))
+    
+# make directory for output
+    finalpath = directory(date, time, new_location)
+
+    if infile1 == directory (hur)?
+        # parallelize()
+    # else:
+    #     regular()
+
 
     # OBS OBS convert to csv later instead
     # if run_spades:
