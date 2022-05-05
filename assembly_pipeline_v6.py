@@ -1,11 +1,13 @@
 from cmath import log
-import sys
-import os
 from datetime import datetime
+import glob
 import gzip
-import re
-import pandas as pd
 from numba import njit
+import pandas as pd
+import os
+import re
+import sys
+
 
 # Start by parsing the following command through the terminal, choosing only one option in each case:
 # 'python assembly_pipeline_v6.py infile1/folder(???) infile2/None(???) here/there trim/notrim kraken/nokraken ariba/noariba wanted_coverage genome_size pilon/nopilon threads RAM'
@@ -413,6 +415,7 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
         header= '\n'+'='*15 +'ARIBA'+ '='*15 +'\n'
         log_parse(header)
         ariba_fun(infile1,infile2, db_ariba)
+        os.system("ariba summary out_sum out.run.*/report.tsv")
 
 # Fastp
     if run_fastp:
