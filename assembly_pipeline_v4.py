@@ -72,7 +72,6 @@ def fastp_func(infile1, infile2, common_name):
 
     fastpinput = 'fastp -i ' + infile1 + ' -I ' + infile2 + ' -o ' + outfile1 + ' -O ' + outfile2
 
-
     os.system(fastpinput)
 
     loglines += 'Fastp complete. Four output files returned:\n'
@@ -363,6 +362,7 @@ def main():
 # Create log file
     logname = 'logfile.txt'
     log = open(logname, 'w')
+    os.system('"LOGFILE" >> logfile.txt')
 
     lines = 15*'-' + 'LOGFILE' + 15*'-' + '\n\n'
 
