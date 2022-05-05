@@ -1,0 +1,2 @@
+#ariba_ref_name	ref_name	gene	var_only	flag	reads	cluster	ref_len	ref_base_assembled	pc_ident	ctg	ctg_len	ctg_cov	known_var	var_type	var_seq_type	known_var_change	has_known_var	ref_ctg_change	ref_ctg_effect	ref_start	ref_end	ref_nt	ctg_start	ctg_end	ctg_nt	smtls_total_depth	smtls_nts	smtls_nts_depth	var_description	free_text
+blaOXA_61.1_AY587956	blaOXA_61.1_AY587956	1	0	27	544	blaOXA_-_26	774	774	100.0	blaOXA_-_26.l15.c4.ctg.1	1856	39.1	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	Original name: blaOXA-61_1_AY587956

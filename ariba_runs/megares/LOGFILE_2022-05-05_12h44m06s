@@ -1,0 +1,49 @@
+---------------LOGFILE---------------
+
+New directory created with the adress /home/alma/Documents/kandidat/assembly_2022-05-05_12h44m06s
+Directory created at 12:44:06.301601 on 2022-05-05
+All outputs will be saved in the new directory.
+
+
+12:44:06.302924: 
+===============ARIBA===============
+
+
+12:44:06.303497:  Starting ariba with megares
+
+12:44:06.304313: Database megares allready downloaded
+
+
+12:44:06.306836: Running ariba on megares
+
+ACR3 detected 1 threads available to it
+ACR3 reported completion
+CMEA detected 1 threads available to it
+CMEA reported completion
+CMEB detected 1 threads available to it
+CMEB reported completion
+CMEC detected 1 threads available to it
+CMEC reported completion
+CMED detected 1 threads available to it
+CMED reported completion
+CMEE detected 1 threads available to it
+CMEE reported completion
+CMEF detected 1 threads available to it
+CMEF reported completion
+CMER detected 1 threads available to it
+CMER reported completion
+FOLP_21 detected 1 threads available to it
+FOLP_21 reported completion
+GYRA_22 detected 1 threads available to it
+GYRA_22 reported completion
+OXA_39 detected 1 threads available to it
+OXA_39 reported completion
+OXA_83 detected 1 threads available to it
+OXA_83 reported completion
+OXA_84 detected 1 threads available to it
+OXA_84 reported completion
+RPOB_16 detected 1 threads available to it
+RPOB_16 reported completion
+12:45:10.534774: Ariba done.
+
+

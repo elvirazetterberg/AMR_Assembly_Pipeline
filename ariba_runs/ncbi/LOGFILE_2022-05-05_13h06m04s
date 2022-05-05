@@ -1,0 +1,24 @@
+---------------LOGFILE---------------
+
+New directory created with the adress /home/alma/Documents/kandidat/assembly_2022-05-05_13h06m04s
+Directory created at 13:06:04.886813 on 2022-05-05
+All outputs will be saved in the new directory.
+
+
+13:06:04.905255: 
+===============ARIBA===============
+
+
+13:06:04.906589:  Starting ariba with ncbi
+
+13:06:09.641545: Answered yes: Removing all existing files starting with "out.ncbi". Proceeding with ariba.
+
+13:06:09.644987: Downloading database ncbi
+
+13:06:14.706117: Preparing references with prefix out.ncbi
+
+13:06:15.366494: Running ariba on ncbi
+
+13:06:16.031632: Ariba done.
+
+

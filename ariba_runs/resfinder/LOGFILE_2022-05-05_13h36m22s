@@ -1,0 +1,63 @@
+---------------LOGFILE---------------
+
+New directory created with the adress /home/alma/Documents/kandidat/assembly_2022-05-05_13h36m22s
+Directory created at 13:36:22.892744 on 2022-05-05
+All outputs will be saved in the new directory.
+
+
+13:36:22.893874: 
+===============ARIBA===============
+
+
+13:36:22.894898:  Starting ariba with resfinder
+
+13:36:24.499225: Answered yes: Removing all existing files starting with "out.resfinder". Proceeding with ariba.
+
+13:36:24.503391: Downloading database resfinder
+
+commit 1506f0f9fbb79c24bcb32261af6f0e873d498f94
+Author: Maja Weiss <s182409@student.dtu.dk>
+Date:   Tue May 3 15:45:05 2022 +0200
+
+    Adds genes blaGMB-1 and tet(O/32/O)
+Using this git commit for resfinder database:
+Combining downloaded fasta files...
+    fosfomycin.fsa
+    oxazolidinone.fsa
+    colistin.fsa
+    nitroimidazole.fsa
+    quinolone.fsa
+    aminoglycoside.fsa
+    trimethoprim.fsa
+    fusidicacid.fsa
+    beta-lactam.fsa
+    phenicol.fsa
+    disinfectant.fsa
+    tetracycline.fsa
+    sulphonamide.fsa
+    macrolide.fsa
+    pseudomonicacid.fsa
+    rifampicin.fsa
+    glycopeptide.fsa
+
+Finished combining files
+
+Finished. Final files are:
+	/home/alma/Documents/kandidat/out.resfinder.fa
+	/home/alma/Documents/kandidat/out.resfinder.tsv
+
+You can use them with ARIBA like this:
+ariba prepareref -f /home/alma/Documents/kandidat/out.resfinder.fa -m /home/alma/Documents/kandidat/out.resfinder.tsv output_directory
+
+If you use this downloaded data, please cite:
+"Identification of acquired antimicrobial resistance genes", Zankari et al 2012, PMID: 22782487
+
+13:36:37.567154: Preparing references with prefix out.resfinder
+
+13:36:50.362781: Running ariba on resfinder
+
+blaOXA_-_26 detected 1 threads available to it
+blaOXA_-_26 reported completion
+13:36:57.968826: Ariba done.
+
+

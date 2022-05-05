@@ -1,0 +1,41 @@
+---------------LOGFILE---------------
+
+New directory created with the adress /home/alma/Documents/kandidat/assembly_2022-05-05_13h39m57s
+Directory created at 13:39:57.017145 on 2022-05-05
+All outputs will be saved in the new directory.
+
+
+13:39:57.018353: 
+===============ARIBA===============
+
+
+13:39:57.019237:  Starting ariba with srst2_argannot
+
+13:40:00.003978: Answered yes: Removing all existing files starting with "out.srst2_argannot". Proceeding with ariba.
+
+13:40:00.008048: Downloading database srst2_argannot
+
+syscall: wget -O out.srst2_argannot.original.fa https://raw.githubusercontent.com/katholt/srst2/master/data/ARGannot_r2.fasta
+Finished downloading and converting data. Final files are:
+	out.srst2_argannot.fa
+	out.srst2_argannot.tsv
+
+You can use them with ARIBA like this:
+ariba prepareref -f out.srst2_argannot.fa -m out.srst2_argannot.tsv output_directory
+
+If you use this downloaded data, please cite:
+"SRST2: Rapid genomic surveillance for public health and hospital microbiology labs",
+Inouye et al 2014, Genome Medicine, PMID: 25422674
+
+"ARG-ANNOT, a new bioinformatic tool to discover antibiotic resistance genes in bacterial genomes",
+Gupta et al 2014, PMID: 24145532
+
+13:40:03.311495: Preparing references with prefix out.srst2_argannot
+
+13:40:10.568168: Running ariba on srst2_argannot
+
+OXA_61_Bla detected 1 threads available to it
+OXA_61_Bla reported completion
+13:40:17.732297: Ariba done.
+
+

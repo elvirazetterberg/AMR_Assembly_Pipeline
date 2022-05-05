@@ -342,6 +342,10 @@ def regular():
     pass
 
 def ariba_fun(infile1,infile2,db_ariba):
+    #("Available databases: argannot, card, ncbi, megares, plasmidfinder, resfinder, srst2_argannot, vfdb_core, vfdb_full, virulencefinder")
+    # Functional db: argannot, vf_core, card, resfinder, srst2_argannot, plasmidfinder, virulencefinder  
+    # Nonfunctional: megares, ncbi och vfdb_full 
+
     for db_name in db_ariba[1:-1].split(','): #klumpigt? as sysargv makes input a string, it is separated into a list here. Also parallell should do all db at same time?
         
         # OBS when making parallell the naming of files must take this into account. Right now Im deleting the privious runs

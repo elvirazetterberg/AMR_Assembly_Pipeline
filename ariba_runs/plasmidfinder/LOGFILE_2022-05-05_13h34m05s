@@ -1,0 +1,53 @@
+---------------LOGFILE---------------
+
+New directory created with the adress /home/alma/Documents/kandidat/assembly_2022-05-05_13h34m05s
+Directory created at 13:34:05.210772 on 2022-05-05
+All outputs will be saved in the new directory.
+
+
+13:34:05.211895: 
+===============ARIBA===============
+
+
+13:34:05.212564:  Starting ariba with plasmidfinder
+
+13:34:07.384103: Answered yes: Removing all existing files starting with "out.plasmidfinder". Proceeding with ariba.
+
+13:34:07.388174: Downloading database plasmidfinder
+
+commit 9002e7282dd0599b9247f4f700368b8fa64fbaa8
+Author: Maja Weiss <s182409@student.dtu.dk>
+Date:   Wed Mar 30 11:20:23 2022 +0200
+
+    adds additional plasmid IncFII(pEH01)_1__CP063521.1
+Using this git commit for plasmidfinder database:
+Combining downloaded fasta files...
+    Rep1.fsa
+    Rep3.fsa
+    Rep2.fsa
+    NT_Rep.fsa
+    Inc18.fsa
+    Rep_trans.fsa
+    enterobacteriales.fsa
+    RepA_N.fsa
+    RepL.fsa
+
+Finished combining files
+
+Finished. Final files are:
+	/home/alma/Documents/kandidat/out.plasmidfinder.fa
+	/home/alma/Documents/kandidat/out.plasmidfinder.tsv
+
+You can use them with ARIBA like this:
+ariba prepareref -f /home/alma/Documents/kandidat/out.plasmidfinder.fa -m /home/alma/Documents/kandidat/out.plasmidfinder.tsv output_directory
+
+If you use this downloaded data, please cite:
+"PlasmidFinder and pMLST: in silico detection and typing of plasmids", Carattoli et al 2014, PMID: 24777092
+
+13:34:09.963866: Preparing references with prefix out.plasmidfinder
+
+13:34:11.822838: Running ariba on plasmidfinder
+
+13:34:15.936787: Ariba done.
+
+

@@ -1,0 +1,51 @@
+---------------LOGFILE---------------
+
+New directory created with the adress /home/alma/Documents/kandidat/assembly_2022-05-05_13h55m10s
+Directory created at 13:55:10.638230 on 2022-05-05
+All outputs will be saved in the new directory.
+
+
+13:55:10.639657: 
+===============ARIBA===============
+
+
+13:55:10.640542:  Starting ariba with virulencefinder
+
+13:55:12.499646: Answered yes: Removing all existing files starting with "out.virulencefinder". Proceeding with ariba.
+
+13:55:12.503654: Downloading database virulencefinder
+
+commit d2d3e98514bcab1b1418661972ddaa5d5c294a77
+Author: Malene Nielsen <s163836@student.dtu.dk>
+Date:   Thu May 6 11:19:45 2021 +0200
+
+    Change file endings to unix
+Using this git commit for virulencefinder database:
+Combining downloaded fasta files...
+    virulence_ecoli.fsa
+    s.aureus_exoenzyme.fsa
+    listeria.fsa
+    s.aureus_hostimm.fsa
+    virulence_ent.fsa
+    s.aureus_toxin.fsa
+    stx.fsa
+
+Finished combining files
+
+Finished. Final files are:
+	/home/alma/Documents/kandidat/out.virulencefinder.fa
+	/home/alma/Documents/kandidat/out.virulencefinder.tsv
+
+You can use them with ARIBA like this:
+ariba prepareref -f /home/alma/Documents/kandidat/out.virulencefinder.fa -m /home/alma/Documents/kandidat/out.virulencefinder.tsv output_directory
+
+If you use this downloaded data, please cite:
+"Real-time whole-genome sequencing for routine typing, surveillance, and outbreak detection of verotoxigenic Escherichia coli", Joensen al 2014, PMID: 24574290
+
+13:55:17.014477: Preparing references with prefix out.virulencefinder
+
+13:55:39.293727: Running ariba on virulencefinder
+
+13:55:44.273816: Ariba done.
+
+
