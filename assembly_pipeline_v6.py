@@ -8,13 +8,13 @@ import pandas as pd
 from numba import njit
 
 # Start by parsing the following command through the terminal, choosing only one option in each case:
-# 'python assembly_pipeline_v5.py infile1/folder(???) infile2/None(???) here/there trim/notrim kraken/nokraken ariba/noariba wanted_coverage genome_size pilon/nopilon threads RAM'
+# 'python assembly_pipeline_v6.py infile1/folder(???) infile2/None(???) here/there trim/notrim kraken/nokraken ariba/noariba wanted_coverage genome_size pilon/nopilon threads RAM'
 
 # test run:
-# python assembly_pipeline_v5.py SRR18825428_1.fastq.gz SRR18825428_2.fastq.gz here trim kraken noariba [vfdb_core] 40 124000000 pilon 40 0
+# python assembly_pipeline_v6.py SRR18825428_1.fastq.gz SRR18825428_2.fastq.gz here trim kraken noariba [vfdb_core] 40 124000000 pilon 40 0
 # 
 # Lokal Alma:
-# python Pipeline/assembly_pipeline_v5.py /home/alma/Documents/kandidat/genomes/SRR18825428_1.fastq /home/alma/Documents/kandidat/genomes/SRR18825428_2.fastq here ntrim nkraken ariba [vfdb_core] 40 124000000 npilon 40 0
+# python Pipeline/assembly_pipeline_v6.py /home/alma/Documents/kandidat/genomes/SRR18825428_1.fastq /home/alma/Documents/kandidat/genomes/SRR18825428_2.fastq here ntrim nkraken ariba [vfdb_core] 40 124000000 npilon 40 0
 
 
 '''OPTIONS'''
@@ -80,6 +80,7 @@ def shortname(filename):
     short = re.search('[a-zA-Z1-9]+', filename).group()
     return short
 
+# @njit(parallel=True)
 def fastp_func(infile1, infile2, common_name):
     '''Function that takes two raw reads fastq files, one forward (1, right) and one reverse(2, left)
     and returns two trimmed fastq files as well as quality control documentation.'''
@@ -98,6 +99,7 @@ def fastp_func(infile1, infile2, common_name):
 
     return outfile1, outfile2
 
+# @njit(parallel=True)
 def kraken_func(infile1, infile2, threads, common_name, path_kraken):
     ''' Function that runs Kraken on two raw reads fastq files, one forward (1, right) and one reverse(2, left), 
     in order to assign taxonomic labels to the sequences'''
@@ -115,6 +117,7 @@ def kraken_func(infile1, infile2, threads, common_name, path_kraken):
     log_parse(f'{kraken_output} \n{kraken_report}')
     return kraken_output, kraken_report
 
+# @njit(parallel=True)
 def reads_for_coverage(fastq_file, wanted_coverage, genome_size):
     '''Function that checks whether the requested coverage can be reached with the input
     files, returning the maximum coverage if this is not the case.'''
@@ -168,6 +171,7 @@ def reads_for_coverage(fastq_file, wanted_coverage, genome_size):
 
     return coverage, reads_needed
 
+# @njit(parallel=True)
 def shorten_fastq(fastq1_file, fastq2_file, reads_needed, common_name):
     '''Function that shortens the fastq files to only be long enough to reach 
     the requested coverage.'''
@@ -202,6 +206,7 @@ def shorten_fastq(fastq1_file, fastq2_file, reads_needed, common_name):
 
     return newname1, newname2
 
+# @njit(parallel=True)
 def spades_func(file1, file2, path_spades, common_name, finalpath, threads): # threads, RAM
     '''Function that runs SPAdes to assemble contigs from short reads.'''
 
@@ -225,6 +230,7 @@ def spades_func(file1, file2, path_spades, common_name, finalpath, threads): # t
 
     return assembly_path
 
+# @njit(parallel=True)
 def pilon_func(fastafile, fasta1, fasta2, common_name, threads, assembly_path):
     '''Function that runs Pilon on contigs-file from SPAdes to 
     polish and assemble further.'''
@@ -263,6 +269,7 @@ def pilon_func(fastafile, fasta1, fasta2, common_name, threads, assembly_path):
 
     return 
 
+# @njit(parallel=True)
 def info(spades_assembly):
     '''Function that uses an assembly-file from SPAdes of Pilon 
     and returns the metrics of that assembly.'''
@@ -331,6 +338,7 @@ def info(spades_assembly):
 
     return info_df
 
+# @njit(parallel=True)
 def ariba_fun(infile1,infile2,db_ariba):
     for db_name in db_ariba[1:-1].split(','): #klumpigt? as sysargv makes input a string, it is separated into a list here. Also parallell should do all db at same time?
         
@@ -381,8 +389,6 @@ def log_parse(string, logname):
     return
 
 # function that runs everything for only one strain. Inputs are all sys.argv[]
-# Return lines for logfile?
-
 def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, shortened, common_name):
     
     time = currenttime()
@@ -467,7 +473,6 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
         # Save info_df INSTEAD KEEP AS DF AND CONCAT WITH KRAKEN AND ALIGNMENT
         # info_df.to_csv(os.PathLike(f'{path}/{common_name}_metrics'))
     
-
 # Move files to correct folder
     """
     if ariba:
