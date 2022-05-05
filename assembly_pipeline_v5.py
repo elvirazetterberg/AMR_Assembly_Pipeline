@@ -435,7 +435,7 @@ def main():
     global logname # maybe not the smartest when parallell? but otherwise need to feed it into every function
     # Rename log file with date and time
     stringtime = time[:2]+'h'+time[3:5]+'m'+time[6:8]+'s'
-    logname = 'LOGFILE' + date + '_' + stringtime
+    logname = 'LOGFILE_' + date + '_' + stringtime
     create_log(finalpath,time,date)
     print(f'Pipeline started, please refer to logfile "{logname}" for updates.') # add path to logfile later 
 
