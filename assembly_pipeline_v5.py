@@ -346,7 +346,7 @@ def ariba_fun(infile1,infile2,db_ariba):
     # Functional db: argannot, vf_core, card, resfinder, srst2_argannot, plasmidfinder, virulencefinder  
     # Nonfunctional: megares, ncbi och vfdb_full 
 
-    for db_name in db_ariba[1:-1].split(','): #klumpigt? as sysargv makes input a string, it is separated into a list here. Also parallell should do all db at same time?
+    for db_name in db_ariba[1:-1].split(', '): #klumpigt? as sysargv makes input a string, it is separated into a list here. Also parallell should do all db at same time?
         
         # OBS when making parallell the naming of files must take this into account. Right now Im deleting the privious runs
     
@@ -448,6 +448,7 @@ def main():
         header= '\n'+'='*15 +'ARIBA'+ '='*15 +'\n'
         log_parse(header)
         ariba_fun(infile1,infile2, db_ariba)
+        os.system("ariba summary out_sum out.run.*/report.tsv")
     
 # Run in parallel
     if parallel:
