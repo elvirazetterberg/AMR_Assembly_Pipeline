@@ -5,7 +5,7 @@ from datetime import datetime
 import gzip
 import re
 import pandas as pd
-
+from numba import njit
 
 # Start by parsing the following command through the terminal, choosing only one option in each case:
 # 'python assembly_pipeline_v5.py infile1/folder(???) infile2/None(???) here/there trim/notrim kraken/nokraken ariba/noariba wanted_coverage genome_size pilon/nopilon threads RAM'
@@ -13,7 +13,7 @@ import pandas as pd
 # test run:
 # python assembly_pipeline_v5.py SRR18825428_1.fastq.gz SRR18825428_2.fastq.gz here trim kraken noariba [vfdb_core] 40 124000000 pilon 40 0
 # 
-#Lokal Alma:
+# Lokal Alma:
 # python Pipeline/assembly_pipeline_v5.py /home/alma/Documents/kandidat/genomes/SRR18825428_1.fastq /home/alma/Documents/kandidat/genomes/SRR18825428_2.fastq here ntrim nkraken ariba [vfdb_core] 40 124000000 npilon 40 0
 
 
@@ -331,7 +331,6 @@ def info(spades_assembly):
 
     return info_df
 
-
 def ariba_fun(infile1,infile2,db_ariba):
     for db_name in db_ariba[1:-1].split(','): #klumpigt? as sysargv makes input a string, it is separated into a list here. Also parallell should do all db at same time?
         
@@ -465,8 +464,8 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
         # If we have multiple info_df then use pd.concat([info_df1, info_df2], axis=0) to stack the 2nd below the 1st.
         # This is useful when running in parallel.
         
-        # Save info_df
-        info_df.to_csv(os.PathLike(f'{path}/{common_name}_metrics'))
+        # Save info_df INSTEAD KEEP AS DF AND CONCAT WITH KRAKEN AND ALIGNMENT
+        # info_df.to_csv(os.PathLike(f'{path}/{common_name}_metrics'))
     
 
 # Move files to correct folder
@@ -491,12 +490,35 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
 
     
     # return info_df to be able to concatenate if running in parallel.
-
+    # 1. change ariba out.db.tsv and kraken report to csv
+    # 2. change csv to df
+    # all_df = pd.concat([info_df, kraken_df, alignment_df], axis=1) # stack in one row
+    # all_df.to_csv(os.PathLike(f'{path}/{common_name}_metrics'))
 
 
 # function that runs multiple strains in parallel. Inputs are all sys.argv[]
-def parallelize(finalpath, infile1, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, shortened, common_name):
+@njit(parallel=True)
+def parallelize(finalpath, file_directory, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, shortened, common_name):
+    '''Function that takes a directory pf forward and reverse files to run the pipeline with in parallel.'''
     
+    current = os.getcwd()
+    os.chdir(file_directory)
+    os.system(f"ls *.gz > input.txt")
+    # go back
+    os.chdir(current)
+
+    dirlist = []
+    with open(f'{file_directory}/input.txt', 'r') as inp:
+        linelist = inp.readlines()
+        for i in range(0, len(linelist), 2):
+            common_name = shortname(i)
+            path = f'{finalpath}/{common_name}'
+            os.mkdir(path)
+            dirlist.append(path)
+            regular(path, f'{file_directory}/{linelist[i]}', f'{file_directory}/{linelist[i+1]}', run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, shortened, common_name)
+    
+    
+
     # create list with directories for each regular() output that correspond to the input short filename
     dirlist = ['dir1', 'dir2']
     # loops through directories and gives a path that regular() can place all output in
