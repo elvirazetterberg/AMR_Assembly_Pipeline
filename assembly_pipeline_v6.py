@@ -5,7 +5,7 @@ from datetime import datetime
 import gzip
 import re
 import pandas as pd
-
+from numba import njit
 # Start by parsing the following command through the terminal, choosing only one option in each case:
 # 'python assembly_pipeline_v5.py infile1/folder(???) infile2/None(???) here/there trim/notrim kraken/nokraken ariba/noariba wanted_coverage genome_size pilon/nopilon threads RAM'
 
@@ -70,8 +70,7 @@ def directory(date, time, there = False):
 
 def currenttime():
     '''Function that returns a string with the current time.'''
-    time = str(datetime.time(datetime.now()))
-    return time
+    return = str(datetime.time(datetime.now()))
 
 def shortname(filename):
     '''Function that take a filename and returns a shorter version 
@@ -383,7 +382,8 @@ def log_parse(string, logname):
 # function that runs everything for only one strain. Inputs are all sys.argv[]
 # Return lines for logfile?
 
-def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, shortened, common_name):
+@njit(parallel=True, error_model='python')
+def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, run_spades, shortened, common_name):
     
     time = currenttime()
     date = str(datetime.date(datetime.now()))
@@ -465,7 +465,7 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
         # This is useful when running in parallel.
         
         # Save info_df
-        info_df.to_csv(os.PathLike(f'{path}/{common_name}_metrics'))
+        info_df.to_csv(os.PathLike(f'{finalpath}/{common_name}_metrics'))
     
 
 # Move files to correct folder
@@ -488,13 +488,9 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
         os.system(f'mv {kraken_report} {kraken_output} {finalpath}')
         log_parse(f'Kraken report and Kraken output moved to directory\n')
 
-    
-    # return info_df to be able to concatenate if running in parallel.
-
-
-
 # function that runs multiple strains in parallel. Inputs are all sys.argv[]
-def parallelize(finalpath, infile1, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, shortened, common_name):
+# Return lines for logfile?
+def parallelize(finalpath):
     
     # create list with directories for each regular() output that correspond to the input short filename
     dirlist = ['dir1', 'dir2']
@@ -502,8 +498,6 @@ def parallelize(finalpath, infile1, run_fastp, kraken, ariba, db_ariba, run_spad
     for dir in dirlist:
         path = f'{finalpath}/{dir}'
         # call regular(path....) with path. PARALLELIZE
-        
-    os.system(f'cd {finalpath}') # change back to finalpath to place all info in
 
     pass
 
@@ -544,12 +538,7 @@ def main():
 # make directory for output
     finalpath = directory(date, time, new_location)
 
-    '''CONTINUE FROM HERE'''
-    if os.path.isdir(infile1):
-        parallelize(finalpath, infile1, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, shortened, common_name)
-    else:
-        regular(finalpath, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, shortened, common_name)
-    # if infile1 == directory (hur)?
+    if infile1 == directory (hur)?
         # parallelize()
     # else:
     #     regular()
