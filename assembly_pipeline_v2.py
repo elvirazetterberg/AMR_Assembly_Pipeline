@@ -192,7 +192,7 @@ def spades_func(file1, file2, path_spades, common_name, finalpath, threads): # t
 def pilon_func(fastafile, fasta1, fasta2, common_name, threads, assembly_path):
     '''Function that runs Pilon on contigs-file from SPAdes to 
     polish and assemble further.'''
-    
+    bowtie = /proj/uppmax2022-2-14/private/campy_pipeline/assembly/verktyg
     current = os.getcwd()
     
     os.chdir(assembly_path)
