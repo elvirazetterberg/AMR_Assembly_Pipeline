@@ -383,11 +383,15 @@ def log_parse(string, logname):
 # function that runs everything for only one strain. Inputs are all sys.argv[]
 # Return lines for logfile?
 
-def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, RAM):
+def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, run_spades, shortened, common_name):
     
     time = currenttime()
     date = str(datetime.date(datetime.now()))
-    
+
+    path_tools = '/proj/uppmax2022-2-14/private/campy_pipeline/assembly/verktyg'
+    path_spades = path_tools + '/SPAdes-3.15.4-Linux/bin'
+    path_kraken = path_tools + '/minikraken2_v1_8GB'
+
     os.system(f'cd {path}')
 
     # Create log file
@@ -438,7 +442,7 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
     if run_spades:
         header= '\n'+'='*15 +'SPADES'+ '='*15 +'\n'
         log_parse(header)
-        assembly_path = spades_func(infile1, infile2, path_spades, common_name, finalpath, threads)
+        assembly_path = spades_func(infile1, infile2, path_spades, common_name, path, threads)
 
 # Pilon
     if pilon:
@@ -513,7 +517,7 @@ def main():
     genome_size = int(sys.argv[9])
     pilon = sys.argv[10] == 'pilon'
     threads = sys.argv[11]
-    RAM = sys.argv[12]
+    RAM = sys.argv[12] # this has not been implemented
 
     run_spades = wanted_coverage != 0
     shortened = False # Changed to True if fastq-files are shortened for spades
@@ -526,9 +530,6 @@ def main():
     ''' -------------------CHANGE !?!?!?!----------------------- '''
 # Hardcoded, location of non-conda tools
 
-    path_tools = '/proj/uppmax2022-2-14/private/campy_pipeline/assembly/verktyg'
-    path_spades = path_tools + '/SPAdes-3.15.4-Linux/bin'
-    path_kraken = path_tools + '/minikraken2_v1_8GB'
 
 # Let's start this pipeline!
     time = currenttime()
@@ -537,7 +538,7 @@ def main():
 # make directory for output
     finalpath = directory(date, time, new_location)
 
-    # if infile1 == directory (hur)?
+    if infile1 == directory (hur)?
         # parallelize()
     # else:
     #     regular()
