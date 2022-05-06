@@ -404,24 +404,25 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
     os.system(f'cd {path}')
 
     # Create log file
+    global logname
     logname = 'logfile.txt' # maybe not the smartest when parallell? but otherwise need to feed it into every function
     # Rename log file with date and time
     stringtime = time[:2]+'h'+time[3:5]+'m'+time[6:8]+'s'
     # logname = 'LOGFILE' + date + '_' + stringtime
-    create_log(path,time,date,logname)
+    create_log(path,time,date)
     print(f'Pipeline started, please refer to logfile "{logname}" for updates.') # add path to logfile later 
 
 # Ariba 
     if ariba:
         header= '\n'+'='*15 +'ARIBA'+ '='*15 +'\n'
-        log_parse(header, logname)
+        log_parse(header)
         ariba_fun(infile1,infile2, db_ariba)
         os.system("ariba summary out_sum out.run.*/report.tsv")
 
 # Fastp
     if run_fastp:
         header= '\n'+'='*15 +'FASTP'+ '='*15 +'\n'
-        log_parse(header, logname)
+        log_parse(header)
         outfile1_trim, outfile2_trim = fastp_func(infile1, infile2, common_name)
 
         infile1 = outfile1_trim
@@ -430,13 +431,13 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
 # Kraken
     if kraken:
         header= '\n'+'='*15 +'KRAKEN'+ '='*15 +'\n'
-        log_parse(header, logname)
+        log_parse(header)
         kraken_output, kraken_report = kraken_func(infile1, infile2, threads, common_name, path_kraken)
 
 # Number of reads to match the wanted coverage
     if run_spades:
         header= '\n'+'='*15 +'READS FOR COVERAGE, SPADES'+ '='*15 +'\n'
-        log_parse(header, logname)
+        log_parse(header)
         coverage, reads_needed = reads_for_coverage(infile1, wanted_coverage, genome_size)
     else:
         coverage = 0
@@ -451,13 +452,13 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
 # Spades
     if run_spades:
         header= '\n'+'='*15 +'SPADES'+ '='*15 +'\n'
-        log_parse(header, logname)
+        log_parse(header)
         assembly_path = spades_func(infile1, infile2, path_spades, common_name, path, threads)
 
 # Pilon
     if pilon:
         header= '\n'+'='*15 +'PILON'+ '='*15 +'\n'
-        log_parse(header, logname)
+        log_parse(header)
         fastafile = f'{assembly_path}/{common_name}.fasta'
         pilon_func(fastafile, infile1, infile2, common_name, threads, assembly_path)
         
@@ -466,7 +467,7 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
 # Info/metrics
     if run_spades:
         header= '\n'+'='*15 +'INFO/METRICS, SPADES'+ '='*15 +'\n'
-        log_parse(header, logname)
+        log_parse(header)
 
         from_spades = f'{assembly_path}/{common_name}.fasta'
         
