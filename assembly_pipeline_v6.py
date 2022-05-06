@@ -505,7 +505,7 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
 
 
 # function that runs multiple strains in parallel. Inputs are all sys.argv[]
-@njit(parallel=True)
+# @njit(parallel=True)
 def parallelize(finalpath, file_directory, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, shortened, common_name):
     '''Function that takes a directory pf forward and reverse files to run the pipeline with in parallel.'''
     
