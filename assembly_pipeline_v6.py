@@ -2,7 +2,7 @@ from cmath import log
 from datetime import datetime
 import glob
 import gzip
-from numba import njit
+# from numba import njit
 import pandas as pd
 import os
 import re
@@ -15,6 +15,7 @@ import sys
 # test run:
 # python assembly_pipeline_v6.py SRR18825428_1.fastq.gz SRR18825428_2.fastq.gz here trim kraken noariba [vfdb_core] 40 124000000 pilon 40 0
 # 
+# python assembly_pipeline_v6.py SRR18825428test_1.fastq.gz SRR18825428test_2.fastq.gz here trim kraken noariba [vfdb_core] 40 124000000 pilon 40 0
 # Lokal Alma:
 # python Pipeline/assembly_pipeline_v6.py /home/alma/Documents/kandidat/genomes/SRR18825428_1.fastq /home/alma/Documents/kandidat/genomes/SRR18825428_2.fastq here ntrim nkraken ariba [vfdb_core] 40 124000000 npilon 40 0
 
