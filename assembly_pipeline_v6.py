@@ -13,9 +13,10 @@ import sys
 # 'python assembly_pipeline_v6.py infile1/folder(???) infile2/None(???) here/there trim/notrim kraken/nokraken ariba/noariba wanted_coverage genome_size pilon/nopilon threads RAM'
 
 # test run:
-# python assembly_pipeline_v6.py SRR18825428_1.fastq.gz SRR18825428_2.fastq.gz here trim kraken noariba [vfdb_core] 40 124000000 pilon 40 0
+# python assembly_pipeline_v6.py SRR18825428_1.fastq.gz SRR18825428_2.fastq.gz here trim kraken noariba [vfdb_core] 40 124000000 nopilon 40 0
 # 
-# python assembly_pipeline_v6.py SRR18825428test_1.fastq.gz SRR18825428test_2.fastq.gz here trim kraken noariba [vfdb_core] 40 124000000 pilon 40 0
+# python assembly_pipeline_v6.py SRR18825428test_1.fastq.gz SRR18825428test_2.fastq.gz here trim kraken noariba [vfdb_core] 40 124000000 nopilon 40 0
+
 # Lokal Alma:
 # python Pipeline/assembly_pipeline_v6.py /home/alma/Documents/kandidat/genomes/SRR18825428_1.fastq /home/alma/Documents/kandidat/genomes/SRR18825428_2.fastq here ntrim nkraken ariba [vfdb_core] 40 124000000 npilon 40 0
 
@@ -275,8 +276,8 @@ def spades_func(file1, file2, path_spades, common_name, finalpath, threads): # t
     #"spades.py --careful -o $filename1_short\_$wanted_coverage\X_spades --pe1-1 $read1_output --pe1-2 $read2_output -t $threads_available -m $RAM_available"
 
     # rename from contigs.fasta to fasta
-    os.system(f'cp {assembly_path}/contigs.fasta {assembly_path}/{common_name}.fasta')
-    log_parse( f'"contigs.fasta"-file copied and renamed to be called "{common_name}.fasta"')
+    # os.system(f'cp {assembly_path}/contigs.fasta {assembly_path}/{common_name}.fasta')
+    # log_parse( f'"contigs.fasta"-file copied and renamed to be called "{common_name}.fasta"')
 
     log_parse('SPAdes finished.\n')
     log_parse(f'All output files can be found here: {assembly_path}\n\n')
