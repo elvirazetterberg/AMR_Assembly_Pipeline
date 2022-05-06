@@ -526,7 +526,7 @@ def parallelize(finalpath, file_directory, run_fastp, kraken, ariba, db_ariba, r
             regular(path, f'{file_directory}/{linelist[i]}', f'{file_directory}/{linelist[i+1]}', run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, shortened, common_name)
     
     
-    os.system(f'cd {finalpath}') # change back to finalpath to place all info in
+    # os.system(f'cd {finalpath}') # change back to finalpath to place all info in
 
     pass
 
