@@ -407,8 +407,8 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
     logname = 'logfile.txt' # maybe not the smartest when parallell? but otherwise need to feed it into every function
     # Rename log file with date and time
     stringtime = time[:2]+'h'+time[3:5]+'m'+time[6:8]+'s'
-    logname = 'LOGFILE' + date + '_' + stringtime
-    create_log(path,time,date)
+    # logname = 'LOGFILE' + date + '_' + stringtime
+    create_log(path,time,date,logname)
     print(f'Pipeline started, please refer to logfile "{logname}" for updates.') # add path to logfile later 
 
 # Ariba 
