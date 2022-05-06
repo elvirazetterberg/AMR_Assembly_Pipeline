@@ -232,8 +232,8 @@ def shorten_fastq(fastq1_file, fastq2_file, reads_needed, common_name):
     log_parse( f'shorten_fastq started to shorten {fastq1_file} and {fastq2_file} to only match wanted coverage.\n\n')
 
     lines_needed = reads_needed*4
-    newname1 = f'X_{common_name}_1.fq.gz'
-    newname2 = f'X_{common_name}_2.fq.gz'
+    newname1 = f'X_{common_name}_1.fastq.gz'
+    newname2 = f'X_{common_name}_2.fastq.gz'
     
     with gzip.open(fastq1_file, 'rt') as trim_me: # maybe change to 'rb'
         newfile = ''
