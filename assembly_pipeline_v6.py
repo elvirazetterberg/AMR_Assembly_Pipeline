@@ -392,7 +392,7 @@ def info(spades_assembly):
     return info_df
 
 # function that runs everything for only one strain. Inputs are all sys.argv[]
-def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, shortened, common_name):
+def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, common_name):
     
     time = currenttime()
     date = str(datetime.date(datetime.now()))
@@ -451,11 +451,10 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
         coverage = 0
 
 # Shortening fastq-files if the coverage can be reached with less
-    if coverage != wanted_coverage:
+    if coverage > wanted_coverage:
         outfile1_shorten, outfile2_shorten = shorten_fastq(infile1, infile2, reads_needed, common_name)        
         infile1 = outfile1_shorten
         infile2 = outfile2_shorten
-        shortened = True
         os.system(f'mv {outfile1_shorten} {outfile2_shorten} {path}')
         log_parse(f'Shortened fastq files from shorten_fastq function moved to directory\n\n')
 
@@ -500,10 +499,7 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
     #     os.system('mv ' + outfile1_trim + ' ' + outfile2_trim + ' fastp.html fastp.json ' + str(path))
     #     log_parse('Trimmed fastp output files moved to directory\n\n')
     
-    # if shortened:
-    #     os.system(f'mv {outfile1_shorten} {outfile2_shorten} {path}')
-    #     log_parse(f'Shortened fastq files from shorten_fastq function moved to directory\n\n')
-
+   
     # if kraken:
     #     os.system(f'mv {kraken_report} {kraken_output} {path}')
     #     log_parse(f'Kraken report and Kraken output moved to directory\n')
@@ -519,7 +515,7 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
 
 # function that runs multiple strains in parallel. Inputs are all sys.argv[]
 # @njit(parallel=True)
-def parallelize(finalpath, file_directory, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, shortened, common_name):
+def parallelize(finalpath, file_directory, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, common_name):
     '''Function that takes a directory pf forward and reverse files to run the pipeline with in parallel.'''
     
     current = os.getcwd()
@@ -536,7 +532,7 @@ def parallelize(finalpath, file_directory, run_fastp, kraken, ariba, db_ariba, r
             path = f'{finalpath}/{common_name}'
             os.mkdir(path)
             dirlist.append(path)
-            regular(path, f'{file_directory}/{linelist[i]}', f'{file_directory}/{linelist[i+1]}', run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, shortened, common_name)
+            regular(path, f'{file_directory}/{linelist[i]}', f'{file_directory}/{linelist[i+1]}', run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, common_name)
     
     
     # os.system(f'cd {finalpath}') # change back to finalpath to place all info in
@@ -562,7 +558,6 @@ def main():
     RAM = sys.argv[12] # this has not been implemented
 
     run_spades = wanted_coverage != 0
-    shortened = False # Changed to True if fastq-files are shortened for spades
     common_name = shortname(infile1) # until here only work if not parallel
 
     if pilon and run_spades == False: # Since pilon requires spades output, this 
@@ -582,9 +577,9 @@ def main():
 
     '''CONTINUE FROM HERE'''
     if os.path.isdir(infile1):
-        parallelize(finalpath, infile1, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, shortened, common_name)
+        parallelize(finalpath, infile1, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, common_name)
     else:
-        regular(finalpath, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, shortened, common_name)
+        regular(finalpath, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, common_name)
     # if infile1 == directory (hur)?
         # parallelize()
     # else:
