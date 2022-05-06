@@ -82,6 +82,56 @@ def shortname(filename):
     short = re.search('[a-zA-Z1-9]+', filename).group()
     return short
 
+def create_log(finalpath, time, date, logname):
+
+    lines = 15*'-' + 'LOGFILE' + 15*'-' + '\n\n'
+    lines += f'New directory created with the adress {finalpath}\n'
+    lines += f'Directory created at {time} on {date}\n'
+    lines += 'All outputs will be saved in the new directory.\n\n'
+    os.system(f"echo '{lines}' > {logname}")
+    
+    return
+
+def log_parse(string, logname):
+    time = currenttime()
+    os.system(f"echo {time}: '{string}\n' >> {logname}")
+    return
+
+# @njit(parallel=True)
+def ariba_fun(infile1,infile2,db_ariba):
+    for db_name in db_ariba[1:-1].split(','): #klumpigt? as sysargv makes input a string, it is separated into a list here. Also parallell should do all db at same time?
+        
+        # OBS when making parallell the naming of files must take this into account. Right now Im deleting the privious runs
+    
+        # if there's allready an existing db, lite fult gjort?
+        # In the pearlpipeline it says "$test_CARD = "CARD_reference_dataset_downloaded"; What does it mean? 
+
+        log_parse(f' Starting ariba with {db_name}')
+        if os.path.exists(f'out.{db_name}.fa'): 
+            log_parse(f'Database {db_name} allready downloaded\n')
+            os.system(f"rm -rf out.run.{db_name}") # är detta smart sätt att göra det? Ska det läggas till i log?
+
+        else: # if database not downloaded. troligen onädigt i framtiden
+            rm_db=input(f'Please note that running this will remove all existing files starting with "out.{db_name}". [y]/n?') 
+            if rm_db.lower().startswith("y")==False:
+                log_parse(f'Answered no: NOT Removing all existing files starting with "out.{db_name}". Exiting ariba.')
+                exit() 
+            else:
+                log_parse(f'Answered yes: Removing all existing files starting with "out.{db_name}". Proceeding with ariba.')
+                os.system(f"rm -rf out.{db_name}*")
+
+            log_parse(f'Downloading database {db_name}')
+            os.system(f"ariba getref {db_name} out.{db_name} >> {logname}")
+
+            log_parse(f'Preparing references with prefix out.{db_name}')
+            os.system(f"ariba prepareref -f out.{db_name}.fa -m out.{db_name}.tsv out.{db_name}.prepareref >> {logname}")
+
+        log_parse(f'Running ariba on {db_name}')
+        os.system(f"ariba run out.{db_name}.prepareref {infile1} {infile2} out.run.{db_name} >> {logname}")
+
+    log_parse(f'Ariba done.\n')
+    return
+
 # @njit(parallel=True)
 def fastp_func(infile1, infile2, common_name):
     '''Function that takes two raw reads fastq files, one forward (1, right) and one reverse(2, left)
@@ -339,56 +389,6 @@ def info(spades_assembly):
     info_df = pd.DataFrame(data)
 
     return info_df
-
-# @njit(parallel=True)
-def ariba_fun(infile1,infile2,db_ariba):
-    for db_name in db_ariba[1:-1].split(','): #klumpigt? as sysargv makes input a string, it is separated into a list here. Also parallell should do all db at same time?
-        
-        # OBS when making parallell the naming of files must take this into account. Right now Im deleting the privious runs
-    
-        # if there's allready an existing db, lite fult gjort?
-        # In the pearlpipeline it says "$test_CARD = "CARD_reference_dataset_downloaded"; What does it mean? 
-
-        log_parse(f' Starting ariba with {db_name}')
-        if os.path.exists(f'out.{db_name}.fa'): 
-            log_parse(f'Database {db_name} allready downloaded\n')
-            os.system(f"rm -rf out.run.{db_name}") # är detta smart sätt att göra det? Ska det läggas till i log?
-
-        else: # if database not downloaded. troligen onädigt i framtiden
-            rm_db=input(f'Please note that running this will remove all existing files starting with "out.{db_name}". [y]/n?') 
-            if rm_db.lower().startswith("y")==False:
-                log_parse(f'Answered no: NOT Removing all existing files starting with "out.{db_name}". Exiting ariba.')
-                exit() 
-            else:
-                log_parse(f'Answered yes: Removing all existing files starting with "out.{db_name}". Proceeding with ariba.')
-                os.system(f"rm -rf out.{db_name}*")
-
-            log_parse(f'Downloading database {db_name}')
-            os.system(f"ariba getref {db_name} out.{db_name} >> {logname}")
-
-            log_parse(f'Preparing references with prefix out.{db_name}')
-            os.system(f"ariba prepareref -f out.{db_name}.fa -m out.{db_name}.tsv out.{db_name}.prepareref >> {logname}")
-
-        log_parse(f'Running ariba on {db_name}')
-        os.system(f"ariba run out.{db_name}.prepareref {infile1} {infile2} out.run.{db_name} >> {logname}")
-
-    log_parse(f'Ariba done.\n')
-    return
-
-def create_log(finalpath, time, date, logname):
-
-    lines = 15*'-' + 'LOGFILE' + 15*'-' + '\n\n'
-    lines += f'New directory created with the adress {finalpath}\n'
-    lines += f'Directory created at {time} on {date}\n'
-    lines += 'All outputs will be saved in the new directory.\n\n'
-    os.system(f"echo '{lines}' > {logname}")
-    
-    return
-
-def log_parse(string, logname):
-    time = currenttime()
-    os.system(f"echo {time}: '{string}\n' >> {logname}")
-    return
 
 # function that runs everything for only one strain. Inputs are all sys.argv[]
 def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, shortened, common_name):
