@@ -414,14 +414,14 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
 # Ariba 
     if ariba:
         header= '\n'+'='*15 +'ARIBA'+ '='*15 +'\n'
-        log_parse(header)
+        log_parse(header, logname)
         ariba_fun(infile1,infile2, db_ariba)
         os.system("ariba summary out_sum out.run.*/report.tsv")
 
 # Fastp
     if run_fastp:
         header= '\n'+'='*15 +'FASTP'+ '='*15 +'\n'
-        log_parse(header)
+        log_parse(header, logname)
         outfile1_trim, outfile2_trim = fastp_func(infile1, infile2, common_name)
 
         infile1 = outfile1_trim
@@ -430,13 +430,13 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
 # Kraken
     if kraken:
         header= '\n'+'='*15 +'KRAKEN'+ '='*15 +'\n'
-        log_parse(header)
+        log_parse(header, logname)
         kraken_output, kraken_report = kraken_func(infile1, infile2, threads, common_name, path_kraken)
 
 # Number of reads to match the wanted coverage
     if run_spades:
         header= '\n'+'='*15 +'READS FOR COVERAGE, SPADES'+ '='*15 +'\n'
-        log_parse(header)
+        log_parse(header, logname)
         coverage, reads_needed = reads_for_coverage(infile1, wanted_coverage, genome_size)
     else:
         coverage = 0
@@ -451,13 +451,13 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
 # Spades
     if run_spades:
         header= '\n'+'='*15 +'SPADES'+ '='*15 +'\n'
-        log_parse(header)
+        log_parse(header, logname)
         assembly_path = spades_func(infile1, infile2, path_spades, common_name, path, threads)
 
 # Pilon
     if pilon:
         header= '\n'+'='*15 +'PILON'+ '='*15 +'\n'
-        log_parse(header)
+        log_parse(header, logname)
         fastafile = f'{assembly_path}/{common_name}.fasta'
         pilon_func(fastafile, infile1, infile2, common_name, threads, assembly_path)
         
@@ -466,7 +466,7 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
 # Info/metrics
     if run_spades:
         header= '\n'+'='*15 +'INFO/METRICS, SPADES'+ '='*15 +'\n'
-        log_parse(header)
+        log_parse(header, logname)
 
         from_spades = f'{assembly_path}/{common_name}.fasta'
         
@@ -486,16 +486,17 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
         log_parse('Ariba output files moved to directory\n\n')
     """
     if run_fastp:
-        os.system('mv ' + outfile1_trim + ' ' + outfile2_trim + ' fastp.html fastp.json ' + str(finalpath))
+        os.system('mv ' + outfile1_trim + ' ' + outfile2_trim + ' fastp.html fastp.json ' + str(path))
         log_parse('Trimmed fastp output files moved to directory\n\n')
     
     if shortened:
-        os.system(f'mv {outfile1_shorten} {outfile2_shorten} {finalpath}')
+        os.system(f'mv {outfile1_shorten} {outfile2_shorten} {path}')
         log_parse(f'Shortened fastq files from shorten_fastq function moved to directory\n\n')
 
     if kraken:
-        os.system(f'mv {kraken_report} {kraken_output} {finalpath}')
+        os.system(f'mv {kraken_report} {kraken_output} {path}')
         log_parse(f'Kraken report and Kraken output moved to directory\n')
+    
 
     
     # return info_df to be able to concatenate if running in parallel.
