@@ -401,7 +401,9 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
     path_spades = path_tools + '/SPAdes-3.15.4-Linux/bin'
     path_kraken = path_tools + '/minikraken2_v1_8GB'
 
-    os.system(f'cd {path}')
+    os.system(f'cp {infile1} {infile2} {path}')
+    os.chdir(path)
+
 
     # Create log file
     global logname
