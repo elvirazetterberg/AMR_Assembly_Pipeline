@@ -93,7 +93,7 @@ def create_log(finalpath, time, date, logname):
     
     return
 
-def log_parse(string, logname):
+def log_parse(string):
     time = currenttime()
     os.system(f"echo {time}: '{string}\n' >> {logname}")
     return
