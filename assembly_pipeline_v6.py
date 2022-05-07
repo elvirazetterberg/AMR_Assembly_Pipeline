@@ -94,9 +94,9 @@ def create_log(finalpath, time, date, logname):
     
     return
 
-def log_parse(string):
+def log_parse(string, logpath = ''):
     time = currenttime()
-    os.system(f"echo {time}: '{string}\n' >> {logname}")
+    os.system(f"echo {time}: '{string}\n' >> {logpath}{logname}")
     return
 
 # @njit(parallel=True)
@@ -275,9 +275,9 @@ def spades_func(file1, file2, path_spades, common_name, finalpath, threads): # t
     os.system(commandline)
     #"spades.py --careful -o $filename1_short\_$wanted_coverage\X_spades --pe1-1 $read1_output --pe1-2 $read2_output -t $threads_available -m $RAM_available"
 
-    # rename from contigs.fasta to fasta
-    # os.system(f'cp {assembly_path}/contigs.fasta {assembly_path}/{common_name}.fasta')
-    # log_parse( f'"contigs.fasta"-file copied and renamed to be called "{common_name}.fasta"')
+    # rename from contigs.fasta to fasta to work with pilon
+    os.system(f'cp {assembly_path}/contigs.fasta {assembly_path}/{common_name}.fasta')
+    log_parse( f'"contigs.fasta"-file copied and renamed to be called "{common_name}.fasta"')
 
     log_parse('SPAdes finished.\n')
     log_parse(f'All output files can be found here: {assembly_path}\n\n')
@@ -293,8 +293,8 @@ def pilon_func(fastafile, fasta1, fasta2, common_name, threads, assembly_path):
     
     os.chdir(assembly_path)
     
-    log_parse('Pilon started')
-    log_parse(f'Input files: {fastafile}, {fasta1}, {fasta2}')
+    log_parse('Pilon started', current)
+    log_parse(f'Input files: {fastafile}, {fasta1}, {fasta2}', current)
 
     bowtie_build = f'bowtie2-build -f --threads {threads} --quiet {fastafile} {common_name}'
     os.system(bowtie_build)
@@ -308,16 +308,16 @@ def pilon_func(fastafile, fasta1, fasta2, common_name, threads, assembly_path):
     os.system(f'samtools index {common_name}.sorted.bam')
 
     time = currenttime()+'\n'
-    log_parse( f'Pilon 1.24 started at {time}')
+    log_parse( f'Pilon 1.24 started at {time}', current)
     
     os.system(f'pilon --genome {common_name}.fasta --frags {common_name}.sorted.bam --output {common_name}.pilon --changes --threads {threads}')
     
     #time = currenttime()+'\n'
     #log_parse(f'Pilon finished at {time}\n')
 
-    log_parse(f'Pilon finished') #removed at time. keep? 
+    log_parse(f'Pilon finished\n', current) #removed at time. keep? 
     
-    log_parse( f'Corrected fasta file created: {common_name}.pilon.fasta')
+    log_parse( f'Corrected fasta file created: {common_name}.pilon.fasta', current)
 
     os.chdir(current)
 
@@ -409,8 +409,8 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
     # Create log file
     global logname
     logname = 'logfile.txt' # maybe not the smartest when parallell? but otherwise need to feed it into every function
-    # Rename log file with date and time
-    stringtime = time[:2]+'h'+time[3:5]+'m'+time[6:8]+'s'
+    # Rename log file with date and time --- easier to just use logfile.txt globally?
+    # stringtime = time[:2]+'h'+time[3:5]+'m'+time[6:8]+'s'
     # logname = 'LOGFILE' + date + '_' + stringtime
     create_log(path, time, date, logname)
     print(f'Pipeline started, please refer to logfile "{logname}" for updates.') # add path to logfile later 
@@ -430,7 +430,6 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
 
         infile1 = outfile1_trim
         infile2 = outfile2_trim
-
 
 # Kraken
     if kraken:
