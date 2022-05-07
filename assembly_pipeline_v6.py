@@ -431,8 +431,6 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
         infile1 = outfile1_trim
         infile2 = outfile2_trim
 
-        os.system('mv ' + outfile1_trim + ' ' + outfile2_trim + ' fastp.html fastp.json ' + str(path))
-        log_parse('Trimmed fastp output files moved to directory\n\n')
 
 # Kraken
     if kraken:
