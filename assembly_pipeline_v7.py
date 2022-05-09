@@ -1,6 +1,6 @@
 from datetime import datetime
 import gzip
-# from numba import njit
+from numba import njit
 import pandas as pd
 import os
 import re
@@ -35,8 +35,8 @@ import sys
 # - RAM: how much RAM that is available
 
 
-def script_log(finalpath):
-    os.system('script logfilescript.txt')
+def script_log(finalpath, logname):
+    os.system(f'script {logname}') # use logname???
     os.system(f'cd /proj/uppmax2022-2-14/private/campy_pipeline\n module load conda\nexport CONDA_ENVS_PATH=/proj/uppmax2022-2-14/private/campy_pipeline/environments\nconda activate pipeline_env\n')
     os.system(f'mv logfilescript.txt {finalpath}')
 
@@ -387,7 +387,7 @@ def info(spades_assembly):
 # function that runs everything for only one strain. Inputs are all sys.argv[]
 def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, common_name):
     
-    script_log(path)
+    # script_log(path)
 
     time = currenttime()
     date = str(datetime.date(datetime.now()))
