@@ -1,6 +1,6 @@
 from datetime import datetime
 import gzip
-# from numba import njit
+from numba import njit
 import pandas as pd
 import os
 import re
