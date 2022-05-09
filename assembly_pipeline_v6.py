@@ -290,7 +290,7 @@ def pilon_func(fastafile, fasta1, fasta2, common_name, threads, assembly_path):
     '''Function that runs Pilon on contigs-file from SPAdes to 
     polish and assemble further.'''
     
-    current = os.getcwd()
+    current = os.getcwd()+'/'
     
     os.chdir(assembly_path)
     
