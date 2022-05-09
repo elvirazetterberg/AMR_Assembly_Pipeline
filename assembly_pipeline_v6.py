@@ -129,7 +129,7 @@ def fastp_func(infile1, infile2, common_name):
     outfile1 = f'out_fastp_{common_name}_1.fq.gz'
     outfile2 = f'out_fastp_{common_name}_2.fq.gz'
 
-    fastpinput = 'fastp -i ' + infile1 + ' -I ' + infile2 + ' -o ' + outfile1 + ' -O ' + outfile2
+    fastpinput = f'fastp -i {infile1} -I {infile2} -o {outfile1} -O {outfile2}'
 
     # os.system(fastpinput) # I dont know if this generates outpu, but in that case I should be parsed into logfile like below
     # log_parse(fastpinput) 
@@ -201,8 +201,9 @@ def reads_for_coverage(fastq_file, wanted_coverage, genome_size):
 
     # Give log output if the coverage CANNOT be achieved, and estimate new coverage
     if total_bases < bases_needed:
-        log_parse(f'There are not enough bases to achieve {wanted_coverage} X coverage.\n\n"')
-        available_coverage = int(2*total_bases/genome_size)
+        log_parse(f'There are not enough bases to achieve {wanted_coverage} X coverage.\n"')
+        log_parse(f'NUMBER OF TOTAL BASES: {total_bases}')
+        available_coverage = int((2*total_bases)/genome_size)
         log_parse( f'Using an estimated coverage of {available_coverage} X instead which amounts to {read_counter} reads from fastq_1 which is {total_bases} bases\n\n')
         coverage = available_coverage
 
