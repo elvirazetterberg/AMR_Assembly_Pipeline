@@ -133,6 +133,7 @@ def fastp_func(infile1, infile2, common_name):
 
     os.system(fastpinput) # I dont know if this generates outpu, but in that case I should be parsed into logfile like below
     # log_parse(fastpinput) 
+    os.system(f'{fastpinput} >> {logname}')
     
     log_parse('Fastp complete. Four output files returned:\n')
     log_parse(f'{outfile1} \n{outfile2} \nfastp.html \nfastp.json \n\n')
