@@ -351,22 +351,24 @@ def info(spades_assembly):
     log_parse( f'The number of contigs: {number_of_contigs}, the total number of bases: {total_bases}\n')
 
     contig_lengths.sort()
-    longest = contig_lengths[0]
+    longest = contig_lengths[-1]
     log_parse(  f'Longest contig: {longest}\n')
     log_parse(  f'Contigs longer than 1 kb: {contigs_over_1000}')
 
+
     # N50
     temp = 0
-    while temp <= total_bases/2:
-        for length in contig_lengths:
-            temp += length
-            N_50 = length
+    for length in contig_lengths:
+        temp += length
+        N_50 = length
+        if temp >= (total_bases/2):
+            break
     
     log_parse( f'N50: {N_50}\n')
 
     # GC-content
-    GC = number_GC/(number_GC + number_AT)*100
-    log_parse( f'The GC-content of the sequence is {GC}. {non_base} non-base characters were excluded from GC-calculation\n')
+    GC = round(number_GC*100/(number_GC + number_AT),2)
+    log_parse( f'The GC-content of the sequence is {GC}%. {non_base} non-base characters were excluded from GC-calculation\n')
 
     log_parse( f'-----------------------Metrics finished-----------------------')
 
