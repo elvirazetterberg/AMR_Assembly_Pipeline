@@ -350,15 +350,15 @@ def info(spades_assembly):
     
     log_parse( f'The number of contigs: {number_of_contigs}, the total number of bases: {total_bases}\n')
 
-    sorted_contig_lengths = contig_lengths.sort()
-    longest = sorted_contig_lengths[0]
+    contig_lengths.sort()
+    longest = contig_lengths[0]
     log_parse(  f'Longest contig: {longest}\n')
     log_parse(  f'Contigs longer than 1 kb: {contigs_over_1000}')
 
     # N50
     temp = 0
     while temp <= total_bases/2:
-        for length in sorted_contig_lengths:
+        for length in contig_lengths:
             temp += length
             N_50 = length
     
@@ -467,7 +467,7 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
         # This is useful when running in parallel.
         
         # Save info_df INSTEAD KEEP AS DF AND CONCAT WITH KRAKEN AND ALIGNMENT
-        # info_df.to_csv(os.PathLike(f'{path}/{common_name}_metrics'))
+        info_df.to_csv(os.PathLike(f'{path}/{common_name}_metrics'))
     
 # Move files to correct folder
     """

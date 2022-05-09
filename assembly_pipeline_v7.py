@@ -356,15 +356,15 @@ def info(spades_assembly):
     
     log_parse( f'The number of contigs: {number_of_contigs}, the total number of bases: {total_bases}\n')
 
-    sorted_contig_lengths = contig_lengths.sort()
-    longest = sorted_contig_lengths[0]
+    contig_lengths.sort()
+    longest = contig_lengths[0]
     log_parse(  f'Longest contig: {longest}\n')
     log_parse(  f'Contigs longer than 1 kb: {contigs_over_1000}')
 
     # N50
     temp = 0
     while temp <= total_bases/2:
-        for length in sorted_contig_lengths:
+        for length in contig_lengths:
             temp += length
             N_50 = length
     
