@@ -424,9 +424,6 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
         header= '\n'+'='*15 +'KRAKEN'+ '='*15 +'\n'
         log_parse(header)
         kraken_output, kraken_report = kraken_func(infile1, infile2, threads, common_name, path_kraken)
-        
-        os.system(f'mv {kraken_report} {kraken_output} {path}')
-        log_parse(f'Kraken report and Kraken output moved to directory\n')
 
 # Number of reads to match the wanted coverage
     if run_spades:
@@ -467,6 +464,7 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
         from_spades = f'{assembly_path}/{common_name}.fasta'
         
         info_df = info(from_spades)
+        
         # If we have multiple info_df then use pd.concat([info_df1, info_df2], axis=0) to stack the 2nd below the 1st.
         # This is useful when running in parallel.
         
@@ -481,16 +479,6 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
             os.system('mv ' + + ' ' +  + ' fastp.html fastp.json ' + str(finalpath)) #Move the db aswell?
         log_parse('Ariba output files moved to directory\n\n')
     """
-    # if run_fastp:
-    #     os.system('mv ' + outfile1_trim + ' ' + outfile2_trim + ' fastp.html fastp.json ' + str(path))
-    #     log_parse('Trimmed fastp output files moved to directory\n\n')
-    
-   
-    # if kraken:
-    #     os.system(f'mv {kraken_report} {kraken_output} {path}')
-    #     log_parse(f'Kraken report and Kraken output moved to directory\n')
-    
-
     
     # return info_df to be able to concatenate if running in parallel.
     # 1. change ariba out.db.tsv and kraken report to csv
