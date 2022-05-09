@@ -1,6 +1,5 @@
 from datetime import datetime
 import gzip
-from typing import final
 from numba import njit
 import pandas as pd
 import os
