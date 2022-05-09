@@ -29,25 +29,12 @@ import sys
 # - trim/notrim: trim means we run fastp, notrim means that we don't
 # - kraken/nokraken: choose whether kraken should be run or not
 # - ariba/noariba: choose whether to align AMR-genes with ariba
+# - [vfdb_core]: list of AMR-databases for ariba, without spaces
 # - wanted_coverage: what coverage is requested? If 0, no assembly is performed.
 # - genome_size: what is the genome size of the input raw reads?
 # - pilon/nopilon: choose whether to run pilon or not. Does not run if spades does not run (0 wanted coverage)
 # - threads: maximum threads available
 # - RAM: how much RAM that is available
-
-
-"""
-V5: 
-
-Added Ariba. 
-Added log_parse to all functions. Still need to parse all os.system lines that generate output to the commandline. 
-Also added create file function with a global name that needs to be changable, possibly the same way the directory is named. 
-
-Cannot try anything other than ariba as UPPMAX servers are down. Ariba funtctional. 
-
-//Alma 
-
-"""
 
 def directory(date, time, there = False):
     
