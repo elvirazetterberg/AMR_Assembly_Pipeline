@@ -11,12 +11,12 @@ import sys
 # 'python assembly_pipeline_v6.py infile1/folder(???) infile2/None(???) here/there trim/notrim kraken/nokraken ariba/noariba wanted_coverage genome_size pilon/nopilon threads RAM'
 
 # test run:
-# python assembly_pipeline_v6.py SRR18825428_1.fastq.gz SRR18825428_2.fastq.gz here trim kraken noariba [vfdb_core] 40 124000000 nopilon 40 0
+# python assembly_pipeline_v6.py SRR18825428_1.fastq.gz SRR18825428_2.fastq.gz here trim kraken noariba [vfdb_core] 40 1743985 nopilon 40 0
 # 
-# python assembly_pipeline_v6.py SRR18825428test_1.fastq.gz SRR18825428test_2.fastq.gz here trim kraken noariba [vfdb_core] 40 124000000 nopilon 40 0
+# python assembly_pipeline_v6.py SRR18825428test_1.fastq.gz SRR18825428test_2.fastq.gz here trim kraken noariba [vfdb_core] 40 1743985 nopilon 40 0
 
 # Lokal Alma:
-# python Pipeline/assembly_pipeline_v6.py /home/alma/Documents/kandidat/genomes/SRR18825428_1.fastq /home/alma/Documents/kandidat/genomes/SRR18825428_2.fastq here ntrim nkraken ariba [vfdb_core] 40 124000000 npilon 40 0
+# python Pipeline/assembly_pipeline_v6.py /home/alma/Documents/kandidat/genomes/SRR18825428_1.fastq /home/alma/Documents/kandidat/genomes/SRR18825428_2.fastq here ntrim nkraken ariba [vfdb_core] 40 1743985 npilon 40 0
 
 
 '''OPTIONS'''
@@ -29,7 +29,7 @@ import sys
 # - ariba/noariba: choose whether to align AMR-genes with ariba
 # - [vfdb_core]: list of AMR-databases for ariba, without spaces
 # - wanted_coverage: what coverage is requested? If 0, no assembly is performed.
-# - genome_size: what is the genome size of the input raw reads?
+# - genome_size: what is the genome size of the organism?
 # - pilon/nopilon: choose whether to run pilon or not. Does not run if spades does not run (0 wanted coverage)
 # - threads: maximum threads available
 # - RAM: how much RAM that is available
@@ -135,9 +135,8 @@ def fastp_func(infile1, infile2, common_name):
     # log_parse(fastpinput) 
     os.system(f'{fastpinput} >> {logname}')
     
-    log_parse('Fastp complete. Four output files returned:\n')
-    log_parse(f'{outfile1} \n{outfile2} \nfastp.html \nfastp.json \n\n')
-
+    log_parse(f'Fastp complete. Four output files returned:\n{outfile1} \n{outfile2} \nfastp.html \nfastp.json \n')
+    
     return outfile1, outfile2
 
 # @njit(parallel=True)
@@ -167,8 +166,8 @@ def reads_for_coverage(fastq_file, wanted_coverage, genome_size):
 
     bases_needed = int(wanted_coverage*genome_size/2)
     
-    log_parse( f'To achieve {wanted_coverage} X, {bases_needed} bases are needed from each fastq-file\n')
-
+    log_parse(f'To achieve {wanted_coverage} X, {bases_needed} bases are needed from each fastq-file\n')
+    log_parse(f'Checking if wanted coverage can be achieved...')
     total_bases = 0
     read_counter = 0
     row_counter = 1 # goes between 1 and 4
@@ -192,7 +191,7 @@ def reads_for_coverage(fastq_file, wanted_coverage, genome_size):
 
         # Give log output if the coverage can be achieved
             if total_bases >= bases_needed:
-                log_parse( f'Needed bases: {bases_needed} (per direction) which amounts to {read_counter} reads from fastq_1 which is {total_bases} bases\n\n')
+                log_parse(f'Coverage can be reached! It amounts to {read_counter} reads from fastq_1 which is {total_bases} bases\n\n')
                 coverage = wanted_coverage
                 break
 
@@ -202,9 +201,8 @@ def reads_for_coverage(fastq_file, wanted_coverage, genome_size):
     # Give log output if the coverage CANNOT be achieved, and estimate new coverage
     if total_bases < bases_needed:
         log_parse(f'There are not enough bases to achieve {wanted_coverage} X coverage.\n"')
-        log_parse(f'NUMBER OF TOTAL BASES: {total_bases}')
         available_coverage = int((2*total_bases)/genome_size)
-        log_parse( f'Using an estimated coverage of {available_coverage} X instead which amounts to {read_counter} reads from fastq_1 which is {total_bases} bases\n\n')
+        log_parse( f'Using an estimated coverage of {available_coverage} X instead which amounts to {read_counter} reads and {total_bases} bases from fastq_1\n\n')
         coverage = available_coverage
 
     reads_needed = read_counter
