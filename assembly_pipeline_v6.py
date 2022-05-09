@@ -1,6 +1,4 @@
-from cmath import log
 from datetime import datetime
-import glob
 import gzip
 # from numba import njit
 import pandas as pd
