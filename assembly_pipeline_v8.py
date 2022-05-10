@@ -1,6 +1,5 @@
 from datetime import datetime
 import gzip
-from numba import njit
 import pandas as pd
 import os
 import re
@@ -9,33 +8,32 @@ import concurrent.futures as future
 
 
 # Start by parsing the following command through the terminal, choosing only one option in each case:
-# 'python assembly_pipeline_v6.py infile1/folder(???) infile2/None(???) here/there trim/notrim kraken/nokraken ariba/noariba wanted_coverage genome_size pilon/nopilon threads RAM'
+# 'python assembly_pipeline_v8.py infile1/directory infile2/None(???) here/there trim/notrim kraken/nokraken ariba/noariba wanted_coverage genome_size pilon/nopilon threads'
 
-# test run:
-# python assembly_pipeline_v8.py SRR18825428_1.fastq.gz SRR18825428_2.fastq.gz here trim kraken noariba [vfdb_core] 40 1743985 nopilon 40 0
-# 
+# test run, regular
+# python assembly_pipeline_v8.py SRR18825428_1.fastq.gz SRR18825428_2.fastq.gz here trim kraken noariba [vfdb_core] 40 1743985 nopilon 40
+
 # parallelize
-# python assembly_pipeline_v8.py manyfiles None here trim kraken noariba [vfdb_core] 40 1743985 nopilon 40 0
-
+# python assembly_pipeline_v8.py manyfiles None here trim kraken noariba [vfdb_core] 40 1743985 nopilon 40
 
 # Lokal Alma:
-# python Pipeline/assembly_pipeline_v8.py /home/alma/Documents/kandidat/genomes/SRR18825428_1.fastq /home/alma/Documents/kandidat/genomes/SRR18825428_2.fastq here ntrim nkraken ariba [vfdb_core] 40 1743985 npilon 40 0
+# python Pipeline/assembly_pipeline_v8.py /home/alma/Documents/kandidat/genomes/SRR18825428_1.fastq /home/alma/Documents/kandidat/genomes/SRR18825428_2.fastq here ntrim nkraken ariba [vfdb_core] 40 1743985 npilon 40
 
 
 '''OPTIONS'''
-# - infile1 / directory: enter a directory to multiple files if parallelization is wanted. Will use same wanted coverage, however!
-# - infile2 / None: enter None if parallelize.
+# - infile1 / directory: enter a directory to multiple short read files to run the pipeline in 
+# parallel. Will use same wanted coverage, however!
+# - infile2 / None: enter None if a directory was entered as infile1.
 # - here/there: Where should all outputs be saved? If 'here' a new directory is created in 
 # the current directory. If 'there' a path will be asked for.
-# - trim/notrim: trim means we run fastp, notrim means that we don't
-# - kraken/nokraken: choose whether kraken should be run or not
-# - ariba/noariba: choose whether to align AMR-genes with ariba
-# - [vfdb_core]: list of AMR-databases for ariba, without spaces
+# - trim/notrim: trim means we run fastp, notrim means that we don't.
+# - kraken/nokraken: choose whether kraken should be run or not.
+# - ariba/noariba: choose whether to align AMR-genes with ariba.
+# - [vfdb_core]: list of AMR-databases for ariba, without spaces.
 # - wanted_coverage: what coverage is requested? If 0, no assembly is performed.
 # - genome_size: what is the genome size of the organism?
 # - pilon/nopilon: choose whether to run pilon or not. Does not run if spades does not run (0 wanted coverage)
-# - threads: maximum threads available
-# - RAM: how much RAM that is available
+# - threads: maximum threads available.
 
 def directory(date, time, there = False):
     
@@ -89,7 +87,6 @@ def log_parse(string, logpath = ''):
     os.system(f"echo {time}: '{string}\n' >> {logpath}{logname}")
     return
 
-# @njit(parallel=True)
 def ariba_fun(infile1,infile2,db_ariba):
     for db_name in db_ariba[1:-1].split(','): #klumpigt? as sysargv makes input a string, it is separated into a list here. Also parallell should do all db at same time?
         
@@ -124,7 +121,6 @@ def ariba_fun(infile1,infile2,db_ariba):
     log_parse(f'Ariba done.\n')
     return
 
-# @njit(parallel=True)
 def fastp_func(infile1, infile2, common_name):
     '''Function that takes two raw reads fastq files, one forward (1, right) and one reverse(2, left)
     and returns two trimmed fastq files as well as quality control documentation.'''
@@ -144,7 +140,6 @@ def fastp_func(infile1, infile2, common_name):
     
     return outfile1, outfile2
 
-# @njit(parallel=True)
 def kraken_func(infile1, infile2, threads, common_name, path_kraken):
     ''' Function that runs Kraken on two raw reads fastq files, one forward (1, right) and one reverse(2, left), 
     in order to assign taxonomic labels to the sequences'''
@@ -162,7 +157,6 @@ def kraken_func(infile1, infile2, threads, common_name, path_kraken):
     log_parse(f'{kraken_output} \n{kraken_report}')
     return kraken_output, kraken_report
 
-# @njit(parallel=True)
 def reads_for_coverage(fastq_file, wanted_coverage, genome_size):
     '''Function that checks whether the requested coverage can be reached with the input
     files, returning the maximum coverage if this is not the case.'''
@@ -216,7 +210,6 @@ def reads_for_coverage(fastq_file, wanted_coverage, genome_size):
 
     return coverage, reads_needed
 
-# @njit(parallel=True)
 def shorten_fastq(fastq1_file, fastq2_file, reads_needed, common_name):
     '''Function that shortens the fastq files to only be long enough to reach 
     the requested coverage.'''
@@ -251,7 +244,6 @@ def shorten_fastq(fastq1_file, fastq2_file, reads_needed, common_name):
 
     return newname1, newname2
 
-# @njit(parallel=True)
 def spades_func(file1, file2, path_spades, common_name, finalpath, threads): # threads, RAM
     '''Function that runs SPAdes to assemble contigs from short reads.'''
 
@@ -275,7 +267,6 @@ def spades_func(file1, file2, path_spades, common_name, finalpath, threads): # t
 
     return assembly_path
 
-# @njit(parallel=True)
 def pilon_func(fastafile, fasta1, fasta2, common_name, threads, assembly_path):
     '''Function that runs Pilon on contigs-file from SPAdes to 
     polish and assemble further.'''
@@ -314,7 +305,6 @@ def pilon_func(fastafile, fasta1, fasta2, common_name, threads, assembly_path):
 
     return 
 
-# @njit(parallel=True)
 def info(spades_assembly):
     '''Function that uses an assembly-file from SPAdes of Pilon 
     and returns the metrics of that assembly.'''
@@ -385,9 +375,12 @@ def info(spades_assembly):
 
     return info_df
 
-# function that runs everything for only one strain. Inputs are all sys.argv[]
 def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads):
-    
+    '''Function that runs the regular pipeline. This function is called from the parallelize
+    function in the case of calling the pipeline with a directory of multiple reads files.
+    Requires an output path, a forward file (1), a reverse file (2) as well as other predetermined 
+    parameters'''
+
     time = currenttime()
     date = str(datetime.date(datetime.now()))
 
@@ -398,20 +391,17 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
     os.system(f'cp {infile1} {infile2} {path}')
     os.chdir(path)
 
-    # if path for infiles has been sent in, then shorten the names 
+# if path for infiles has been sent in, then shorten the names. Otherwise there will be no change.
     infile1 = infile1.split('/')[-1]
     infile2 = infile2.split('/')[-1]
 
     common_name = shortname(infile1)
 
-    # Create log file
+# Create log file
     global logname
-    logname = 'logfile.txt' # maybe not the smartest when parallell? but otherwise need to feed it into every function
-    # Rename log file with date and time --- easier to just use logfile.txt globally?
-    # stringtime = time[:2]+'h'+time[3:5]+'m'+time[6:8]+'s'
-    # logname = 'LOGFILE' + date + '_' + stringtime
+    logname = 'logfile.txt'
     create_log(path, time, date, logname)
-    print(f'Pipeline started, please refer to logfile "{logname}" for updates.') # add path to logfile later 
+    print(f'Pipeline started, please refer to logfile "{logname}" for updates.')
 
 # Ariba 
     if ariba:
@@ -481,26 +471,20 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
         
         # Save info_df INSTEAD KEEP AS DF AND CONCAT WITH KRAKEN AND ALIGNMENT
         info_df.to_csv(os.PathLike(f'{path}/{common_name}_metrics'))
-    
-# Move files to correct folder
-    
-    # return info_df to be able to concatenate if running in parallel.
-    # 1. change ariba out.db.tsv and kraken report to csv
-    # 2. change csv to df
-    # all_df = pd.concat([info_df, kraken_df, alignment_df], axis=1) # stack in one row
-    # all_df.to_csv(os.PathLike(f'{path}/{common_name}_metrics'))
+        
+        # 1. change ariba out.db.tsv and kraken report to csv
+        # 2. concatenate ariba overview, kraken and info to one csv-file in the variable results_csv
+
+        # os.system(mv results_csv finalpath)
 
 def map_func(dir, f):
+    '''Function to map regular to files and directory when running in parallel'''
     return regular(dir, f[0], f[1], run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads)
 
-# function that runs multiple strains in parallel. Inputs are all sys.argv[]
-# @njit(parallel=True)
-def parallelize(finalpath, file_directory, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads):
-    '''Function that takes a directory pf forward and reverse files to run the pipeline with in parallel.'''
+def parallelize(finalpath, file_directory):
+    '''Function that takes a directory of forward and reverse files to run the 
+    pipeline with in parallel. Also takes a final path to the collective directory'''
     
-    # def _map_func(dir,f1,f2):
-    #     return regular(dir, f1, f2, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, common_name)
-
     current = os.getcwd()
     os.chdir(file_directory)
     os.system(f"ls *.gz > input.txt")
@@ -519,24 +503,13 @@ def parallelize(finalpath, file_directory, run_fastp, kraken, ariba, db_ariba, r
             f1 = linelist[i].strip('\n')
             f2 = linelist[i+1].strip('\n')
             files.append((f'{file_directory}/{f1}', f'{file_directory}/{f2}'))
-            # regular(path, f'{file_directory}/{linelist[i]}', f'{file_directory}/{linelist[i+1]}', run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, common_name)
-    
+            
     with future.ProcessPoolExecutor() as ex:
-        #files = [(f1,f2)]
         ex.map(map_func, dirlist, files)
-
-        # for d,f in dirlist, files:
-        #     f1 = f[0]
-        #     f2 = f[1]
-        #     ex.regular(dir, f1, f2, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, common_name)
-
     
-    # os.system(f'cd {finalpath}') # change back to finalpath to place all info in
-
-    pass
+    # os.system(f'cd {finalpath}') # change back to finalpath ???
 
 def main():
-    # os.system('SBATCH -p node -n 1')
     """
     path/to/file1 path/to/file2 here nopar notrim nokraken ariba [db1, db2] 0 size nopilon thr ram
     """
@@ -560,10 +533,6 @@ def main():
         pilon = False
         pilon_lines = 'Pilon not run since SPAdes was not run (!)\n\n'
 
-    ''' -------------------CHANGE !?!?!?!----------------------- '''
-# Hardcoded, location of non-conda tools
-
-
 # Let's start this pipeline!
     time = currenttime()
     date = str(datetime.date(datetime.now()))
@@ -571,26 +540,11 @@ def main():
 # make directory for output
     finalpath = directory(date, time, new_location)
 
-    '''CONTINUE FROM HERE'''
     if os.path.isdir(infile1):
         parallelize(finalpath, infile1, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads)
     else:
         regular(finalpath, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads)
-    # if infile1 == directory (hur)?
-        # parallelize()
-    # else:
-    #     regular()
 
-
-    # OBS OBS convert to csv later instead
-    # if run_spades:
-    # os.system(f'mv {info_df} {finalpath}')
-    # log.writelines(f'Dataframe moved')
-
-# Close and move the logfile to the correct directory
-
-#    os.system('mv {logname} '+str(finalpath))
-    
 
 if __name__ == '__main__':
     main()  
