@@ -69,7 +69,9 @@ def currenttime():
 def shortname(filename):
     '''Function that take a filename and returns a shorter version 
     including only the first continuous word-number sequence.'''
-    short = re.search('[a-zA-Z1-9]+', filename).group()
+    splitit = filename.split('/')
+    name = splitit[-1]
+    short = re.search('[a-zA-Z1-9]+', name).group()
     return short
 
 def create_log(finalpath, time, date, logname):
