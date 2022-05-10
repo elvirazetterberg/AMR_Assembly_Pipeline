@@ -398,6 +398,10 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
     os.system(f'cp {infile1} {infile2} {path}')
     os.chdir(path)
 
+    # if path for infiles has been sent in, then shorten the names 
+    infile1 = infile1.split('/')[-1]
+    infile2 = infile2.split('/')[-1]
+
     common_name = shortname(infile1)
 
     # Create log file
