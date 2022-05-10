@@ -12,12 +12,14 @@ import concurrent.futures as future
 # 'python assembly_pipeline_v6.py infile1/folder(???) infile2/None(???) here/there trim/notrim kraken/nokraken ariba/noariba wanted_coverage genome_size pilon/nopilon threads RAM'
 
 # test run:
-# python assembly_pipeline_v6.py SRR18825428_1.fastq.gz SRR18825428_2.fastq.gz here trim kraken noariba [vfdb_core] 40 1743985 nopilon 40 0
+# python assembly_pipeline_v8.py SRR18825428_1.fastq.gz SRR18825428_2.fastq.gz here trim kraken noariba [vfdb_core] 40 1743985 nopilon 40 0
 # 
-# python assembly_pipeline_v6.py SRR18825428test_1.fastq.gz SRR18825428test_2.fastq.gz here trim kraken noariba [vfdb_core] 40 1743985 nopilon 40 0
+# parallelize
+# python assembly_pipeline_v8.py manyfiles None here trim kraken noariba [vfdb_core] 40 1743985 nopilon 40 0
+
 
 # Lokal Alma:
-# python Pipeline/assembly_pipeline_v6.py /home/alma/Documents/kandidat/genomes/SRR18825428_1.fastq /home/alma/Documents/kandidat/genomes/SRR18825428_2.fastq here ntrim nkraken ariba [vfdb_core] 40 1743985 npilon 40 0
+# python Pipeline/assembly_pipeline_v8.py /home/alma/Documents/kandidat/genomes/SRR18825428_1.fastq /home/alma/Documents/kandidat/genomes/SRR18825428_2.fastq here ntrim nkraken ariba [vfdb_core] 40 1743985 npilon 40 0
 
 
 '''OPTIONS'''
@@ -503,7 +505,7 @@ def parallelize(finalpath, file_directory, run_fastp, kraken, ariba, db_ariba, r
     with open(f'{file_directory}/input.txt', 'r') as inp:
         linelist = inp.readlines()
         for i in range(0, len(linelist), 2):
-            common_name = shortname(i)
+            common_name = shortname(linelist[i])
             path = f'{finalpath}/{common_name}'
             os.mkdir(path)
             dirlist.append(path)
