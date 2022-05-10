@@ -503,7 +503,7 @@ def parallelize(finalpath, file_directory, run_fastp, kraken, ariba, db_ariba, r
 
     dirlist = []
     files = []
-    with gzip.open(f'{file_directory}/input.txt', 'rt') as inp:
+    with open(f'{file_directory}/input.txt', 'r') as inp:
         linelist = inp.readlines()
         for i in range(0, len(linelist), 2):
             common_name = shortname(linelist[i])
