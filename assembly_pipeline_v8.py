@@ -381,7 +381,7 @@ def info(spades_assembly):
     data = {'Total nr bases': total_bases, 'Nr contigs': number_of_contigs, 'Longest contig': longest, 
     'Nr contigs > 1kb': contigs_over_1000, 'N50':N_50, 'GC-content': GC}
 
-    info_df = pd.DataFrame(data)
+    info_df = pd.DataFrame(data=data, index=[0])
 
     return info_df
 
