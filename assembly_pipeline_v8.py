@@ -491,6 +491,9 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
     # all_df.to_csv(os.PathLike(f'{path}/{common_name}_metrics'))
 
 def map_func(dir, f1, f2):
+    print('directory:', dir)
+    print('f1:', f1)
+    print('f2:', f2)
     return regular(dir, f1, f2, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads)
 
 # function that runs multiple strains in parallel. Inputs are all sys.argv[]
@@ -519,11 +522,6 @@ def parallelize(finalpath, file_directory, run_fastp, kraken, ariba, db_ariba, r
             files.append((f'{file_directory}/{linelist[i]}', f'{file_directory}/{linelist[i+1]}'))
             # regular(path, f'{file_directory}/{linelist[i]}', f'{file_directory}/{linelist[i+1]}', run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, common_name)
     
-    print('--------------------------------')
-    print(dirlist)
-    print(files)
-    print('--------------------------------')
-
     with future.ProcessPoolExecutor() as ex:
         #files = [(f1,f2)]
         ex.map(map_func, dirlist, files[0], files[1])
