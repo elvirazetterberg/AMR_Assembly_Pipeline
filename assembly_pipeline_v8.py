@@ -395,6 +395,12 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
     path_spades = path_tools + '/SPAdes-3.15.4-Linux/bin'
     path_kraken = path_tools + '/minikraken2_v1_8GB'
 
+    print('------regular------')
+    print('infile1:', infile1)
+    print('infile2:', infile2)
+    print('path:', path)
+    print('-------------------')
+
     os.system(f'cp {infile1} {infile2} {path}')
     os.chdir(path)
 
@@ -490,11 +496,11 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
     # all_df = pd.concat([info_df, kraken_df, alignment_df], axis=1) # stack in one row
     # all_df.to_csv(os.PathLike(f'{path}/{common_name}_metrics'))
 
-def map_func(dir, f1, f2):
+def map_func(dir, f):
     print('directory:', dir)
-    print('f1:', f1)
-    print('f2:', f2)
-    return regular(dir, f1, f2, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads)
+    print('f1:', f[0])
+    print('f2:', f[1])
+    return regular(dir, f[0], f[1], run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads)
 
 # function that runs multiple strains in parallel. Inputs are all sys.argv[]
 # @njit(parallel=True)
@@ -524,7 +530,7 @@ def parallelize(finalpath, file_directory, run_fastp, kraken, ariba, db_ariba, r
     
     with future.ProcessPoolExecutor() as ex:
         #files = [(f1,f2)]
-        ex.map(map_func, dirlist, files[0], files[1])
+        ex.map(map_func, dirlist, files)
 
         # for d,f in dirlist, files:
         #     f1 = f[0]
