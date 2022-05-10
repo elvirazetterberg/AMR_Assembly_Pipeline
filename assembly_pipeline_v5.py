@@ -13,7 +13,7 @@ import pandas as pd
 # python assembly_pipeline_v5.py SRR18825428_1.fastq.gz SRR18825428_2.fastq.gz here regular trim kraken noariba [vfdb_core] 40 124000000 pilon 40 0
 # 
 #Lokal Alma:
-# python Pipeline/assembly_pipeline_v5.py /home/alma/Documents/kandidat/genomes/SRR18825428_1.fastq /home/alma/Documents/kandidat/genomes/SRR18825428_2.fastq here nregular ntrim nkraken ariba [vfdb_core] 40 124000000 npilon 40 0
+# python Pipeline/assembly_pipeline_v5.py /home/alma/Documents/kandidat/genomes/SRR19101548_1.fastq.gz /home/alma/Documents/kandidat/genomes/SRR19101548_2.fastq.gz here nregular ntrim nkraken ariba [argannot,card,megares,plasmidfinder,resfinder,srst2_argannot,vfdb_core,virulencefinder] 0 124000000 npilon 0 0
 
 
 '''OPTIONS'''
@@ -344,29 +344,29 @@ def regular():
 def ariba_fun(infile1,infile2,db_ariba):
     #("Available databases: argannot, card, ncbi, megares, plasmidfinder, resfinder, srst2_argannot, vfdb_core, vfdb_full, virulencefinder")
     # Functional db: argannot, vf_core, card, resfinder, srst2_argannot, plasmidfinder, virulencefinder  
-    # Nonfunctional: megares, ncbi och vfdb_full 
+    # Nonfunctional: ncbi och vfdb_full 
 
-    for db_name in db_ariba[1:-1].split(', '): #klumpigt? as sysargv makes input a string, it is separated into a list here. Also parallell should do all db at same time?
+    for db_name in db_ariba: #klumpigt? as sysargv makes input a string, it is separated into a list here. Also parallell should do all db at same time?
         
-        # OBS when making parallell the naming of files must take this into account. Right now Im deleting the privious runs
-    
-        # if there's allready an existing db, lite fult gjort?
-        # In the pearlpipeline it says "$test_CARD = "CARD_reference_dataset_downloaded"; What does it mean? 
+        # OBS when making parallell the naming of files must take this into account. Right now Im deleting the previous runs
 
         log_parse(f' Starting ariba with {db_name}')
         if os.path.exists(f'out.{db_name}.fa'): 
-            log_parse(f'Database {db_name} allready downloaded\n')
+            log_parse(f'Database {db_name} already downloaded')
             os.system(f"rm -rf out.run.{db_name}") # är detta smart sätt att göra det? Ska det läggas till i log?
 
-        else: # if database not downloaded. troligen onädigt i framtiden
-            rm_db=input(f'Please note that running this will remove all existing files starting with "out.{db_name}". [y]/n?') 
-            if rm_db.lower().startswith("y")==False:
-                log_parse(f'Answered no: NOT Removing all existing files starting with "out.{db_name}". Exiting ariba.')
-                exit() 
-            else:
-                log_parse(f'Answered yes: Removing all existing files starting with "out.{db_name}". Proceeding with ariba.')
-                os.system(f"rm -rf out.{db_name}*")
+        else: # if database not downloaded.
 
+#            REMOVED TO MAKE PARAL. EASIER           
+#            rm_db=input(f'Please note that running this will remove all existing files starting with "out.{db_name}". [y]/n?') 
+#            if rm_db.lower().startswith("y")==False:
+#                log_parse(f'Answered no: NOT Removing all existing files starting with "out.{db_name}". Exiting ariba.')
+#                exit() 
+#            else:
+#                log_parse(f'Answered yes: Removing all existing files starting with "out.{db_name}". Proceeding with ariba.')
+#                os.system(f"rm -rf out.{db_name}*")
+
+            os.system(f"rm -rf out.{db_name}*") # DURING PARAL. THIS MIGHT BE AN ISSUE, PERHAPS SHOULD CREATE UNIQUE NAME? OR MOVE DIRCTLY INTO DIR
             log_parse(f'Downloading database {db_name}')
             os.system(f"ariba getref {db_name} out.{db_name} >> {logname}")
 
@@ -406,12 +406,15 @@ def main():
     run_fastp = sys.argv[5] == 'trim' # will run fastp if True
     kraken = sys.argv[6] == 'kraken'
     ariba = sys.argv[7] == 'ariba'
-    db_ariba = sys.argv[8] 
+    db_ariba = sys.argv[8][1:-1].split(',')
     wanted_coverage = int(sys.argv[9]) # if wanted coverage == 0, then don't run spades
     genome_size = int(sys.argv[10])
     pilon = sys.argv[11] == 'pilon'
     threads = sys.argv[12]
     RAM = sys.argv[13]
+
+    for d in db_ariba:
+        print(d)
 
     run_spades = wanted_coverage != 0
     shortened = False # Changed to True if fastq-files are shortened for spades
@@ -448,7 +451,7 @@ def main():
         header= '\n'+'='*15 +'ARIBA'+ '='*15 +'\n'
         log_parse(header)
         ariba_fun(infile1,infile2, db_ariba)
-        os.system("ariba summary out_sum out.run.*/report.tsv")
+        os.system("ariba summary out.sum out.run.*/report.tsv")
     
 # Run in parallel
     if parallel:
@@ -515,13 +518,14 @@ def main():
     
 
 # Move files to correct folder
-    """
+
     if ariba:
-        os.system('mv ' + + ' ' +  + ' fastp.html fastp.json ' + str(finalpath))
-        if db_downloaded ==False:
-            os.system('mv ' + + ' ' +  + ' fastp.html fastp.json ' + str(finalpath)) #Move the db aswell?
+        for db in db_ariba:
+            os.system(f'mv out.run.{db}* ' + str(finalpath))
+        os.system(f'mv out.sum* ' + str(finalpath))
         log_parse('Ariba output files moved to directory\n\n')
-    """
+        os.system(f'mv {logname}* '+ str(finalpath))
+        
     if run_fastp:
         os.system('mv ' + outfile1_trim + ' ' + outfile2_trim + ' fastp.html fastp.json ' + str(finalpath))
         log_parse('Trimmed fastp output files moved to directory\n\n')

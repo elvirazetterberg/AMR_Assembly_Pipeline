@@ -1,0 +1,8 @@
+virulence finder:   0 
+vfdb_core:          91
+srst2_argannot:     1
+argannot:           1
+resfinferder:       1
+card:               6
+megares:            10
+plasmidfinder:      0
