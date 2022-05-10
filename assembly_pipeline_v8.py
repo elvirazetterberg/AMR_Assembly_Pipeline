@@ -494,9 +494,6 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
     # all_df.to_csv(os.PathLike(f'{path}/{common_name}_metrics'))
 
 def map_func(dir, f):
-    print('directory:', dir)
-    print('f1:', f[0])
-    print('f2:', f[1])
     return regular(dir, f[0], f[1], run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads)
 
 # function that runs multiple strains in parallel. Inputs are all sys.argv[]
