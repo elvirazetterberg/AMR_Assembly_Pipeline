@@ -395,9 +395,6 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
     path_spades = path_tools + '/SPAdes-3.15.4-Linux/bin'
     path_kraken = path_tools + '/minikraken2_v1_8GB'
 
-    print('------regular------')
-    print(f'cp {infile1} {infile2} {path}')
-
     os.system(f'cp {infile1} {infile2} {path}')
     os.chdir(path)
 
@@ -519,8 +516,8 @@ def parallelize(finalpath, file_directory, run_fastp, kraken, ariba, db_ariba, r
             path = f'{finalpath}/{common_name}'
             os.mkdir(path)
             dirlist.append(path)
-            f1 = linelist[i].strip('/n')
-            f2 = linelist[i+1].strip('/n')
+            f1 = linelist[i].strip('\n')
+            f2 = linelist[i+1].strip('\n')
             files.append((f'{file_directory}/{f1}', f'{file_directory}/{f2}'))
             # regular(path, f'{file_directory}/{linelist[i]}', f'{file_directory}/{linelist[i+1]}', run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, common_name)
     
