@@ -522,7 +522,9 @@ def parallelize(finalpath, file_directory, run_fastp, kraken, ariba, db_ariba, r
             path = f'{finalpath}/{common_name}'
             os.mkdir(path)
             dirlist.append(path)
-            files.append((f'{file_directory}/{linelist[i]}', f'{file_directory}/{linelist[i+1]}'))
+            f1 = linelist[i].strip('/n')
+            f2 = linelist[i+1].strip('/n')
+            files.append((f'{file_directory}/{f1})', f'{file_directory}/{f2}'))
             # regular(path, f'{file_directory}/{linelist[i]}', f'{file_directory}/{linelist[i+1]}', run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, common_name)
     
     with future.ProcessPoolExecutor() as ex:
