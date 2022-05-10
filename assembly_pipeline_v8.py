@@ -384,7 +384,7 @@ def info(spades_assembly):
     return info_df
 
 # function that runs everything for only one strain. Inputs are all sys.argv[]
-def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, common_name):
+def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads):
     
     time = currenttime()
     date = str(datetime.date(datetime.now()))
@@ -396,6 +396,7 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
     os.system(f'cp {infile1} {infile2} {path}')
     os.chdir(path)
 
+    common_name = shortname(infile1)
 
     # Create log file
     global logname
@@ -483,16 +484,16 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
     # all_df = pd.concat([info_df, kraken_df, alignment_df], axis=1) # stack in one row
     # all_df.to_csv(os.PathLike(f'{path}/{common_name}_metrics'))
 
-# def map_func(dir, f1, f2):
-#     return regular(dir, f1, f2, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, common_name)
+def map_func(dir, f1, f2):
+    return regular(dir, f1, f2, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads)
 
 # function that runs multiple strains in parallel. Inputs are all sys.argv[]
 # @njit(parallel=True)
-def parallelize(finalpath, file_directory, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, common_name):
+def parallelize(finalpath, file_directory, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads):
     '''Function that takes a directory pf forward and reverse files to run the pipeline with in parallel.'''
     
-    def _map_func(dir,f1,f2):
-        return regular(dir, f1, f2, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, common_name)
+    # def _map_func(dir,f1,f2):
+    #     return regular(dir, f1, f2, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, common_name)
 
     current = os.getcwd()
     os.chdir(file_directory)
@@ -515,7 +516,7 @@ def parallelize(finalpath, file_directory, run_fastp, kraken, ariba, db_ariba, r
 
     with future.ProcessPoolExecutor() as ex:
         #files = [(f1,f2)]
-        ex.map(_map_func, dirlist, files[0], files[1])
+        ex.map(map_func, dirlist, files[0], files[1])
 
         # for d,f in dirlist, files:
         #     f1 = f[0]
@@ -532,6 +533,7 @@ def main():
     """
     path/to/file1 path/to/file2 here nopar notrim nokraken ariba [db1, db2] 0 size nopilon thr ram
     """
+    global infile1, infile2, new_location, run_fastp, kraken, ariba, db_ariba, wanted_coverage, genome_size, pilon, threads, run_spades
     infile1 = sys.argv[1] # 
     infile2 = sys.argv[2]
     new_location = sys.argv[3] == 'there' # will ask for directory location if True
@@ -543,10 +545,9 @@ def main():
     genome_size = int(sys.argv[9])
     pilon = sys.argv[10] == 'pilon'
     threads = sys.argv[11]
-    RAM = sys.argv[12] # this has not been implemented
+    # RAM = sys.argv[12] # this has not been implemented
 
     run_spades = wanted_coverage != 0
-    common_name = shortname(infile1) # until here only work if not parallel
 
     if pilon and run_spades == False: # Since pilon requires spades output, this 
         pilon = False
@@ -565,9 +566,9 @@ def main():
 
     '''CONTINUE FROM HERE'''
     if os.path.isdir(infile1):
-        parallelize(finalpath, infile1, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, common_name)
+        parallelize(finalpath, infile1, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads)
     else:
-        regular(finalpath, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, common_name)
+        regular(finalpath, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads)
     # if infile1 == directory (hur)?
         # parallelize()
     # else:
