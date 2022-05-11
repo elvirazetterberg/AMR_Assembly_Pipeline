@@ -504,7 +504,7 @@ def parallelize(finalpath, file_directory):
             f2 = linelist[i+1].strip('\n')
             files.append((f'{file_directory}/{f1}', f'{file_directory}/{f2}'))
             
-    with future.ProcessPoolExecutor() as ex:
+    with future.ThreadPoolExecutor() as ex:
         ex.map(map_func, dirlist, files)
     
     # os.system(f'cd {finalpath}') # change back to finalpath ???
@@ -541,7 +541,7 @@ def main():
     finalpath = directory(date, time, new_location)
 
     if os.path.isdir(infile1):
-        parallelize(finalpath, infile1, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads)
+        parallelize(finalpath, infile1)
     else:
         regular(finalpath, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads)
 
