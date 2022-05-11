@@ -406,7 +406,7 @@ def main():
     run_fastp = sys.argv[5] == 'trim' # will run fastp if True
     kraken = sys.argv[6] == 'kraken'
     ariba = sys.argv[7] == 'ariba'
-    db_ariba = sys.argv[8][1:-1].split(',')
+    db_ariba = sys.argv[8][1:-1].strip(" ").split(',')
     wanted_coverage = int(sys.argv[9]) # if wanted coverage == 0, then don't run spades
     genome_size = int(sys.argv[10])
     pilon = sys.argv[11] == 'pilon'
@@ -525,7 +525,7 @@ def main():
         os.system(f'mv out.sum* ' + str(finalpath))
         log_parse('Ariba output files moved to directory\n\n')
         os.system(f'mv {logname}* '+ str(finalpath))
-        
+
     if run_fastp:
         os.system('mv ' + outfile1_trim + ' ' + outfile2_trim + ' fastp.html fastp.json ' + str(finalpath))
         log_parse('Trimmed fastp output files moved to directory\n\n')

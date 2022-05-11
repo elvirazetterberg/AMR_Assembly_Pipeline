@@ -88,27 +88,17 @@ def log_parse(string, logpath = ''):
     return
 
 def ariba_fun(infile1,infile2,db_ariba):
-    for db_name in db_ariba[1:-1].split(','): #klumpigt? as sysargv makes input a string, it is separated into a list here. Also parallell should do all db at same time?
-        
-        # OBS when making parallell the naming of files must take this into account. Right now Im deleting the privious runs
-    
-        # if there's allready an existing db, lite fult gjort?
-        # In the pearlpipeline it says "$test_CARD = "CARD_reference_dataset_downloaded"; What does it mean? 
+    # Functional db: argannot, vf_core, card, resfinder, srst2_argannot, plasmidfinder, virulencefinder  
+    # Nonfunctional: ncbi och vfdb_full 
 
+    for db_name in db_ariba: 
         log_parse(f' Starting ariba with {db_name}')
         if os.path.exists(f'out.{db_name}.fa'): 
-            log_parse(f'Database {db_name} allready downloaded\n')
-            os.system(f"rm -rf out.run.{db_name}") # är detta smart sätt att göra det? Ska det läggas till i log?
+            log_parse(f'Database {db_name} already downloaded')
+            os.system(f"rm -rf out.run.{db_name}") # OBS FARLIGT? är detta smart sätt att göra det? Ska det läggas till i log?
 
-        else: # if database not downloaded. troligen onädigt i framtiden
-            rm_db=input(f'Please note that running this will remove all existing files starting with "out.{db_name}". [y]/n?') 
-            if rm_db.lower().startswith("y")==False:
-                log_parse(f'Answered no: NOT Removing all existing files starting with "out.{db_name}". Exiting ariba.')
-                exit() 
-            else:
-                log_parse(f'Answered yes: Removing all existing files starting with "out.{db_name}". Proceeding with ariba.')
-                os.system(f"rm -rf out.{db_name}*")
-
+        else: # if database not downloaded.
+            os.system(f"rm -rf out.{db_name}*") # DURING PARAL. THIS MIGHT BE AN ISSUE, PERHAPS SHOULD CREATE UNIQUE NAME? OR MOVE DIRCTLY INTO DIR
             log_parse(f'Downloading database {db_name}')
             os.system(f"ariba getref {db_name} out.{db_name} >> {logname}")
 
@@ -408,7 +398,8 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
         header= '\n'+'='*15 +'ARIBA'+ '='*15 +'\n'
         log_parse(header)
         ariba_fun(infile1,infile2, db_ariba)
-        os.system("ariba summary out_sum out.run.*/report.tsv")
+        #os.system("ariba summary out_sum out.run.*/report.tsv") #change from v5
+        os.system("ariba summary out.sum out.run.*/report.tsv")
 
 # Fastp
     if run_fastp:
@@ -520,7 +511,7 @@ def main():
     run_fastp = sys.argv[4] == 'trim' # will run fastp if True
     kraken = sys.argv[5] == 'kraken'
     ariba = sys.argv[6] == 'ariba'
-    db_ariba = sys.argv[7] 
+    db_ariba = sys.argv[7][1:-1].strip(" ").split(',')
     wanted_coverage = int(sys.argv[8]) # if wanted coverage == 0, then don't run spades
     genome_size = int(sys.argv[9])
     pilon = sys.argv[10] == 'pilon'
