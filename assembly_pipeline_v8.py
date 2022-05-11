@@ -494,9 +494,6 @@ def parallelize(finalpath, file_directory):
             f1 = linelist[i].strip('\n')
             f2 = linelist[i+1].strip('\n')
             files.append((f'{file_directory}/{f1}', f'{file_directory}/{f2}'))
-            
-    print(dirlist)
-    print(files)
     
     with future.ThreadPoolExecutor() as ex:
         ex.map(map_func, dirlist, files)
