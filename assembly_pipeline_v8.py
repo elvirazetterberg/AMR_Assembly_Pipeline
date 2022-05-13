@@ -505,7 +505,7 @@ def main():
     """
     path/to/file1 path/to/file2 here nopar notrim nokraken ariba [db1, db2] 0 size nopilon thr ram
     """
-    global new_location, run_fastp, kraken, ariba, db_ariba, wanted_coverage, genome_size, pilon, threads, run_spades
+    global run_fastp, kraken, ariba, db_ariba, wanted_coverage, genome_size, pilon, threads, run_spades
     infile1 = sys.argv[1] # 
     infile2 = sys.argv[2]
     new_location = sys.argv[3] == 'there' # will ask for directory location if True
