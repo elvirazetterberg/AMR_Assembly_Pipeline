@@ -17,7 +17,8 @@ import concurrent.futures as future
 # python assembly_pipeline_v8.py manyfiles None here trim kraken noariba [vfdb_core] 40 1743985 nopilon 40
 
 # Lokal Alma:
-# python Pipeline/assembly_pipeline_v8.py /home/alma/Documents/kandidat/genomes/SRR18825428_1.fastq /home/alma/Documents/kandidat/genomes/SRR18825428_2.fastq here ntrim nkraken ariba [vfdb_core] 40 1743985 npilon 40
+# python Pipeline/assembly_pipeline_v8.py /home/alma/Documents/kandidat/genomes/SRR18825428_1.fastq.gz /home/alma/Documents/kandidat/genomes/SRR18825428_2.fastq.gz here ntrim nkraken ariba [vfdb_core] 0 1743985 npilon 0
+
 
 
 '''OPTIONS'''
