@@ -493,10 +493,12 @@ def parallelize(finalpath, file_directory):
 
     dirlist = []
     files = []
+    com_names=[]
     with open(f'{file_directory}/input.txt', 'r') as inp:
         linelist = inp.readlines()
         for i in range(0, len(linelist), 2):
             common_name = shortname(linelist[i])
+            com_names.append(common_name) # EDITED: for use in sum_info file
             path = f'{finalpath}/{common_name}'
             os.mkdir(path)
             dirlist.append(path)
@@ -509,25 +511,20 @@ def parallelize(finalpath, file_directory):
 
     os.system(f'cd {finalpath}') # change back to finalpath ??? yes <3
  
-    # Creating combined info-files for parallellized genomes, currently names are last but works
-    finalname="sum_info"
-    with open(f'{file_directory}/input.txt', 'r') as inp:
-        linelist = inp.readlines()
-        evry_2_el = [linelist[index].strip('_2.fastq.gz') for index in range(1, len(linelist), 2)] #need to strip \n aswell?
-            
-        infopath= os.getcwd() # correct? where are we standing?
-        all_filenames = [i for i in glob.glob(f'assembly*/*assembly/info.csv')]  
-
-        combined_csv = pd.concat([pd.read_csv(f) for f in all_filenames ], axis=0) 
-        combined_csv["Genome Name"] = evry_2_el
-        combined_csv.to_csv( f'{infopath}/{finalname}.csv', index=False, encoding='utf-8-sig')
+    # Creating combined info-files for parallellized genomes, currently names are last but works. OK?
+    finalname="sum_info" #change?
+    infopath= os.getcwd() # correct? where are we standing?
+    all_filenames = [i for i in glob.glob(f'assembly*/*assembly/info.csv')]  
+    combined_csv = pd.concat([pd.read_csv(f) for f in all_filenames ], axis=0) 
+    combined_csv["Genome Name"] = com_names # EDITED: from appending names in loop above
+    combined_csv.to_csv( f'{infopath}/{finalname}.csv', index=False, encoding='utf-8-sig')
     
 
 def main():
     """
     path/to/file1 path/to/file2 here nopar notrim nokraken ariba [db1, db2] 0 size nopilon thr ram
     """
-    global run_fastp, kraken, ariba, db_ariba, wanted_coverage, genome_size, pilon, threads, run_spades
+    global infile1, infile2, new_location, run_fastp, kraken, ariba, db_ariba, wanted_coverage, genome_size, pilon, threads, run_spades
     infile1 = sys.argv[1] # 
     infile2 = sys.argv[2]
     new_location = sys.argv[3] == 'there' # will ask for directory location if True
