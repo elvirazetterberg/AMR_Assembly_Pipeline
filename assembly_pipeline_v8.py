@@ -90,54 +90,55 @@ def log_parse(string, logpath = ''):
     os.system(f"echo {time}: '{string}\n' >> {logpath}{logname}")
     return
 
-def ariba_fun(infile1,infile2,db_ariba):
+def ariba_fun(path, infile1,infile2,db_ariba):
     # Functional db: argannot, vf_core, card, resfinder, srst2_argannot, plasmidfinder, virulencefinder  
     # Nonfunctional: ncbi och vfdb_full 
+    os.chdir(path)
 
     for db_name in db_ariba: 
-        log_parse(f' Starting ariba with {db_name}')
+        log_parse(f' Starting ariba with {db_name}', path)
         if os.path.exists(f'out.{db_name}.fa'): 
-            log_parse(f'Database {db_name} already downloaded')
+            log_parse(f'Database {db_name} already downloaded', path)
             os.system(f"rm -rf out.run.{db_name}") # OBS FARLIGT? är detta smart sätt att göra det? Ska det läggas till i log?
 
         else: # if database not downloaded.
             os.system(f"rm -rf out.{db_name}*") # DURING PARAL. THIS MIGHT BE AN ISSUE, PERHAPS SHOULD CREATE UNIQUE NAME? OR MOVE DIRCTLY INTO DIR
-            log_parse(f'Downloading database {db_name}')
+            log_parse(f'Downloading database {db_name}', path)
             os.system(f"ariba getref {db_name} out.{db_name} >> {logname}")
 
-            log_parse(f'Preparing references with prefix out.{db_name}')
+            log_parse(f'Preparing references with prefix out.{db_name}', path)
             os.system(f"ariba prepareref -f out.{db_name}.fa -m out.{db_name}.tsv out.{db_name}.prepareref >> {logname}")
 
-        log_parse(f'Running ariba on {db_name}')
+        log_parse(f'Running ariba on {db_name}', path)
         os.system(f"ariba run out.{db_name}.prepareref {infile1} {infile2} out.run.{db_name} >> {logname}")
 
-    log_parse(f'Ariba done.\n')
+    log_parse(f'Ariba done.\n', path)
     return
 
-def fastp_func(infile1, infile2, common_name):
+def fastp_func(path, infile1, infile2, common_name):
     '''Function that takes two raw reads fastq files, one forward (1, right) and one reverse(2, left)
     and returns two trimmed fastq files as well as quality control documentation.'''
+    os.chdir(path)
 
-    log_parse(f'Fastp started with {infile1} and {infile2}\n')
+    log_parse(f'Fastp started with {infile1} and {infile2}\n', path)
 
     outfile1 = f'out_fastp_{common_name}_1.fq.gz'
     outfile2 = f'out_fastp_{common_name}_2.fq.gz'
 
     fastpinput = f'fastp -i {infile1} -I {infile2} -o {outfile1} -O {outfile2}'
 
-    # os.system(fastpinput) # I dont know if this generates outpu, but in that case I should be parsed into logfile like below
-    # log_parse(fastpinput) 
     os.system(f'{fastpinput} >> {logname}')
     
-    log_parse(f'Fastp complete. Four output files returned:\n{outfile1} \n{outfile2} \nfastp.html \nfastp.json \n')
+    log_parse(f'Fastp complete. Four output files returned:\n{outfile1} \n{outfile2} \nfastp.html \nfastp.json \n', path)
     
     return outfile1, outfile2
 
-def kraken_func(infile1, infile2, threads, common_name, path_kraken):
+def kraken_func(path, infile1, infile2, threads, common_name, path_kraken):
     ''' Function that runs Kraken on two raw reads fastq files, one forward (1, right) and one reverse(2, left), 
     in order to assign taxonomic labels to the sequences'''
-                
-    log_parse(f'Kraken started with {infile1} and {infile2} as input with {threads} threads available \n' )
+    os.chdir(path)
+
+    log_parse(f'Kraken started with {infile1} and {infile2} as input with {threads} threads available \n', path)
     kraken_output = f'out_kraken_{common_name}.out'
     kraken_report = f'report_kraken_{common_name}.report'
 
@@ -146,13 +147,15 @@ def kraken_func(infile1, infile2, threads, common_name, path_kraken):
     os.system(krakeninput)# I dont know if this generates outpu, but in that case I should be parsed into logfile like below
     #os.system(f'{krakeninput} >> {logname}') 
 
-    log_parse(f'Kraken run finished. Two output files returned:\n')
-    log_parse(f'{kraken_output} \n{kraken_report}')
+    log_parse(f'Kraken run finished. Two output files returned:\n', path)
+    log_parse(f'{kraken_output} \n{kraken_report}', path)
     return kraken_output, kraken_report
 
-def reads_for_coverage(fastq_file, wanted_coverage, genome_size):
+def reads_for_coverage(path, fastq_file, wanted_coverage, genome_size):
     '''Function that checks whether the requested coverage can be reached with the input
     files, returning the maximum coverage if this is not the case.'''
+    os.chdir(path)
+
     log_parse(f'Running: reads_for_coverage')
     log_parse(f'Checking if coverage can be achieved \n\n')
 
@@ -203,11 +206,12 @@ def reads_for_coverage(fastq_file, wanted_coverage, genome_size):
 
     return coverage, reads_needed
 
-def shorten_fastq(fastq1_file, fastq2_file, reads_needed, common_name):
+def shorten_fastq(path, fastq1_file, fastq2_file, reads_needed, common_name):
     '''Function that shortens the fastq files to only be long enough to reach 
     the requested coverage.'''
+    os.chdir(path)
 
-    log_parse( f'shorten_fastq started to shorten {fastq1_file} and {fastq2_file} to only match wanted coverage.\n\n')
+    log_parse( f'shorten_fastq started to shorten {fastq1_file} and {fastq2_file} to only match wanted coverage.\n\n', path)
 
     lines_needed = reads_needed*4
     newname1 = f'X_{common_name}_1.fastq.gz'
@@ -233,14 +237,15 @@ def shorten_fastq(fastq1_file, fastq2_file, reads_needed, common_name):
     with gzip.open(newname2, 'wt') as one:
         one.write(newfile)
 
-    log_parse( f'Shortening complete.\nOutputs: {newname1}, {newname2}.\n\n')
+    log_parse( f'Shortening complete.\nOutputs: {newname1}, {newname2}.\n\n', path)
 
     return newname1, newname2
 
-def spades_func(file1, file2, path_spades, common_name, finalpath, threads): # threads, RAM
+def spades_func(path, file1, file2, path_spades, common_name, finalpath, threads): # threads, RAM
     '''Function that runs SPAdes to assemble contigs from short reads.'''
+    os.chdir(path)
 
-    log_parse('SPAdes started\n')
+    log_parse('SPAdes started\n', path)
 
     # To make sure X_spades output is in the correct output directory. 
     # Pilon output will also be added here
@@ -253,10 +258,10 @@ def spades_func(file1, file2, path_spades, common_name, finalpath, threads): # t
 
     # rename from contigs.fasta to fasta to work with pilon
     os.system(f'cp {assembly_path}/contigs.fasta {assembly_path}/{common_name}.fasta')
-    log_parse( f'"contigs.fasta"-file copied and renamed to be called "{common_name}.fasta"')
+    log_parse( f'"contigs.fasta"-file copied and renamed to be called "{common_name}.fasta"', path)
 
-    log_parse('SPAdes finished.\n')
-    log_parse(f'All output files can be found here: {assembly_path}\n\n')
+    log_parse('SPAdes finished.\n', path)
+    log_parse(f'All output files can be found here: {assembly_path}\n\n', path)
 
     return assembly_path
 
@@ -298,14 +303,15 @@ def pilon_func(fastafile, fasta1, fasta2, common_name, threads, assembly_path):
 
     return 
 
-def info(spades_assembly):
+def info(path, spades_assembly):
     '''Function that uses an assembly-file from SPAdes of Pilon 
     and returns the metrics of that assembly.'''
 
     # Output som pandas table for att satta ihop alla strains till en sammanstalld csv-fil, 
     # och varje strain till var sin csv-fil
+    os.chdir(path)
 
-    log_parse( 'Looking at the metrics of assembly_fasta\n')
+    log_parse( 'Looking at the metrics of assembly_fasta\n', path)
 
     number_of_contigs, bases_in_contig, total_bases = 0, 0, 0
     contig_lengths = []
@@ -399,16 +405,16 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
 # Ariba 
     if ariba:
         header= '\n'+'='*15 +'ARIBA'+ '='*15 +'\n'
-        log_parse(header)
-        ariba_fun(infile1,infile2, db_ariba)
+        log_parse(header, path)
+        ariba_fun(path, infile1,infile2, db_ariba)
         #os.system("ariba summary out_sum out.run.*/report.tsv") #change from v5
         os.system("ariba summary out.sum out.run.*/report.tsv")
 
 # Fastp
     if run_fastp:
         header= '\n'+'='*15 +'FASTP'+ '='*15 +'\n'
-        log_parse(header)
-        outfile1_trim, outfile2_trim = fastp_func(infile1, infile2, common_name)
+        log_parse(header, path)
+        outfile1_trim, outfile2_trim = fastp_func(path, infile1, infile2, common_name)
 
         infile1 = outfile1_trim
         infile2 = outfile2_trim
@@ -416,35 +422,35 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
 # Kraken
     if kraken:
         header= '\n'+'='*15 +'KRAKEN'+ '='*15 +'\n'
-        log_parse(header)
-        kraken_output, kraken_report = kraken_func(infile1, infile2, threads, common_name, path_kraken)
+        log_parse(header, path)
+        kraken_output, kraken_report = kraken_func(path, infile1, infile2, threads, common_name, path_kraken)
 
 # Number of reads to match the wanted coverage
     if run_spades:
         header= '\n'+'='*15 +'READS FOR COVERAGE, SPADES'+ '='*15 +'\n'
-        log_parse(header)
-        coverage, reads_needed = reads_for_coverage(infile1, wanted_coverage, genome_size)
+        log_parse(header, path)
+        coverage, reads_needed = reads_for_coverage(path, infile1, wanted_coverage, genome_size)
     else:
         coverage = 0
 
 # Shortening fastq-files if the coverage can be reached with less
     if coverage > wanted_coverage:
-        outfile1_shorten, outfile2_shorten = shorten_fastq(infile1, infile2, reads_needed, common_name)        
+        outfile1_shorten, outfile2_shorten = shorten_fastq(path, infile1, infile2, reads_needed, common_name)        
         infile1 = outfile1_shorten
         infile2 = outfile2_shorten
         os.system(f'mv {outfile1_shorten} {outfile2_shorten} {path}')
-        log_parse(f'Shortened fastq files from shorten_fastq function moved to directory\n\n')
+        log_parse(f'Shortened fastq files from shorten_fastq function moved to directory\n\n', path)
 
 # Spades
     if run_spades:
         header= '\n'+'='*15 +'SPADES'+ '='*15 +'\n'
-        log_parse(header)
-        assembly_path = spades_func(infile1, infile2, path_spades, common_name, path, threads)
+        log_parse(header, path)
+        assembly_path = spades_func(path, infile1, infile2, path_spades, common_name, path, threads)
 
 # Pilon
     if pilon:
         header= '\n'+'='*15 +'PILON'+ '='*15 +'\n'
-        log_parse(header)
+        log_parse(header, path)
         fastafile = f'{assembly_path}/{common_name}.fasta'
         pilon_func(fastafile, infile1, infile2, common_name, threads, assembly_path)
         
@@ -453,7 +459,7 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
 # Info/metrics
     if run_spades:
         header= '\n'+'='*15 +'INFO/METRICS, SPADES'+ '='*15 +'\n'
-        log_parse(header)
+        log_parse(header, path)
 
         from_spades = f'{assembly_path}/{common_name}.fasta'
         
