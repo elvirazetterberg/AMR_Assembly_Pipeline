@@ -87,7 +87,7 @@ def create_log(finalpath, time, date, logname):
 
 def log_parse(string, logpath = ''):
     time = currenttime()
-    os.system(f"echo {time}: '{string}\n' >> {logpath}{logname}")
+    os.system(f"echo {time}: '{string}\n' >> {logpath}/{logname}")
     return
 
 def ariba_fun(path, infile1,infile2,db_ariba):
@@ -269,7 +269,7 @@ def pilon_func(fastafile, fasta1, fasta2, common_name, threads, assembly_path):
     '''Function that runs Pilon on contigs-file from SPAdes to 
     polish and assemble further.'''
     
-    current = os.getcwd()+'/'
+    current = os.getcwd()
     
     os.chdir(assembly_path)
     
