@@ -463,7 +463,7 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
 
         from_spades = f'{assembly_path}/{common_name}.fasta'
         
-        info_df = info(from_spades)
+        info_df = info(path, from_spades)
         info_df.to_csv(header = True, path_or_buf = f'{path}/{common_name}_info.csv')
         
         # If we have multiple info_df then use pd.concat([info_df1, info_df2], axis=0) to stack the 2nd below the 1st.
