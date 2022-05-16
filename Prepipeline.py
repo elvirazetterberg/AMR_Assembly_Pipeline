@@ -1,4 +1,5 @@
 from datetime import datetime
+from tkinter import Y
 import pandas as pd
 import os
 import concurrent.futures as future
@@ -30,12 +31,21 @@ Contributors: Alma Nilsson, Corinne Olivero, Elvira Zetterberg, Evelina Andersso
 
 """
 
+def while_yn(string, default_ans):
+    ans=""
+    yes_or_no = False
+    while yes_or_no==False:
+        ans=input(string) or default_ans
+        yes_or_no = ans.lower().startswith("y") or ans.lower().startswith("n")
+        if yes_or_no==False:
+            print(f"Please answer 'yes' or 'no'. Giver answer '{ans}' does not satisfy the criteria.")
+    return ans
 
 def command_generator(frst,scnd,one_or_sev):
 
     #Check path for input and check if files exist:
     path=input(f"If not in current directory, please input absolute path for {one_or_sev}. Otherwise press ENTER: ") or sp.getoutput("pwd") #os.curdir not working?
-    print(path)
+    print("Current directory:",path)
     file_ex = sp.getoutput(f' [ -f {path}/{frst} ] && echo "File exist" || echo "File does not exist"')
     if file_ex!="File exist":
         exit(f'Could not find "{frst}". Exiting.')
@@ -44,7 +54,7 @@ def command_generator(frst,scnd,one_or_sev):
 
     # Check what tools are wanted, default is nothing
     for tool in tools:
-        t=input(f"Do you want to run {tool}? y/[n]:\t") or "no"
+        t=while_yn(f"Do you want to run {tool}? y/[n]:\t", "no")
         if t.lower().startswith("y"):
             chosen_tools.append(tool.lower()) 
         else:
@@ -68,7 +78,7 @@ def command_generator(frst,scnd,one_or_sev):
     cov=input("What coverage is requested? If 0, no assembly is performed.\t") or "0"
     gen_siz=input("What is the genome size of your organism?\t") or "0"
     if cov!=0:
-        pilon=input("Do you wish to run pilon? y/[n]\t")+"pilon" or "no"
+        pilon=while_yn("Do you wish to run pilon? y/[n]\t", "no")+ "pilon"
         if pilon.lower().startswith("y"): # not working for some reason
             pilon="pilon"
     threads=input("Please write the maximum threads available:\t") or "0"
@@ -84,14 +94,6 @@ def command_generator(frst,scnd,one_or_sev):
 
 def main():  
     
-    # print(f" \n\n\
-    #  ____  ____   _____    ____  _ ____  _____  _     _ __   _  _____  \n\
-    # |  _ \|    \ | ____|  |  _ \| |  _ \|  ___|| |   | |  \ | ||  ___| \n\
-    # | |_) |    / | |__    | |_) | | |_) | |__  | |   | |   \| || |___  \n\
-    # |  __/| |\ \ | |___   |  __/| |  __/| |___ | |___| | |\ \ || |___  \n\
-    # |_|   |_| \_\|_____|  |_|   |_|_|   |_____||_____|_| | \__||_____| \n\n\
-    # COMMAND  GENERATOR  FOR  ASSEMBLY, & AMR  &  VIRULENCE  DETECTION\n\n")
-
     print(f" \n\n\
      ____  ____  _____    ____  _ ____  _____  _     _ __   _  _____  \n\
     |  _ \|    \| ____|  |  _ \| |  _ \|  ___|| |   | |  \ | ||  ___| \n\
@@ -111,17 +113,18 @@ def main():
     chosen_db=[]
 
     # START OF COMMAND GENERATION:
-    sev=input("Do you wish to run several genomes? [y]/n:\t") or "yes" 
+    sev=while_yn("Do you wish to run several genomes? [y]/n:\t", "yes")
     if sev.lower().startswith("y"):
-        directory=input("Please input name of directory containing genomes: ")
+        directory=input("Please input name of directory containing genomes: ") or exit("No name given. Exiting.") 
         command=command_generator(directory,"None","directory")
     else:
-        name=input("please enter the name (ID) of your genome: ") or exit("No name given. Exiting.") #should we ask for name of file or name? 
+        name=input("please enter the name (ID) of your genome: ").strip("_2.fastq.gz").strip("_1.fastq.gz") \
+            or exit("No name given. Exiting.") 
 
         command=command_generator(name,name,"genome")
 
 
-    a=input(f"Your command is: \n {command}\nDo you wish to run the pipeline imemdiately? y/[n]") or "no"
+    a=while_yn(f"Your command is: \n {command}\n\nDo you wish to run the pipeline imemdiately? y/[n]","no")
     if a.lower is "y":
         os.system(command)
     else:
