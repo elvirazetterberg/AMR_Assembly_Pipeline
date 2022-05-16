@@ -120,7 +120,7 @@ def create_log(path, time, date, logname):
     lines += os.popen("conda list | awk '/^spades /{print $1\"\t\"$2}'").read().strip() + '\n'
     lines += os.popen("conda list | awk '/^bowtie2 /{print $1\"\t\"$2}'").read().strip() + '\n'
     lines += os.popen("conda list | awk '/^ariba /{print $1\"\t\"$2}'").read().strip() + '\n\n'
-    lines += f'New directory created with the adress {finalpath}\n'
+    lines += f'New directory created with the adress {path}\n'
     lines += f'Directory created at {time} on {date}\n'
     lines += 'All outputs will be saved in the new directory.\n\n'
     os.system(f"echo '{lines}' > {logname}")
@@ -599,7 +599,6 @@ def main():
 
     if pilon and run_spades == False: # Since pilon requires spades output, this 
         pilon = False
-        pilon_lines = 'Pilon not run since SPAdes was not run (!)\n\n'
 
 # Let's start this pipeline!
 
