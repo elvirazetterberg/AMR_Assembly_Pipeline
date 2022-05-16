@@ -568,13 +568,13 @@ def parallelize(finalpath, file_directory):
 
     os.system(f'cd {finalpath}') # change back to finalpath ??? yes <3
  
-    # Creating combined info-files for parallellized genomes, currently names are last but works. OK?
-    finalname="sum_info" #change?
-    infopath= os.getcwd() # correct? where are we standing?
-    all_filenames = [i for i in glob.glob(f'{infopath}/*/info.csv')]  
-    combined_csv = pd.concat([pd.read_csv(f) for f in all_filenames ], axis=0) 
-    combined_csv["Genome Name"] = com_names # EDITED: from appending names in loop above
-    combined_csv.to_csv( f'{infopath}/{finalname}.csv', index=False, encoding='utf-8-sig')
+    # # Creating combined info-files for parallellized genomes, currently names are last but works. OK?
+    # finalname="sum_info" #change?
+    # infopath= os.getcwd() # correct? where are we standing?
+    # all_filenames = [i for i in glob.glob(f'{infopath}/*/info.csv')]  
+    # combined_csv = pd.concat([pd.read_csv(f) for f in all_filenames ], axis=0) 
+    # combined_csv["Genome Name"] = com_names # EDITED: from appending names in loop above
+    # combined_csv.to_csv( f'{infopath}/{finalname}.csv', index=False, encoding='utf-8-sig')
     
 
 def main():
