@@ -8,18 +8,30 @@ import concurrent.futures as future
 import glob
 
 
+"""
 
-# Start by parsing the following command through the terminal, choosing only one option in each case:
-# 'python assembly_pipeline_v8.py infile1/directory infile2/None(???) here/there trim/notrim kraken/nokraken ariba/noariba wanted_coverage genome_size pilon/nopilon threads'
+                    HI  AND  WELCOME  TO  THE _____
+             ____  _ ____  _____  _     _ __   _  _____  
+            |  _ \| |  _ \|  ___|| |   | |  \ | ||  ___| 
+            | |_) | | |_) | |__  | |   | |   \| || |___  
+            |  __/| |  __/| |___ | |___| | |\ \ || |___   
+            |_|   |_|_|   |_____||_____|_| | \__||_____| 
 
-# test run, regular
-# python assembly_pipeline_v8.py SRR18825428_1.fastq.gz SRR18825428_2.fastq.gz here trim kraken noariba [vfdb_core] 40 1743985 nopilon 40
+                            UU x SVA
 
-# test run, parallelize
-# python assembly_pipeline_v8.py manyfiles None here trim kraken noariba [vfdb_core] 40 1743985 nopilon 40
 
-# Lokal Alma:
-# python Pipeline/assembly_pipeline_v8.py /home/alma/Documents/kandidat/genomes/SRR18825428_1.fastq.gz /home/alma/Documents/kandidat/genomes/SRR18825428_2.fastq.gz here ntrim nkraken ariba [vfdb_core] 0 1743985 npilon 0
+Start by parsing the following command through the terminal, choosing only one option in each case:
+'python assembly_pipeline.py infile1/directory infile2/None here/there trim/notrim kraken/nokraken ariba/noariba wanted_coverage genome_size pilon/nopilon threads'
+
+
+
+REFERENCE:
+The work of third year students at the Master's Programme in Molecular Biotechnology Engineering (X) at Uppsala University 2022. 
+GitHub: https://github.com/elvirazetterberg/Pipeline.git  #change name 
+Contributors: Alma Nilsson, Corinne Olivero, Elvira Zetterberg, Evelina Andersson, Julia Sulyaeva, Moa Qvarnlöf
+
+"""
+
 
 
 
@@ -77,7 +89,17 @@ def shortname(filename):
 
 def create_log(finalpath, time, date, logname):
 
-    lines = 15*'-' + 'LOGFILE' + 15*'-' + '\n\n'
+    lines = f'                                              \n\
+                    HI  AND  WELCOME  TO  THE _____         \n\
+             ____  _ ____  _____  _     _ __   _  _____     \n\
+            |  _ \| |  _ \|  ___|| |   | |  \ | ||  ___|    \n\
+            | |_) | | |_) | |__  | |   | |   \| || |___     \n\
+            |  __/| |  __/| |___ | |___| | |\ \ || |___     \n\
+            |_|   |_|_|   |_____||_____|_| | \__||_____|    \n\
+                                                            \n\
+                            UU x SVA                        \n\n\n'
+
+    lines += 15*'-' + 'LOGFILE' + 15*'-' + '\n\n'
     lines += f'Pipeline called with following arguments:\n'
     lines += f'\t infile1: {infile1}, infile2: {infile2}, new_location: {new_location},\n'
     lines += f'\t run_fastp: {run_fastp}, kraken: {kraken}, ariba: {ariba}, db_ariba: {db_ariba}, wanted_coverage: {wanted_coverage},\n'
@@ -562,6 +584,17 @@ def main():
         pilon_lines = 'Pilon not run since SPAdes was not run (!)\n\n'
 
 # Let's start this pipeline!
+
+    print(f'                                                    \n\
+                        HI  AND  WELCOME  TO  THE _____         \n\
+                ____  _ ____  _____  _     _ __   _  _____     \n\
+                |  _ \| |  _ \|  ___|| |   | |  \ | ||  ___|    \n\
+                | |_) | | |_) | |__  | |   | |   \| || |___     \n\
+                |  __/| |  __/| |___ | |___| | |\ \ || |___     \n\
+                |_|   |_|_|   |_____||_____|_| | \__||_____|    \n\
+                                                                \n\
+                                UU x SVA                        \n')
+
     time = currenttime()
     date = str(datetime.date(datetime.now()))
     

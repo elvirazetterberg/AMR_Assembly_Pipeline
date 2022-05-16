@@ -15,14 +15,18 @@ import subprocess as sp
 
                         COMMAND GENERATOR!
 
+                        
+
 This script generates a command in the following format:
 
 'python assembly_pipeline_v8.py infile1/directory infile2/None here/there trim/notrim kraken/nokraken ariba/noariba wanted_coverage genome_size pilon/nopilon threads'
 
 And will start the pipeline with the generated command if wanted.
 
-
-Reference:
+REFERENCE:
+The work of third year students at the Master's Programme in Molecular Biotechnology Engineering (X) at Uppsala University 2022. 
+GitHub: https://github.com/elvirazetterberg/Pipeline.git  #change name 
+Contributors: Alma Nilsson, Corinne Olivero, Elvira Zetterberg, Evelina Andersson, Julia Sulyaeva, Moa Qvarnlöf
 
 """
 
