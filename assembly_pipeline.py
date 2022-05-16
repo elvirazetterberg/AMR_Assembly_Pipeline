@@ -95,7 +95,8 @@ def shortname(filename):
     short = re.search('[a-zA-Z1-9]+', name).group()
     return short
 
-def create_log(finalpath, time, date, logname):
+def create_log(path, time, date, logname):
+    os.chdir(path)
 
     lines = f'                                              \n\
                     HI  AND  WELCOME  TO  THE _____         \n\
@@ -119,7 +120,7 @@ def create_log(finalpath, time, date, logname):
     lines += os.popen("conda list | awk '/^spades /{print $1\"\t\"$2}'").read().strip() + '\n'
     lines += os.popen("conda list | awk '/^bowtie2 /{print $1\"\t\"$2}'").read().strip() + '\n'
     lines += os.popen("conda list | awk '/^ariba /{print $1\"\t\"$2}'").read().strip() + '\n\n'
-    lines += f'New directory created with the adress {finalpath}\n'
+    lines += f'New directory created with the adress {path}\n'
     lines += f'Directory created at {time} on {date}\n'
     lines += 'All outputs will be saved in the new directory.\n\n'
     os.system(f"echo '{lines}' > {logname}")
@@ -459,7 +460,6 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
 # Create log file
     global logname
     logname = 'logfile.txt'
-    os.chdir(path)
     create_log(path, time, date, logname)
     print(f'Pipeline started, please refer to logfile "{logname}" for updates.')
 
@@ -532,11 +532,6 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
         
         # Save info_df INSTEAD KEEP AS DF AND CONCAT WITH KRAKEN AND ALIGNMENT
         info_df.to_csv(os.PathLike(f'{path}/{common_name}_metrics'))
-        
-        # 1. change ariba out.db.tsv and kraken report to csv
-        # 2. concatenate ariba overview, kraken and info to one csv-file in the variable results_csv
-
-        # os.system(mv results_csv finalpath)
 
 def map_func(dir, f):
     '''Function to map regular to files and directory when running in parallel'''
@@ -573,13 +568,13 @@ def parallelize(finalpath, file_directory):
 
     os.system(f'cd {finalpath}') # change back to finalpath ??? yes <3
  
-    # Creating combined info-files for parallellized genomes, currently names are last but works. OK?
-    finalname="sum_info" #change?
-    infopath= os.getcwd() # correct? where are we standing?
-    all_filenames = [i for i in glob.glob(f'*/info.csv')]  
-    combined_csv = pd.concat([pd.read_csv(f) for f in all_filenames ], axis=0) 
-    combined_csv["Genome Name"] = com_names # EDITED: from appending names in loop above
-    combined_csv.to_csv( f'{infopath}/{finalname}.csv', index=False, encoding='utf-8-sig')
+    # # Creating combined info-files for parallellized genomes, currently names are last but works. OK?
+    # finalname="sum_info" #change?
+    # infopath= os.getcwd() # correct? where are we standing?
+    # all_filenames = [i for i in glob.glob(f'{infopath}/*/info.csv')]  
+    # combined_csv = pd.concat([pd.read_csv(f) for f in all_filenames ], axis=0) 
+    # combined_csv["Genome Name"] = com_names # EDITED: from appending names in loop above
+    # combined_csv.to_csv( f'{infopath}/{finalname}.csv', index=False, encoding='utf-8-sig')
     
 
 def main():
@@ -604,7 +599,6 @@ def main():
 
     if pilon and run_spades == False: # Since pilon requires spades output, this 
         pilon = False
-        pilon_lines = 'Pilon not run since SPAdes was not run (!)\n\n'
 
 # Let's start this pipeline!
 
