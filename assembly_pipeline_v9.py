@@ -15,7 +15,7 @@ import glob
 # test run, regular
 # python assembly_pipeline_v8.py SRR18825428_1.fastq.gz SRR18825428_2.fastq.gz here trim kraken noariba [vfdb_core] 40 1743985 nopilon 40
 
-# parallelize
+# test run, parallelize
 # python assembly_pipeline_v8.py manyfiles None here trim kraken noariba [vfdb_core] 40 1743985 nopilon 40
 
 # Lokal Alma:
@@ -123,7 +123,7 @@ def ariba_fun(path, infile1,infile2,db_ariba):
             os.system(f"ariba prepareref -f out.{db_name}.fa -m out.{db_name}.tsv out.{db_name}.prepareref >> {logname}")
 
         os.chdir(path) # go to output path
-        
+
         log_parse(f'Running ariba on {db_name}', path)
         os.system(f"ariba run {base_dir}/out.{db_name}.prepareref {infile1} {infile2} out.run.{db_name} >> {logname}")
 
