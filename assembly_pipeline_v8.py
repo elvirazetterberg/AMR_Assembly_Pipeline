@@ -88,6 +88,7 @@ def create_log(finalpath, time, date, logname):
 def log_parse(string, logpath = ''):
     time = currenttime()
     os.system(f"echo {time}: '{string}\n' >> {logpath}/{logname}")
+    
     return
 
 def ariba_fun(path, infile1,infile2,db_ariba):
