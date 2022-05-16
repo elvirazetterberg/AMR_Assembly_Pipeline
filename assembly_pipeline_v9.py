@@ -105,7 +105,8 @@ def log_parse(string, logpath = ''):
 def ariba_fun(path, infile1,infile2,db_ariba):
     # Functional db: argannot, vf_core, card, resfinder, srst2_argannot, plasmidfinder, virulencefinder  
     # Nonfunctional: ncbi och vfdb_full 
-    os.chdir(path)
+    
+    os.chdir(base_dir)
 
     for db_name in db_ariba: 
         log_parse(f' Starting ariba with {db_name}', path)
@@ -121,8 +122,10 @@ def ariba_fun(path, infile1,infile2,db_ariba):
             log_parse(f'Preparing references with prefix out.{db_name}', path)
             os.system(f"ariba prepareref -f out.{db_name}.fa -m out.{db_name}.tsv out.{db_name}.prepareref >> {logname}")
 
+        os.chdir(path) # go to output path
+        
         log_parse(f'Running ariba on {db_name}', path)
-        os.system(f"ariba run out.{db_name}.prepareref {infile1} {infile2} out.run.{db_name} >> {logname}")
+        os.system(f"ariba run {base_dir}/out.{db_name}.prepareref {infile1} {infile2} out.run.{db_name} >> {logname}")
 
     log_parse(f'Ariba done.\n', path)
     return
@@ -411,6 +414,7 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
 # Create log file
     global logname
     logname = 'logfile.txt'
+    os.chdir(path)
     create_log(path, time, date, logname)
     print(f'Pipeline started, please refer to logfile "{logname}" for updates.')
 
@@ -497,11 +501,12 @@ def parallelize(finalpath, file_directory):
     '''Function that takes a directory of forward and reverse files to run the 
     pipeline with in parallel. Also takes a final path to the collective directory'''
     
-    current = os.getcwd()
+    global base_dir
+    base_dir = os.getcwd()
     os.chdir(file_directory)
     os.system(f"ls *.gz > input.txt")
     # go back
-    os.chdir(current)
+    os.chdir(base_dir)
 
     dirlist = []
     files = []
