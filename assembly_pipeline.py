@@ -20,6 +20,13 @@ import glob
                             UU x SVA
 
 
+Before running:
+    * Make sure all tools mentioned in the sections 'Assembly tools and where to find them' and 
+        'ALIGNMENT !?'are installed properly.
+    * Hard code the paths to the SPAdes-tool and Minikraken2 database in the function 'regular'
+
+*************Now you should be ready to test the pipeline!*************
+
 Start by parsing the following command through the terminal, choosing only one option in each case:
 'python assembly_pipeline.py infile1/directory infile2/None here/there trim/notrim kraken/nokraken ariba/noariba wanted_coverage genome_size pilon/nopilon threads'
 
@@ -47,7 +54,8 @@ Contributors: Alma Nilsson, Corinne Olivero, Elvira Zetterberg, Evelina Andersso
 # - [vfdb_core]: list of AMR-databases for ariba, without spaces.
 # - wanted_coverage: what coverage is requested? If 0, no assembly is performed.
 # - genome_size: what is the genome size of the organism?
-# - pilon/nopilon: choose whether to run pilon or not. Does not run if spades does not run (0 wanted coverage)
+# - pilon/nopilon: choose whether to run pilon or not. Does not run if no spades (0 wanted coverage).
+''' THIS VERSION CANNOT RUN PILON.'''
 # - threads: maximum threads available.
 
 def directory(date, time, there = False):
@@ -420,9 +428,24 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
     time = currenttime()
     date = str(datetime.date(datetime.now()))
 
+#                   |  |
+#                   |  |
+#                 __|  |__
+#                 \      /
+#                  \    /
+#                   \  /   
+#                    \/
+################################################
+# CHANGE THESE PATHS TO FIT YOUR DOWNLOADS! :D
+################################################
+
     path_tools = '/proj/uppmax2022-2-14/private/campy_pipeline/assembly/verktyg'
     path_spades = path_tools + '/SPAdes-3.15.4-Linux/bin'
     path_kraken = path_tools + '/minikraken2_v1_8GB'
+
+################################################
+# NO MORE MODIFICATIONS NEEDED (HOPEFULLY)
+################################################
 
     os.system(f'cp {infile1} {infile2} {path}')
     os.chdir(path)
