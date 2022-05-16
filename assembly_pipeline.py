@@ -95,7 +95,8 @@ def shortname(filename):
     short = re.search('[a-zA-Z1-9]+', name).group()
     return short
 
-def create_log(finalpath, time, date, logname):
+def create_log(path, time, date, logname):
+    os.chdir(path)
 
     lines = f'                                              \n\
                     HI  AND  WELCOME  TO  THE _____         \n\
@@ -459,7 +460,6 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
 # Create log file
     global logname
     logname = 'logfile.txt'
-    os.chdir(path)
     create_log(path, time, date, logname)
     print(f'Pipeline started, please refer to logfile "{logname}" for updates.')
 
@@ -607,16 +607,6 @@ def main():
         pilon_lines = 'Pilon not run since SPAdes was not run (!)\n\n'
 
 # Let's start this pipeline!
-
-    print(f'                                                    \n\
-                        HI  AND  WELCOME  TO  THE _____         \n\
-                ____  _ ____  _____  _     _ __   _  _____     \n\
-                |  _ \| |  _ \|  ___|| |   | |  \ | ||  ___|    \n\
-                | |_) | | |_) | |__  | |   | |   \| || |___     \n\
-                |  __/| |  __/| |___ | |___| | |\ \ || |___     \n\
-                |_|   |_|_|   |_____||_____|_| | \__||_____|    \n\
-                                                                \n\
-                                UU x SVA                        \n')
 
     time = currenttime()
     date = str(datetime.date(datetime.now()))
