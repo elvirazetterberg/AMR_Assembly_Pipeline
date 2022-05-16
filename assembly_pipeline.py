@@ -527,11 +527,6 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
         info_df = info(path, from_spades)
         info_df.to_csv(header = True, path_or_buf = f'{path}/{common_name}_info.csv')
         
-        # If we have multiple info_df then use pd.concat([info_df1, info_df2], axis=0) to stack the 2nd below the 1st.
-        # This is useful when running in parallel.
-        
-        # Save info_df INSTEAD KEEP AS DF AND CONCAT WITH KRAKEN AND ALIGNMENT
-        info_df.to_csv(os.PathLike(f'{path}/{common_name}_metrics'))
 
 def map_func(dir, f):
     '''Function to map regular to files and directory when running in parallel'''
