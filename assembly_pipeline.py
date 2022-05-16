@@ -560,15 +560,14 @@ def parallelize(finalpath, file_directory):
     with future.ThreadPoolExecutor() as ex:
         ex.map(map_func, dirlist, files)
 
-    os.system(f'cd {finalpath}') # change back to finalpath ??? yes <3
+    os.chdir(finalpath) # change back to finalpath ??? yes <3
  
     # Creating combined info-files for parallellized genomes, currently names are last but works. OK?
     finalname="sum_info" #change?
-    infopath= os.getcwd() # correct? where are we standing?
-    all_filenames = [i for i in glob.glob(f'{infopath}/*/*info.csv')]  
+    all_filenames = [i for i in glob.glob(f'{finalpath}/*/*info.csv')]  
     combined_csv = pd.concat([pd.read_csv(f) for f in all_filenames ], axis=0) 
     combined_csv["Genome Name"] = com_names # EDITED: from appending names in loop above
-    combined_csv.to_csv(path_or_buf= f'{infopath}/{finalname}.csv', index=False, encoding='utf-8-sig')
+    combined_csv.to_csv(path_or_buf= f'{finalpath}/{finalname}.csv', index=False, encoding='utf-8-sig')
     
 
 def main():
