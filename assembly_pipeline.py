@@ -532,11 +532,6 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
         
         # Save info_df INSTEAD KEEP AS DF AND CONCAT WITH KRAKEN AND ALIGNMENT
         info_df.to_csv(os.PathLike(f'{path}/{common_name}_metrics'))
-        
-        # 1. change ariba out.db.tsv and kraken report to csv
-        # 2. concatenate ariba overview, kraken and info to one csv-file in the variable results_csv
-
-        # os.system(mv results_csv finalpath)
 
 def map_func(dir, f):
     '''Function to map regular to files and directory when running in parallel'''
