@@ -78,17 +78,17 @@ def shortname(filename):
 def create_log(finalpath, time, date, logname):
 
     lines = 15*'-' + 'LOGFILE' + 15*'-' + '\n\n'
-    lines += f'Pipeline called with following arguments:'
-    lines += f'\t infile1: {infile1}, infile2: {infile2}, new_location: {new_location},'
-    lines += f'\t run_fastp: {run_fastp}, kraken: {kraken}, ariba: {ariba}, db_ariba: {db_ariba}, wanted_coverage: {wanted_coverage},'
-    lines += f'\t genome_size: {genome_size}, pilon: {pilon}, threads: {threads}'
-    lines += f'The following packages and versions used:'
-    lines += os.popen("conda list | awk '/^python /{print $1\"\t\"$2}'").read().strip()
-    lines += os.popen("conda list | awk '/^fastp /{print $1\"\t\"$2}'").read().strip()
-    lines += os.popen("conda list | awk '/^kraken2 /{print $1\"\t\"$2}'").read().strip()
-    lines += os.popen("conda list | awk '/^spades /{print $1\"\t\"$2}'").read().strip()
-    lines += os.popen("conda list | awk '/^bowtie2 /{print $1\"\t\"$2}'").read().strip()
-    lines += os.popen("conda list | awk '/^ariba /{print $1\"\t\"$2}'").read().strip()
+    lines += f'Pipeline called with following arguments:\n'
+    lines += f'\t infile1: {infile1}, infile2: {infile2}, new_location: {new_location},\n'
+    lines += f'\t run_fastp: {run_fastp}, kraken: {kraken}, ariba: {ariba}, db_ariba: {db_ariba}, wanted_coverage: {wanted_coverage},\n'
+    lines += f'\t genome_size: {genome_size}, pilon: {pilon}, threads: {threads}\n\n'
+    lines += f'The following packages and versions used:\n'
+    lines += os.popen("conda list | awk '/^python /{print $1\"\t\"$2}'").read().strip() + '\n'
+    lines += os.popen("conda list | awk '/^fastp /{print $1\"\t\"$2}'").read().strip() + '\n'
+    lines += os.popen("conda list | awk '/^kraken2 /{print $1\"\t\"$2}'").read().strip() + '\n'
+    lines += os.popen("conda list | awk '/^spades /{print $1\"\t\"$2}'").read().strip() + '\n'
+    lines += os.popen("conda list | awk '/^bowtie2 /{print $1\"\t\"$2}'").read().strip() + '\n'
+    lines += os.popen("conda list | awk '/^ariba /{print $1\"\t\"$2}'").read().strip() + '\n\n'
     lines += f'New directory created with the adress {finalpath}\n'
     lines += f'Directory created at {time} on {date}\n'
     lines += 'All outputs will be saved in the new directory.\n\n'
