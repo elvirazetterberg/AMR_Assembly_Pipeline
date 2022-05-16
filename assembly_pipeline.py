@@ -608,16 +608,6 @@ def main():
 
 # Let's start this pipeline!
 
-    print(f'                                                    \n\
-                        HI  AND  WELCOME  TO  THE _____         \n\
-                ____  _ ____  _____  _     _ __   _  _____     \n\
-                |  _ \| |  _ \|  ___|| |   | |  \ | ||  ___|    \n\
-                | |_) | | |_) | |__  | |   | |   \| || |___     \n\
-                |  __/| |  __/| |___ | |___| | |\ \ || |___     \n\
-                |_|   |_|_|   |_____||_____|_| | \__||_____|    \n\
-                                                                \n\
-                                UU x SVA                        \n')
-
     time = currenttime()
     date = str(datetime.date(datetime.now()))
     
