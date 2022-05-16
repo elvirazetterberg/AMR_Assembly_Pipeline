@@ -134,14 +134,12 @@ def log_parse(string, logpath = ''):
     return
 
 def ariba_fun(path, infile1,infile2,db_ariba):
-    # Functional db: argannot, vf_core, card, resfinder, srst2_argannot, plasmidfinder, virulencefinder  
-    # Nonfunctional: ncbi och vfdb_full 
     
     os.chdir(base_dir)
     
     for db_name in db_ariba: 
         log_parse(f' Starting ariba with {db_name}', path)
-        if os.path.exists(f'out.{db_name}.fa'): 
+        if os.path.exists(f'out.{db_name}.fa'): #if databases allready downloaded
             log_parse(f'Database {db_name} already downloaded', path)
             os.system(f"rm -rf out.run.{db_name}") # OBS need warning?
 
