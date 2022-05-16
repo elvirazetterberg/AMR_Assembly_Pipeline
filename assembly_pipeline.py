@@ -404,13 +404,13 @@ def info(path, spades_assembly):
         if temp >= (total_bases/2):
             break
     
-    log_parse( f'N50: {N_50}\n')
+    log_parse( f'N50: {N_50}\n', path)
 
     # GC-content
     GC = round(number_GC*100/(number_GC + number_AT),2)
-    log_parse( f'The GC-content of the sequence is {GC}%. {non_base} non-base characters were excluded from GC-calculation\n')
+    log_parse( f'The GC-content of the sequence is {GC}%. {non_base} non-base characters were excluded from GC-calculation\n', path)
 
-    log_parse( f'-----------------------Metrics finished-----------------------')
+    log_parse( f'-----------------------Metrics finished-----------------------', path)
 
     # PLACE ALL INFO IN PANDAS TABLE
     data = {'Total nr bases': total_bases, 'Nr contigs': number_of_contigs, 'Longest contig': longest, 
