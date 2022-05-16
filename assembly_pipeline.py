@@ -54,8 +54,8 @@ Contributors: Alma Nilsson, Corinne Olivero, Elvira Zetterberg, Evelina Andersso
 # - [vfdb_core]: list of AMR-databases for ariba, without spaces.
 # - wanted_coverage: what coverage is requested? If 0, no assembly is performed.
 # - genome_size: what is the genome size of the organism?
-# - pilon/nopilon: choose whether to run pilon or not. Does not run if spades does not run 
-# (0 wanted coverage). THIS VERSION CANNOT RUN PILON.
+# - pilon/nopilon: choose whether to run pilon or not. Does not run if no spades (0 wanted coverage).
+''' THIS VERSION CANNOT RUN PILON.'''
 # - threads: maximum threads available.
 
 def directory(date, time, there = False):
@@ -428,9 +428,24 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
     time = currenttime()
     date = str(datetime.date(datetime.now()))
 
+#                   |  |
+#                   |  |
+#                 __|  |__
+#                 \      /
+#                  \    /
+#                   \  /   
+#                    \/
+################################################
+# CHANGE THESE PATHS TO FIT YOUR DOWNLOADS! :D
+################################################
+
     path_tools = '/proj/uppmax2022-2-14/private/campy_pipeline/assembly/verktyg'
     path_spades = path_tools + '/SPAdes-3.15.4-Linux/bin'
     path_kraken = path_tools + '/minikraken2_v1_8GB'
+
+################################################
+# NO MORE MODIFICATIONS NEEDED (HOPEFULLY)
+################################################
 
     os.system(f'cp {infile1} {infile2} {path}')
     os.chdir(path)
