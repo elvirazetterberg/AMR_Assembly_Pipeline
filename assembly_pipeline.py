@@ -123,11 +123,11 @@ def create_log(path, time, date, logname):
     lines += f'New directory created with the adress {path}\n'
     lines += f'Directory created at {time} on {date}\n'
     lines += 'All outputs will be saved in the new directory.\n\n'
-    os.system(f"echo '{lines}' > {logname}")
+    log_parse(lines, path)
     
     return
 
-def log_parse(string, logpath = ''):
+def log_parse(string, logpath):
     time = currenttime()
     os.system(f"echo {time}: '{string}\n' >> {logpath}/{logname}")
     
@@ -173,7 +173,7 @@ def fastp_func(path, infile1, infile2, common_name):
 
     fastpinput = f'fastp -i {infile1} -I {infile2} -o {outfile1} -O {outfile2}'
 
-    os.system(f'{fastpinput} >> {logname}')
+    os.system(fastpinput)
     
     log_parse(f'Fastp complete. Four output files returned:\n{outfile1} \n{outfile2} \nfastp.html \nfastp.json \n', path)
     
