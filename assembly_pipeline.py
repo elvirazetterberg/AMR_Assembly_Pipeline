@@ -202,13 +202,13 @@ def reads_for_coverage(path, fastq_file, wanted_coverage, genome_size):
     files, returning the maximum coverage if this is not the case.'''
     os.chdir(path)
 
-    log_parse(f'Running: reads_for_coverage')
-    log_parse(f'Checking if coverage can be achieved \n\n')
+    log_parse(f'Running: reads_for_coverage', path)
+    log_parse(f'Checking if coverage can be achieved \n\n', path)
 
     bases_needed = int(wanted_coverage*genome_size/2)
     
-    log_parse(f'To achieve {wanted_coverage} X, {bases_needed} bases are needed from each fastq-file\n')
-    log_parse(f'Checking if wanted coverage can be achieved...')
+    log_parse(f'To achieve {wanted_coverage} X, {bases_needed} bases are needed from each fastq-file\n', path)
+    log_parse(f'Checking if wanted coverage can be achieved...', path)
     total_bases = 0
     read_counter = 0
     row_counter = 1 # goes between 1 and 4
@@ -232,7 +232,7 @@ def reads_for_coverage(path, fastq_file, wanted_coverage, genome_size):
 
         # Give log output if the coverage can be achieved
             if total_bases >= bases_needed:
-                log_parse(f'Coverage can be reached! It amounts to {read_counter} reads from fastq_1 which is {total_bases} bases\n\n')
+                log_parse(f'Coverage can be reached! It amounts to {read_counter} reads from fastq_1 which is {total_bases} bases\n\n', path)
                 coverage = wanted_coverage
                 break
 
@@ -241,14 +241,14 @@ def reads_for_coverage(path, fastq_file, wanted_coverage, genome_size):
 
     # Give log output if the coverage CANNOT be achieved, and estimate new coverage
     if total_bases < bases_needed:
-        log_parse(f'There are not enough bases to achieve {wanted_coverage} X coverage.\n"')
+        log_parse(f'There are not enough bases to achieve {wanted_coverage} X coverage.\n"', path)
         available_coverage = int((2*total_bases)/genome_size)
-        log_parse( f'Using an estimated coverage of {available_coverage} X instead which amounts to {read_counter} reads and {total_bases} bases from fastq_1\n\n')
+        log_parse( f'Using an estimated coverage of {available_coverage} X instead which amounts to {read_counter} reads and {total_bases} bases from fastq_1\n\n', path)
         coverage = available_coverage
 
     reads_needed = read_counter
     
-    log_parse( f'Function finished.\nOutputs: coverage {coverage}, reads needed {reads_needed}\n\n')
+    log_parse( f'Function finished.\nOutputs: coverage {coverage}, reads needed {reads_needed}\n\n', path)
 
     return coverage, reads_needed
 
