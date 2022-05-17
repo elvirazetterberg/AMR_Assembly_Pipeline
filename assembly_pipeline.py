@@ -134,19 +134,17 @@ def log_parse(string, logpath = ''):
     return
 
 def ariba_fun(path, infile1,infile2,db_ariba):
-    # Functional db: argannot, vf_core, card, resfinder, srst2_argannot, plasmidfinder, virulencefinder  
-    # Nonfunctional: ncbi och vfdb_full 
     
     os.chdir(base_dir)
-
+    
     for db_name in db_ariba: 
         log_parse(f' Starting ariba with {db_name}', path)
-        if os.path.exists(f'out.{db_name}.fa'): 
+        if os.path.exists(f'out.{db_name}.fa'): #if databases allready downloaded
             log_parse(f'Database {db_name} already downloaded', path)
-            os.system(f"rm -rf out.run.{db_name}") # OBS FARLIGT? är detta smart sätt att göra det? Ska det läggas till i log?
+            os.system(f"rm -rf out.run.{db_name}") # OBS need warning?
 
         else: # if database not downloaded.
-            os.system(f"rm -rf out.{db_name}*") # DURING PARAL. THIS MIGHT BE AN ISSUE, PERHAPS SHOULD CREATE UNIQUE NAME? OR MOVE DIRCTLY INTO DIR
+            os.system(f"rm -rf out.{db_name}*")
             log_parse(f'Downloading database {db_name}', path)
             os.system(f"ariba getref {db_name} out.{db_name} >> {logname}")
 
@@ -158,6 +156,8 @@ def ariba_fun(path, infile1,infile2,db_ariba):
         log_parse(f'Running ariba on {db_name}', path)
         os.system(f"ariba run {base_dir}/out.{db_name}.prepareref {infile1} {infile2} out.run.{db_name} >> {logname}")
 
+    os.system("mkdir Ariba_output")     # Making dir to ensure output is not in main dir
+    os.system("mv out.* Ariba_output")  # No other names start with out. , right?
     log_parse(f'Ariba done.\n', path)
     return
 
