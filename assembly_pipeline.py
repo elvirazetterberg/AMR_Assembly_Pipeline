@@ -461,8 +461,7 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
     global logname
     logname = 'logfile.txt'
     create_log(path, time, date, logname)
-    print(f'Pipeline started, please refer to logfile "{logname}" for updates.')
-
+    
 # Ariba 
     if ariba:
         header= '\n'+'='*15 +'ARIBA'+ '='*15 +'\n'
@@ -549,7 +548,7 @@ def parallelize(finalpath, file_directory):
         linelist = inp.readlines()
         for i in range(0, len(linelist), 2):
             common_name = shortname(linelist[i])
-            com_names.append(common_name) # EDITED: for use in sum_info file
+            com_names.append(common_name)
             path = f'{finalpath}/{common_name}'
             os.mkdir(path)
             dirlist.append(path)
@@ -560,13 +559,13 @@ def parallelize(finalpath, file_directory):
     with future.ThreadPoolExecutor() as ex:
         ex.map(map_func, dirlist, files)
 
-    os.chdir(finalpath) # change back to finalpath ??? yes <3
+    os.chdir(finalpath)
  
-    # Creating combined info-files for parallellized genomes, currently names are last but works. OK?
-    finalname="sum_info" #change?
+    # Creating combined info-files for parallellized genomes, currently names are last but works.
+    finalname="sum_info"
     all_filenames = [i for i in glob.glob(f'{finalpath}/*/*info.csv')]  
     combined_csv = pd.concat([pd.read_csv(f) for f in all_filenames ], axis=0) 
-    combined_csv["Genome Name"] = com_names # EDITED: from appending names in loop above
+    combined_csv["Genome Name"] = com_names
     combined_csv.to_csv(path_or_buf= f'{finalpath}/{finalname}.csv', index=False, encoding='utf-8-sig')
     
 
