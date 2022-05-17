@@ -192,26 +192,27 @@ def kraken_func(path, infile1, infile2, threads, common_name, path_kraken):
     os.system(krakeninput)# I dont know if this generates outpu, but in that case I should be parsed into logfile like below
     #os.system(f'{krakeninput} >> {logname}') 
 
-    log_parse(f'Kraken run finished. Two output files returned:\n', path)
-    log_parse(f'{kraken_output} \n{kraken_report}', path)
+    lines = f'Kraken run finished. Two output files returned:\n'
+    lines += f'{kraken_output} \n{kraken_report}\n'
+    log_parse(lines, path)
+
     return kraken_output, kraken_report
 
 def reads_for_coverage(path, fastq_file, wanted_coverage, genome_size):
     '''Function that checks whether the requested coverage can be reached with the input
     files, returning the maximum coverage if this is not the case.'''
-    os.chdir(path)
 
     log_parse(f'Running: reads_for_coverage', path)
-    log_parse(f'Checking if coverage can be achieved \n\n', path)
 
     bases_needed = int(wanted_coverage*genome_size/2)
     
     log_parse(f'To achieve {wanted_coverage} X, {bases_needed} bases are needed from each fastq-file\n', path)
-    log_parse(f'Checking if wanted coverage can be achieved...', path)
+    log_parse(f'Checking if wanted coverage can be achieved...\n', path)
     total_bases = 0
     read_counter = 0
     row_counter = 1 # goes between 1 and 4
     
+    os.chdir(path)
     with gzip.open(fastq_file, 'rt') as file:
         for line in file:
             if '@' in line:
