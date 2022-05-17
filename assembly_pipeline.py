@@ -74,7 +74,7 @@ def directory(date, time, there = False):
         path = os.getcwd()
 
     # Rename directory with date and time
-    namedir = 'assembly_' + date + '_' + stringtime
+    namedir = 'pipeline_output_' + date + '_' + stringtime
 
     finalpath = os.path.join(path, namedir)
 
@@ -569,7 +569,6 @@ def parallelize(finalpath, file_directory):
     combined_csv["Genome Name"] = com_names
     combined_csv.to_csv(path_or_buf= f'{finalpath}/{finalname}.csv', index=False, encoding='utf-8-sig')
     
-
 def main():
     """
     path/to/file1 path/to/file2 here nopar notrim nokraken ariba [db1, db2] 0 size nopilon thr ram
