@@ -95,8 +95,7 @@ def shortname(filename):
     short = re.search('[a-zA-Z1-9]+', name).group()
     return short
 
-def create_log(path, time, date, logname):
-    os.chdir(path)
+def create_log(path, time, date, infile1, infile2, new_location):
 
     lines = f'                                              \n\
                     HI  AND  WELCOME  TO  THE _____         \n\
@@ -460,7 +459,7 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
 # Create log file
     global logname
     logname = 'logfile.txt'
-    create_log(path, time, date, logname)
+    create_log(path, time, date, infile1, infile2)
     
 # Ariba 
     if ariba:
@@ -575,7 +574,7 @@ def main():
     """
     path/to/file1 path/to/file2 here nopar notrim nokraken ariba [db1, db2] 0 size nopilon thr ram
     """
-    global run_fastp, kraken, ariba, db_ariba, wanted_coverage, genome_size, pilon, threads, run_spades
+    global new_location, run_fastp, kraken, ariba, db_ariba, wanted_coverage, genome_size, pilon, threads, run_spades
     infile1 = sys.argv[1] # 
     infile2 = sys.argv[2]
     new_location = sys.argv[3] == 'there' # will ask for directory location if True
