@@ -95,7 +95,7 @@ def shortname(filename):
     short = re.search('[a-zA-Z1-9]+', name).group()
     return short
 
-def create_log(path, time, date, infile1, infile2, new_location):
+def create_log(path, time, date, infile1, infile2):
 
     lines = f'                                              \n\
                     HI  AND  WELCOME  TO  THE _____         \n\
