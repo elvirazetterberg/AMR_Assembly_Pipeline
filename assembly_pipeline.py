@@ -525,6 +525,8 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
         
         info_df = info(path, from_spades)
         info_df.to_csv(header = True, path_or_buf = f'{path}/{common_name}_info.csv')
+
+    return 1
         
 def map_func(dir, f):
     '''Function to map regular to files and directory when running in parallel'''
@@ -557,7 +559,7 @@ def parallelize(finalpath, file_directory):
             files.append((f'{file_directory}/{f1}', f'{file_directory}/{f2}'))
     
     with future.ThreadPoolExecutor() as ex:
-        ex.map(map_func, dirlist, files)
+        results = ex.map(map_func, dirlist, files)
 
     os.chdir(finalpath)
  
@@ -573,7 +575,7 @@ def main():
     """
     path/to/file1 path/to/file2 here nopar notrim nokraken ariba [db1, db2] 0 size nopilon thr ram
     """
-    global infile1, infile2, new_location, run_fastp, kraken, ariba, db_ariba, wanted_coverage, genome_size, pilon, threads, run_spades
+    global new_location, run_fastp, kraken, ariba, db_ariba, wanted_coverage, genome_size, pilon, threads, run_spades
     infile1 = sys.argv[1] # 
     infile2 = sys.argv[2]
     new_location = sys.argv[3] == 'there' # will ask for directory location if True
