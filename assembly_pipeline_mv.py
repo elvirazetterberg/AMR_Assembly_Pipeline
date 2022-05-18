@@ -296,7 +296,7 @@ def shorten_fastq(path, fastq1_file, fastq2_file, reads_needed, common_name):
 
     return newpath1, newpath2
 
-def spades_func(path, file1, file2, path_spades, common_name, threads): # threads, RAM
+def spades_func(path, file1, file2, path_spades, common_name, threads, RAM):
     '''Function that runs SPAdes to assemble contigs from short reads.'''
 
     log_parse('SPAdes started\n', path)
@@ -306,7 +306,7 @@ def spades_func(path, file1, file2, path_spades, common_name, threads): # thread
     assembly_path = f'{path}/{common_name}_assembly'
 
     # commandline = '#SBATCH -p node -n 1 \n'
-    commandline = f'python {path_spades}/spades.py --careful -o {assembly_path} --pe1-1 {file1} --pe1-2 {file2} -t {threads}'
+    commandline = f'python {path_spades}/spades.py --careful -o {assembly_path} --pe1-1 {file1} --pe1-2 {file2} -t {threads} -m {RAM}'
     os.system(commandline)
     #"spades.py --careful -o $filename1_short\_$wanted_coverage\X_spades --pe1-1 $read1_output --pe1-2 $read2_output -t $threads_available -m $RAM_available"
 
@@ -421,7 +421,7 @@ def info(path, spades_assembly):
 
     return info_df
 
-def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads):
+def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, RAM):
     '''Function that runs the regular pipeline. This function is called from the parallelize
     function in the case of calling the pipeline with a directory of multiple reads files.
     Requires an output path, a forward file (1), a reverse file (2) as well as other predetermined 
@@ -507,14 +507,14 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
     if run_spades:
         header= '\n'+'='*15 +'SPADES'+ '='*15 +'\n'
         log_parse(header, path)
-        assembly_path = spades_func(path, infile1, infile2, path_spades, common_name, threads)
+        assembly_path = spades_func(path, infile1, infile2, path_spades, common_name, threads, RAM)
 
 # Pilon
-    if pilon:
-        header= '\n'+'='*15 +'PILON'+ '='*15 +'\n'
-        log_parse(header, path)
-        fastafile = f'{assembly_path}/{common_name}.fasta'
-        pilon_func(path, fastafile, infile1, infile2, common_name, threads, assembly_path)
+    # if pilon:
+    #     header= '\n'+'='*15 +'PILON'+ '='*15 +'\n'
+    #     log_parse(header, path)
+    #     fastafile = f'{assembly_path}/{common_name}.fasta'
+    #     pilon_func(path, fastafile, infile1, infile2, common_name, threads, assembly_path)
         
 # Info/metrics
     if run_spades:
@@ -574,7 +574,7 @@ def main():
     """
     path/to/file1 path/to/file2 here nopar notrim nokraken ariba [db1, db2] 0 size nopilon thr ram
     """
-    global new_location, run_fastp, kraken, ariba, db_ariba, wanted_coverage, genome_size, pilon, threads, run_spades, finalpath
+    global new_location, run_fastp, kraken, ariba, db_ariba, wanted_coverage, genome_size, pilon, threads, RAM, run_spades, finalpath
     infile1 = sys.argv[1] # 
     infile2 = sys.argv[2]
     new_location = sys.argv[3] == 'there' # will ask for directory location if True
@@ -586,7 +586,7 @@ def main():
     genome_size = int(sys.argv[9])
     pilon = sys.argv[10] == 'pilon'
     threads = sys.argv[11]
-    # RAM = sys.argv[12] # this has not been implemented
+    RAM = sys.argv[12]
 
     run_spades = wanted_coverage != 0
 
@@ -604,7 +604,7 @@ def main():
     if os.path.isdir(infile1):
         parallelize(finalpath, infile1)
     else:
-        regular(finalpath, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads)
+        regular(finalpath, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, RAM)
 
 
 if __name__ == '__main__':
