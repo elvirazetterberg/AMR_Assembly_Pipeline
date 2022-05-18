@@ -530,7 +530,7 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
         
 def map_func(dir, f):
     '''Function to map regular to files and directory when running in parallel'''
-    return regular(dir, f[0], f[1], run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads)
+    return regular(dir, f[0], f[1], run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, RAM)
 
 def parallelize(finalpath, file_directory):
     '''Function that takes a directory of forward and reverse files to run the 
