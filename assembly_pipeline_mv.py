@@ -219,10 +219,7 @@ def reads_for_coverage(path, fastq_file, wanted_coverage, genome_size):
     read_counter = 0
     row_counter = 1 # goes between 1 and 4
     
-    filepath = f'{path}/{fastq_file}'
-    log_parse(filepath, path)
-    
-    with gzip.open(filepath, 'rt') as file:
+    with gzip.open(fastq_file, 'rt') as file:
         for line in file:
             if '@' in line:
                 lenlist = re.findall('(length=[1-9]+)', line)
@@ -265,7 +262,8 @@ def shorten_fastq(path, fastq1_file, fastq2_file, reads_needed, common_name):
     '''Function that shortens the fastq files to only be long enough to reach 
     the requested coverage.'''
 
-    log_parse( f'shorten_fastq started to shorten {fastq1_file} and {fastq2_file} to only match wanted coverage.\n\n', path)
+    log_parse(f'Shorten_fastq started.\n', path)
+    log_parse(f'Shortening {fastq1_file} and {fastq2_file} to only match wanted coverage.\n\n', path)
 
     lines_needed = reads_needed*4
     newname1 = f'X_{common_name}_1.fastq.gz'
@@ -273,11 +271,8 @@ def shorten_fastq(path, fastq1_file, fastq2_file, reads_needed, common_name):
 
     newpath1 = f'{path}/{newname1}'
     newpath2 = f'{path}/{newname2}'
-
-    filepath1 = f'{path}/{fastq1_file}'
-    filepath2 = f'{path}/{fastq2_file}'
     
-    with gzip.open(filepath1, 'rt') as trim_me: # maybe change to 'rb'
+    with gzip.open(fastq1_file, 'rt') as trim_me: # maybe change to 'rb'
         newfile = ''
         for i, line in enumerate(trim_me):
             newfile += line
@@ -287,7 +282,7 @@ def shorten_fastq(path, fastq1_file, fastq2_file, reads_needed, common_name):
     with gzip.open(newpath1, 'wt') as one:
         one.write(newfile)
 
-    with gzip.open(filepath2, 'rt') as trim_me:
+    with gzip.open(fastq2_file, 'rt') as trim_me:
         newfile = ''
         for i, line in enumerate(trim_me):
             newfile += line
