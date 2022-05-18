@@ -220,6 +220,7 @@ def reads_for_coverage(path, fastq_file, wanted_coverage, genome_size):
     row_counter = 1 # goes between 1 and 4
     
     filepath = f'{path}/{fastq_file}'
+    log_parse(filepath, path)
     
     with gzip.open(filepath, 'rt') as file:
         for line in file:
