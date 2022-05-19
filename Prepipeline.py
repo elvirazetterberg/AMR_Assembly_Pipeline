@@ -90,6 +90,7 @@ def command_generator(frst,scnd,one_or_sev):
     else:
         command=f"python assembly_pipeline_v8.py {path}/{frst}_1.fastq.gz {path}/{scnd}_2.fastq.gz {pos} {chosen_tools[0]}"+\
             f"{chosen_tools[1]} {chosen_tools[2]} {chosen_db} {cov} {gen_siz} {pilon} {threads}" #if they enter the filename this is innacurate
+    command += " " +input("What amount of RAM is needed?")
     return  command
 
 def main():  

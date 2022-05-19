@@ -136,18 +136,18 @@ def ariba_fun(path, infile1, infile2, db_ariba):
     
     for db_name in db_ariba: 
         log_parse(f' Starting ariba with {db_name}', path)
-        if os.path.exists(f'{base_dir}/out.{db_name}.fa'): #if databases already downloaded
+        if os.path.exists(f'{finalpath}/out.{db_name}.fa'): #if databases already downloaded
             log_parse(f'Database {db_name} already downloaded', path)
-            os.system(f"rm -rf {base_dir}/out.run.{db_name}") # OBS need warning?
+            os.system(f"rm -rf {finalpath}/out.run.{db_name}") # OBS need warning?
 
         else: # if database not downloaded.
-            os.system(f"rm -rf {base_dir}/out.{db_name}*")
+            os.system(f"rm -rf {finalpath}/out.{db_name}*")
             log_parse(f'Downloading database {db_name}', path)
-            os.system(f"ariba getref {db_name} {base_dir}/out.{db_name} >> {path}/{logname}") # >> kommer inte funka, finns inte logname i finalpath som vi står i
+            os.system(f"ariba getref {db_name} {finalpath}/out.{db_name} >> {path}/{logname}") # >> kommer inte funka, finns inte logname i finalpath som vi står i
             # Provade >> {path}/{logname} istället för >> {logname}. Kanske funkar
 
             log_parse(f'Preparing references with prefix out.{db_name}', path)
-            os.system(f"ariba prepareref -f {base_dir}/out.{db_name}.fa -m {base_dir}/out.{db_name}.tsv {base_dir}/out.{db_name}.prepareref >> {path}/{logname}") # samma här m >>
+            os.system(f"ariba prepareref -f {finalpath}/out.{db_name}.fa -m {finalpath}/out.{db_name}.tsv {finalpath}/out.{db_name}.prepareref >> {path}/{logname}") # samma här m >>
 
         os.chdir(path) # go to output path
 
@@ -462,8 +462,6 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
     infile2 = f'{path}/{f2}'
 
 # Create log file
-    global logname
-    logname = 'logfile.txt'
     create_log(path, time, date, infile1, infile2)
     
 # Ariba 
@@ -536,12 +534,12 @@ def parallelize(finalpath, file_directory):
     '''Function that takes a directory of forward and reverse files to run the 
     pipeline with in parallel. Also takes a final path to the collective directory'''
     
-    global base_dir
-    base_dir = os.getcwd()
+    # global base_dir # changeing to finalpath global
+    # base_dir = os.getcwd()
     os.chdir(file_directory)
     os.system(f"ls *.gz > input.txt")
     # go back
-    os.chdir(base_dir)
+    os.chdir(finalpath)
 
     dirlist = []
     files = []
@@ -573,7 +571,8 @@ def main():
     """
     path/to/file1 path/to/file2 here nopar notrim nokraken ariba [db1, db2] 0 size nopilon thr ram
     """
-    global new_location, run_fastp, kraken, ariba, db_ariba, wanted_coverage, genome_size, pilon, threads, RAM, run_spades, finalpath
+    global new_location, run_fastp, kraken, ariba, db_ariba, wanted_coverage, genome_size, pilon, threads, RAM, run_spades, finalpath, logname
+
     infile1 = sys.argv[1] # 
     infile2 = sys.argv[2]
     new_location = sys.argv[3] == 'there' # will ask for directory location if True
@@ -596,6 +595,7 @@ def main():
 
     time = currenttime()
     date = str(datetime.date(datetime.now()))
+    logname = 'logfile.txt' #Moved logname to make global
     
 # make directory for output
     finalpath = directory(date, time, new_location)
