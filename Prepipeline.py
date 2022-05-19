@@ -50,7 +50,7 @@ def command_generator(frst,scnd,one_or_sev):
     if file_ex!="File exist":
         exit(f'Could not find "{frst}". Exiting.')
     # Check if output should be in current directory
-    pos=input("If you want to change the path for the output directory, please write 'there'. Otherwise press ENTER: ") or "here"
+    pos=input("If you want to change the path for the output directory, please enter output path. Otherwise press ENTER: ") or "here"
 
     # Check what tools are wanted, default is nothing
     for tool in tools:
