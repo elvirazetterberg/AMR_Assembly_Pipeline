@@ -21,8 +21,7 @@ import glob
 
 
 Before running:
-    * Make sure all tools mentioned in the sections 'Assembly tools and where to find them' and 
-        'ALIGNMENT !?'are installed properly.
+    * Make sure all tools mentioned in the sections 'The pipeline tools and where to find them' are installed properly.
     * Hard code the paths to the SPAdes-tool and Minikraken2 database in the function 'regular'
 
 *************Now you should be ready to test the pipeline!*************
@@ -93,7 +92,7 @@ def shortname(filename):
     including only the first continuous word-number sequence.'''
     splitit = filename.split('/')
     name = splitit[-1]
-    short = re.search('[a-zA-Z1-9]+', name).group()
+    short = re.search('[a-zA-Z0-9]+', name).group()
     return short
 
 def create_log(path, time, date, infile1, infile2):
@@ -134,6 +133,7 @@ def log_parse(string, logpath):
     return
 
 def ariba_fun(path, infile1, infile2, db_ariba):
+    print(base_dir)
     
     for db_name in db_ariba: 
         log_parse(f' Starting ariba with {db_name}', path)
@@ -153,7 +153,7 @@ def ariba_fun(path, infile1, infile2, db_ariba):
         os.chdir(path) # go to output path
 
         log_parse(f'Running ariba on {db_name}', path)
-        os.system(f"ariba run out.{db_name}.prepareref {infile1} {infile2} out.run.{db_name} >> {path}/{logname}")
+        os.system(f"ariba run {base_dir}/out.{db_name}.prepareref {infile1} {infile2} out.run.{db_name} >> {path}/{logname}")
 
     os.system(f"mkdir {path}/Ariba_output")     # Making dir to ensure output is not in main dir
     os.system(f"mv out.* {path}/Ariba_output")  # No other names start with out. , right?
@@ -463,8 +463,6 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
     infile2 = f'{path}/{f2}'
 
 # Create log file
-    global logname
-    logname = 'logfile.txt'
     create_log(path, time, date, infile1, infile2)
     
 # Ariba 
@@ -473,7 +471,6 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
         log_parse(header, path)
         ariba_fun(path, infile1,infile2, db_ariba)
         #os.system("ariba summary out_sum out.run.*/report.tsv") #change from v5
-        os.system("ariba summary out.sum out.run.*/report.tsv")
 
 # Fastp
     if run_fastp:
@@ -537,8 +534,7 @@ def parallelize(finalpath, file_directory):
     '''Function that takes a directory of forward and reverse files to run the 
     pipeline with in parallel. Also takes a final path to the collective directory'''
     
-    global base_dir
-    base_dir = os.getcwd()
+
     os.chdir(file_directory)
     os.system(f"ls *.gz > input.txt")
     # go back
@@ -574,7 +570,7 @@ def main():
     """
     path/to/file1 path/to/file2 here nopar notrim nokraken ariba [db1, db2] 0 size nopilon thr ram
     """
-    global new_location, run_fastp, kraken, ariba, db_ariba, wanted_coverage, genome_size, pilon, threads, RAM, run_spades, finalpath
+    global new_location, run_fastp, kraken, ariba, db_ariba, wanted_coverage, genome_size, pilon, threads, RAM, run_spades, finalpath, logname, base_dir 
     infile1 = sys.argv[1] # 
     infile2 = sys.argv[2]
     new_location = sys.argv[3] == 'there' # will ask for directory location if True
@@ -595,14 +591,18 @@ def main():
 
 # Let's start this pipeline!
 
+    logname = 'logfile.txt'
     time = currenttime()
     date = str(datetime.date(datetime.now()))
-    
+    base_dir = os.getcwd()
+
 # make directory for output
     finalpath = directory(date, time, new_location)
 
     if os.path.isdir(infile1):
         parallelize(finalpath, infile1)
+        #os.system("ariba summary out.sum out.run.*/report.tsv")
+
     else:
         regular(finalpath, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, RAM)
 
