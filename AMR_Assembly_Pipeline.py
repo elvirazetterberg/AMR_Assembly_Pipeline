@@ -45,8 +45,8 @@ Contributors: Alma Nilsson, Corinne Olivero, Elvira Zetterberg, Evelina Andersso
 # - infile1 / directory: enter a directory to multiple short read files to run the pipeline in 
 # parallel. Will use same wanted coverage, however!
 # - infile2 / None: enter None if a directory was entered as infile1.
-# - here/there: Where should all outputs be saved? If 'here' a new directory is created in 
-# the current directory. If 'there' a path will be asked for.
+# - here/path: Where should all outputs be saved? If 'here' a new directory is created in
+# the current directory. If a path is given the output will be saved there.
 # - trim/notrim: trim means we run fastp, notrim means that we don't.
 # - kraken/nokraken: choose whether kraken should be run or not.
 # - ariba/noariba: choose whether to align AMR-genes with ariba.
