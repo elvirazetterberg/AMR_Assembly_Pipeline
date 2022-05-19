@@ -27,7 +27,7 @@ Before running:
 *************Now you should be ready to test the pipeline!*************
 
 Start by parsing the following command through the terminal, choosing only one option in each case:
-'python AMR_Assembly_Pipeline.py infile1/directory infile2/None here/there trim/notrim kraken/nokraken ariba/noariba wanted_coverage genome_size pilon/nopilon threads RAM'
+'python AMR_Assembly_Pipeline.py infile1/directory infile2/None here/path trim/notrim kraken/nokraken ariba/noariba wanted_coverage genome_size pilon/nopilon threads RAM'
 
 
 
@@ -58,7 +58,7 @@ Contributors: Alma Nilsson, Corinne Olivero, Elvira Zetterberg, Evelina Andersso
 # - threads: maximum threads available.
 # - RAM: maximum RAM available.
 
-def directory(date, time, there = False):
+def directory(date, time, here):
     
     ''' Function to create directory where all outputs from the pipeline are placed. 
     Date and time specific'''
@@ -67,9 +67,9 @@ def directory(date, time, there = False):
     stringtime = time[:2]+'h'+time[3:5]+'m'+time[6:8]+'s'
 
     # Choose path of directory
-    if there:
-        print('You requested to save all output files in another directory.')
-        path = input('New path: ')
+    if not here:
+        log_parse('You requested to save all output files in another directory.')
+        path = new_location
     else:
         path = os.getcwd()
 
@@ -573,14 +573,15 @@ def main():
     global new_location, run_fastp, kraken, ariba, db_ariba, wanted_coverage, genome_size, pilon, threads, RAM, run_spades, finalpath, logname, base_dir 
     infile1 = sys.argv[1] # 
     infile2 = sys.argv[2]
-    new_location = sys.argv[3] == 'there' # will ask for directory location if True
-    run_fastp = sys.argv[4] == 'trim' # will run fastp if True
-    kraken = sys.argv[5] == 'kraken'
-    ariba = sys.argv[6] == 'ariba'
+    here = sys.argv[3].lower() == 'here' # will ask for directory location if False
+    new_location = sys.argv[3]
+    run_fastp = sys.argv[4].lower() == 'trim' # will run fastp if True
+    kraken = sys.argv[5].lower() == 'kraken'
+    ariba = sys.argv[6].lower() == 'ariba'
     db_ariba = sys.argv[7][1:-1].strip(" ").split(',')
     wanted_coverage = int(sys.argv[8]) # if wanted coverage == 0, then don't run spades
     genome_size = int(sys.argv[9])
-    pilon = sys.argv[10] == 'pilon'
+    pilon = sys.argv[10].lower() == 'pilon'
     threads = sys.argv[11]
     RAM = sys.argv[12]
 
@@ -597,7 +598,7 @@ def main():
     base_dir = os.getcwd()
 
 # make directory for output
-    finalpath = directory(date, time, new_location)
+    finalpath = directory(date, time, here)
 
     if os.path.isdir(infile1):
         parallelize(finalpath, infile1)
