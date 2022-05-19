@@ -27,7 +27,7 @@ Before running:
 *************Now you should be ready to test the pipeline!*************
 
 Start by parsing the following command through the terminal, choosing only one option in each case:
-'python assembly_pipeline.py infile1/directory infile2/None here/there trim/notrim kraken/nokraken ariba/noariba wanted_coverage genome_size pilon/nopilon threads'
+'python AMR_Assembly_Pipeline.py infile1/directory infile2/None here/there trim/notrim kraken/nokraken ariba/noariba wanted_coverage genome_size pilon/nopilon threads RAM'
 
 
 
@@ -56,6 +56,7 @@ Contributors: Alma Nilsson, Corinne Olivero, Elvira Zetterberg, Evelina Andersso
 # - pilon/nopilon: choose whether to run pilon or not. Does not run if no spades (0 wanted coverage).
 ''' THIS VERSION CANNOT RUN PILON.'''
 # - threads: maximum threads available.
+# - RAM: maximum RAM available.
 
 def directory(date, time, there = False):
     
