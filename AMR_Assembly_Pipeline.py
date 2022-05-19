@@ -27,7 +27,7 @@ Before running:
 *************Now you should be ready to test the pipeline!*************
 
 Start by parsing the following command through the terminal, choosing only one option in each case:
-'python AMR_Assembly_Pipeline.py infile1/directory infile2/None here/there trim/notrim kraken/nokraken ariba/noariba wanted_coverage genome_size pilon/nopilon threads RAM'
+'python AMR_Assembly_Pipeline.py infile1/directory infile2/None here/there trim/notrim kraken/nokraken ariba/noariba [databases] wanted_coverage genome_size pilon/nopilon threads RAM'
 
 
 
@@ -50,7 +50,7 @@ Contributors: Alma Nilsson, Corinne Olivero, Elvira Zetterberg, Evelina Andersso
 # - trim/notrim: trim means we run fastp, notrim means that we don't.
 # - kraken/nokraken: choose whether kraken should be run or not.
 # - ariba/noariba: choose whether to align AMR-genes with ariba.
-# - [vfdb_core]: list of AMR-databases for ariba, without spaces.
+# - [vfdb_core]: list of AMR-databases for ariba, without spaces. [argannot,card,megares,plasmidfinder,resfinder,srst2_argannot,vfdb_core,virulencefinder]
 # - wanted_coverage: what coverage is requested? If 0, no assembly is performed.
 # - genome_size: what is the genome size of the organism?
 # - pilon/nopilon: choose whether to run pilon or not. Does not run if no spades (0 wanted coverage).
@@ -133,8 +133,6 @@ def log_parse(string, logpath):
     return
 
 def ariba_fun(path, infile1, infile2, db_ariba):
-    print(base_dir)
-    
     for db_name in db_ariba: 
         log_parse(f' Starting ariba with {db_name}', path)
         if os.path.exists(f'{base_dir}/out.{db_name}.fa'): #if databases already downloaded
@@ -144,19 +142,16 @@ def ariba_fun(path, infile1, infile2, db_ariba):
         else: # if database not downloaded.
             os.system(f"rm -rf {base_dir}/out.{db_name}*")
             log_parse(f'Downloading database {db_name}', path)
-            os.system(f"ariba getref {db_name} {base_dir}/out.{db_name} >> {path}/{logname}") # >> kommer inte funka, finns inte logname i finalpath som vi står i
-            # Provade >> {path}/{logname} istället för >> {logname}. Kanske funkar
+            os.system(f"ariba getref {db_name} {base_dir}/out.{db_name} >> {path}/{logname}")
 
             log_parse(f'Preparing references with prefix out.{db_name}', path)
             os.system(f"ariba prepareref -f {base_dir}/out.{db_name}.fa -m {base_dir}/out.{db_name}.tsv {base_dir}/out.{db_name}.prepareref >> {path}/{logname}") # samma här m >>
 
-        os.chdir(path) # go to output path
-
         log_parse(f'Running ariba on {db_name}', path)
-        os.system(f"ariba run {base_dir}/out.{db_name}.prepareref {infile1} {infile2} out.run.{db_name} >> {path}/{logname}")
+        os.system(f"ariba run {base_dir}/out.{db_name}.prepareref {infile1} {infile2} {path}/out.run.{db_name} >> {path}/{logname}")
 
     os.system(f"mkdir {path}/Ariba_output")     # Making dir to ensure output is not in main dir
-    os.system(f"mv out.* {path}/Ariba_output")  # No other names start with out. , right?
+    os.system(f"mv {path}/out.* {path}/Ariba_output")  # No other names start with out. , right?
     log_parse(f'Ariba done.\n', path)
     return
 
@@ -428,6 +423,7 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
     Requires an output path, a forward file (1), a reverse file (2) as well as other predetermined 
     parameters'''
 
+    #os.chdir(finalpath)
     time = currenttime()
     date = str(datetime.date(datetime.now()))
 
@@ -507,12 +503,14 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
         log_parse(header, path)
         assembly_path = spades_func(path, infile1, infile2, path_spades, common_name, threads, RAM)
 
-# Pilon
-    # if pilon:
-    #     header= '\n'+'='*15 +'PILON'+ '='*15 +'\n'
-    #     log_parse(header, path)
-    #     fastafile = f'{assembly_path}/{common_name}.fasta'
-    #     pilon_func(path, fastafile, infile1, infile2, common_name, threads, assembly_path)
+#Pilon
+    if pilon:
+        header= '\n'+'='*15 +'PILON'+ '='*15 +'\n'
+        log_parse(header, path)
+        fastafile = f'{assembly_path}/{common_name}.fasta'
+
+        log_parse("Pilon currently not functional. Continuing without running.")
+        # pilon_func(path, fastafile, infile1, infile2, common_name, threads, assembly_path)
         
 # Info/metrics
     if run_spades:
@@ -559,12 +557,13 @@ def parallelize(finalpath, file_directory):
     os.chdir(finalpath)
  
     # Creating combined info-files for parallellized genomes, currently names are last but works.
-    finalname="sum_info"
-    all_filenames = [i for i in glob.glob(f'{finalpath}/*/*info.csv')]
-    combined_csv = pd.concat([pd.read_csv(f) for f in all_filenames ], axis=0)
-    just_names = [name.split('/')[-1].split('_')[0] for name in all_filenames]
-    combined_csv["Genome Name"] = just_names
-    combined_csv.to_csv(path_or_buf= f'{finalpath}/{finalname}.csv', index=False, encoding='utf-8-sig')
+    if run_spades:
+        finalname="sum_info"
+        all_filenames = [i for i in glob.glob(f'{finalpath}/*/*info.csv')]
+        combined_csv = pd.concat([pd.read_csv(f) for f in all_filenames ], axis=0)
+        just_names = [name.split('/')[-1].split('_')[0] for name in all_filenames]
+        combined_csv["Genome Name"] = just_names
+        combined_csv.to_csv(path_or_buf= f'{finalpath}/{finalname}.csv', index=False, encoding='utf-8-sig')
     
 def main():
     """
