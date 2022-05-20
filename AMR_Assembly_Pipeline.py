@@ -50,7 +50,7 @@ Contributors: Alma Nilsson, Corinne Olivero, Elvira Zetterberg, Evelina Andersso
 # - trim/notrim: trim means we run fastp, notrim means that we don't.
 # - kraken/nokraken: choose whether kraken should be run or not.
 # - ariba/noariba: choose whether to align AMR-genes with ariba.
-# - [vfdb_core]: list of AMR-databases for ariba, without spaces. [argannot,card,megares,plasmidfinder,resfinder,srst2_argannot,vfdb_core,virulencefinder]
+# - [databases]: list of AMR-databases for ariba, without spaces. [argannot,card,megares,plasmidfinder,resfinder,srst2_argannot,vfdb_core,virulencefinder]
 # - wanted_coverage: what coverage is requested? If 0, no assembly is performed.
 # - genome_size: what is the genome size of the organism?
 # - pilon/nopilon: choose whether to run pilon or not. Does not run if no spades (0 wanted coverage).
