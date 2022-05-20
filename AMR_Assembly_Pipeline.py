@@ -136,7 +136,7 @@ def log_parse(string, logpath):
     
     return
 
-def ariba_fun(path, infile1, infile2, db_ariba):
+def ariba_fun(path, infile1, infile2):
     for db_name in db_ariba: 
         log_parse(f' Starting ariba with {db_name}', path)
         if os.path.exists(f'{base_dir}/out.{db_name}.fa'): #if databases already downloaded
@@ -185,7 +185,7 @@ def fastp_func(path, infile1, infile2, common_name):
 
     return outpath1, outpath2
 
-def kraken_func(path, infile1, infile2, threads, common_name, path_kraken):
+def kraken_func(path, infile1, infile2, common_name, path_kraken):
     ''' Function that runs Kraken on two raw reads fastq files, one forward (1, right) and one reverse(2, left), 
     in order to assign taxonomic labels to the sequences'''
 
@@ -205,7 +205,7 @@ def kraken_func(path, infile1, infile2, threads, common_name, path_kraken):
     if path != finalpath:
         os.system(f'mv {kraken_output} {kraken_report} {path}')
 
-def reads_for_coverage(path, fastq_file, wanted_coverage, genome_size):
+def reads_for_coverage(path, fastq_file):
     '''Function that checks whether the requested coverage can be reached with the input
     files, returning the maximum coverage if this is not the case.'''
 
@@ -296,7 +296,7 @@ def shorten_fastq(path, fastq1_file, fastq2_file, reads_needed, common_name):
 
     return newpath1, newpath2
 
-def spades_func(path, file1, file2, path_spades, common_name, threads, RAM):
+def spades_func(path, file1, file2, path_spades, common_name):
     '''Function that runs SPAdes to assemble contigs from short reads.'''
 
     log_parse('SPAdes started\n', path)
@@ -319,7 +319,7 @@ def spades_func(path, file1, file2, path_spades, common_name, threads, RAM):
 
     return assembly_path
 
-def pilon_func(path, fastafile, fasta1, fasta2, common_name, threads, assembly_path):
+def pilon_func(path, fastafile, fasta1, fasta2, common_name, assembly_path):
     '''Function that runs Pilon on contigs-file from SPAdes to 
     polish and assemble further.'''
     
@@ -421,7 +421,7 @@ def info(path, spades_assembly):
 
     return info_df
 
-def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, RAM):
+def regular(path, infile1, infile2):
     '''Function that runs the regular pipeline. This function is called from the parallelize
     function in the case of calling the pipeline with a directory of multiple reads files.
     Requires an output path, a forward file (1), a reverse file (2) as well as other predetermined 
@@ -469,7 +469,7 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
     if ariba:
         header= '\n'+'='*15 +'ARIBA'+ '='*15 +'\n'
         log_parse(header, path)
-        ariba_fun(path, infile1,infile2, db_ariba)
+        ariba_fun(path, infile1, infile2)
         #os.system("ariba summary out_sum out.run.*/report.tsv") #change from v5
 
 # Fastp
@@ -485,13 +485,13 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
     if kraken:
         header= '\n'+'='*15 +'KRAKEN'+ '='*15 +'\n'
         log_parse(header, path)
-        kraken_func(path, infile1, infile2, threads, common_name, path_kraken)
+        kraken_func(path, infile1, infile2, common_name, path_kraken)
 
 # Number of reads to match the wanted coverage
     if run_spades:
         header= '\n'+'='*15 +'READS FOR COVERAGE, SPADES'+ '='*15 +'\n'
         log_parse(header, path)
-        coverage, reads_needed = reads_for_coverage(path, infile1, wanted_coverage, genome_size)
+        coverage, reads_needed = reads_for_coverage(path, infile1)
     else:
         coverage = 0
 
@@ -505,7 +505,7 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
     if run_spades:
         header= '\n'+'='*15 +'SPADES'+ '='*15 +'\n'
         log_parse(header, path)
-        assembly_path = spades_func(path, infile1, infile2, path_spades, common_name, threads, RAM)
+        assembly_path = spades_func(path, infile1, infile2, path_spades, common_name)
 
 #Pilon
     if pilon:
@@ -514,7 +514,7 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
         fastafile = f'{assembly_path}/{common_name}.fasta'
 
         log_parse("Pilon currently not functional. Continuing without running.")
-        # pilon_func(path, fastafile, infile1, infile2, common_name, threads, assembly_path)
+        # pilon_func(path, fastafile, infile1, infile2, common_name, assembly_path)
         
 # Info/metrics
     if run_spades:
@@ -530,7 +530,7 @@ def regular(path, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spad
         
 def map_func(dir, f):
     '''Function to map regular to files and directory when running in parallel'''
-    return regular(dir, f[0], f[1], run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, RAM)
+    return regular(dir, f[0], f[1])
 
 def parallelize(finalpath, file_directory):
     '''Function that takes a directory of forward and reverse files to run the 
@@ -608,7 +608,7 @@ def main():
         #os.system("ariba summary out.sum out.run.*/report.tsv")
 
     else:
-        regular(finalpath, infile1, infile2, run_fastp, kraken, ariba, db_ariba, run_spades, wanted_coverage, genome_size, pilon, threads, RAM)
+        regular(finalpath, infile1, infile2)
 
 
 if __name__ == '__main__':
