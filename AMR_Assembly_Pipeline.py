@@ -29,19 +29,9 @@ Before running:
 Start by parsing the following command through the terminal, choosing only one option in each case:
 'python AMR_Assembly_Pipeline.py infile1/directory infile2/None here/there trim/notrim kraken/nokraken ariba/noariba [databases] wanted_coverage genome_size pilon/nopilon threads RAM'
 
-
-
-REFERENCE:
-The work of third year students at the Master's Programme in Molecular Biotechnology Engineering (X) at Uppsala University 2022. 
-GitHub: https://github.com/elvirazetterberg/AMR_Assembly_Pipeline.git
-Contributors: Alma Nilsson, Corinne Olivero, Elvira Zetterberg, Evelina Andersson, Julia Sulyaeva, Moa Qvarnlof
-
 """
 
-
-
-
-'''OPTIONS'''
+'''OPTIONS: must be in order'''
 # - infile1 / directory: enter a directory to multiple short read files to run the pipeline in 
 # parallel. Will use same wanted coverage, however!
 # - infile2 / None: enter None if a directory was entered as infile1.
@@ -57,6 +47,15 @@ Contributors: Alma Nilsson, Corinne Olivero, Elvira Zetterberg, Evelina Andersso
 ''' THIS VERSION CANNOT RUN PILON.'''
 # - threads: maximum threads available.
 # - RAM: maximum RAM available.
+
+
+"""
+REFERENCE:
+The work of third year students at the Master's Programme in Molecular Biotechnology Engineering (X) at Uppsala University 2022. 
+GitHub: https://github.com/elvirazetterberg/AMR_Assembly_Pipeline.git
+Contributors: Alma Nilsson, Corinne Olivero, Elvira Zetterberg, Evelina Andersson, Julia Sulyaeva, Moa Qvarnlof
+
+"""
 
 def directory(date, time, here):
     
