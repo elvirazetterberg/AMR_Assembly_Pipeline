@@ -33,7 +33,7 @@ Start by parsing the following command through the terminal, choosing only one o
 
 REFERENCE:
 The work of third year students at the Master's Programme in Molecular Biotechnology Engineering (X) at Uppsala University 2022. 
-GitHub: https://github.com/elvirazetterberg/Pipeline.git  #change name 
+GitHub: https://github.com/elvirazetterberg/AMR_Assembly_Pipeline.git
 Contributors: Alma Nilsson, Corinne Olivero, Elvira Zetterberg, Evelina Andersson, Julia Sulyaeva, Moa Qvarnlof
 
 """
