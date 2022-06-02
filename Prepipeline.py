@@ -61,13 +61,14 @@ def command_generator(frst,scnd,one_or_sev):
         chosen_tools[0]="trim"
 
     # If ariba, Check what databases are wanted
-    for db in databases:
-        t=while_yn(f"Do you want to run {db}? y/[n]:\t", "no")
-        if t.lower().startswith("y"):
-            chosen_db.append(db.lower()) 
-        else:
-            chosen_db.append(f"no{db.lower()}")
-    chosen_db=str(chosen_db).strip(" ") # creating a string without spaces, to be compatible with the command line input format
+    if "ariba" in chosen_tools: 
+        for db in databases:
+            t=while_yn(f"Do you want to run {db}? y/[n]:\t", "no")
+            if t.lower().startswith("y"):
+                chosen_db.append(db.lower()) 
+            else:
+                chosen_db.append(f"no{db.lower()}")
+        chosen_db=str(chosen_db).strip(" ") # creating a string without spaces, to be compatible with the command line input format
     
     # Checking parameters for assebly, if none given default is 0
     cov=input("What coverage is requested? If 0, no assembly is performed.\t") or "0"
@@ -114,8 +115,7 @@ def main():
         directory=input("Please input name of directory containing genomes: ") or exit("No name given. Exiting.") 
         command=command_generator(directory,"None","directory")
     else:
-        name=input("please enter the name (ID) of your genome including filename extension: ").replace("_2.fastq.gz","").replace("_1.fastq.gz","") or exit("No name given. Exiting.") 
-        print(name)
+        name=input("please enter the name (ID) of your strain: ").replace("_2.fastq.gz","").replace("_1.fastq.gz","") or exit("No name given. Exiting.") 
         command=command_generator(name+"_1.fastq.gz",name+"_2.fastq.gz","genome")
 
 
