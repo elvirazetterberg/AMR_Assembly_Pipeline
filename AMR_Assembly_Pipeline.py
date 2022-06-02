@@ -27,7 +27,7 @@ Before running:
 *************Now you should be ready to test the pipeline!*************
 
 Start by parsing the following command through the terminal, choosing only one option in each case:
-'python AMR_Assembly_Pipeline.py infile1/directory infile2/None here/there trim/notrim kraken/nokraken ariba/noariba [databases] wanted_coverage genome_size pilon/nopilon threads RAM'
+'python AMR_Assembly_Pipeline.py infile1/directory infile2/None here/path trim/notrim kraken/nokraken ariba/noariba [databases] wanted_coverage genome_size pilon/nopilon threads RAM'
 
 """
 
