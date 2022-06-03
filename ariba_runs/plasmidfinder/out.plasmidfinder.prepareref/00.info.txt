@@ -1,3 +1,0 @@
-input fasta file:	out.plasmidfinder.fa
-input tsv file:	out.plasmidfinder.tsv
-genetic_code	11
