@@ -27,7 +27,7 @@ Before running:
 *************Now you should be ready to test the pipeline!*************
 
 Start by parsing the following command through the terminal, choosing only one option in each case:
-'python AMR_Assembly_Pipeline.py infile1/directory infile2/None here/there trim/notrim kraken/nokraken ariba/noariba [databases] wanted_coverage genome_size pilon/nopilon threads RAM'
+'python AMR_Assembly_Pipeline.py infile1/directory infile2/None here/path trim/notrim kraken/nokraken ariba/noariba [databases] wanted_coverage genome_size pilon/nopilon threads RAM'
 
 """
 
@@ -131,7 +131,7 @@ def log_parse(string, logpath):
     
     return
 
-def ariba_fun(path, infile1, infile2):
+def ariba_func(path, infile1, infile2):
     for db_name in db_ariba: 
         log_parse(f' Starting ariba with {db_name}', path)
         if os.path.exists(f'{base_dir}/out.{db_name}.fa'): #if databases already downloaded
@@ -464,7 +464,7 @@ def regular(path, infile1, infile2):
     if ariba:
         header= '\n'+'='*15 +'ARIBA'+ '='*15 +'\n'
         log_parse(header, path)
-        ariba_fun(path, infile1, infile2)
+        ariba_func(path, infile1, infile2)
         #os.system("ariba summary out_sum out.run.*/report.tsv") #change from v5
 
 # Fastp
