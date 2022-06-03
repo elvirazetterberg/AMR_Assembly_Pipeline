@@ -585,7 +585,7 @@ def main():
 
     run_spades = wanted_coverage != 0
 
-    if pilon and run_spades == False: # Since pilon requires spades output, this 
+    if pilon and run_spades == False: # Since pilon requires spades output it will not run if no spades
         pilon = False
 
 # Let's start this pipeline!
