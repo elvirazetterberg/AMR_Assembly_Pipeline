@@ -100,7 +100,7 @@ def command_generator(frst,scnd,one_or_sev):
             f"{chosen_tools[1]} {chosen_tools[2]} {chosen_db} {cov} {gen_siz} {pilon} {threads}" 
 
     command += " " + while_not_nr("What amount of RAM is needed?","0")
-    return  command
+    return  "python " + command
 
 def main():  
     
