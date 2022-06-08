@@ -1,3 +1,0 @@
-input fasta file:	out.vfdb_core.fa
-input tsv file:	out.vfdb_core.tsv
-genetic_code	11

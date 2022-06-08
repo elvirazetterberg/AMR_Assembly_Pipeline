@@ -131,7 +131,7 @@ def log_parse(string, logpath):
     
     return
 
-def ariba_fun(path, infile1, infile2):
+def ariba_func(path, infile1, infile2):
     for db_name in db_ariba: 
         log_parse(f' Starting ariba with {db_name}', path)
         if os.path.exists(f'{base_dir}/out.{db_name}.fa'): #if databases already downloaded
@@ -464,7 +464,7 @@ def regular(path, infile1, infile2):
     if ariba:
         header= '\n'+'='*15 +'ARIBA'+ '='*15 +'\n'
         log_parse(header, path)
-        ariba_fun(path, infile1, infile2)
+        ariba_func(path, infile1, infile2)
         #os.system("ariba summary out_sum out.run.*/report.tsv") #change from v5
 
 # Fastp
@@ -585,7 +585,7 @@ def main():
 
     run_spades = wanted_coverage != 0
 
-    if pilon and run_spades == False: # Since pilon requires spades output, this 
+    if pilon and run_spades == False: # Since pilon requires spades output it will not run if no spades
         pilon = False
 
 # Let's start this pipeline!
