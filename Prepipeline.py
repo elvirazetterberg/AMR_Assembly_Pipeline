@@ -16,7 +16,7 @@ import subprocess as sp
 
 This script generates a command in the following format:
 
-'python assembly_pipeline_v8.py infile1/directory infile2/None here/path trim/notrim kraken/nokraken ariba/noariba wanted_coverage genome_size pilon/nopilon threads'
+'python AMR_Assembly_Pipeline.py infile1/directory infile2/None here/path trim/notrim kraken/nokraken ariba/noariba [databases] wanted_coverage genome_size pilon/nopilon threads RAM'
 
 And will start the pipeline with the generated command if wanted.
 
@@ -87,7 +87,7 @@ def command_generator(frst,scnd,one_or_sev):
     gen_siz=while_not_nr("What is the genome size of your organism?\t", "0")
     if cov!=0:
         pilon=while_yn("Do you wish to run pilon? y/[n]\t", "no")+ "pilon"
-        if pilon.lower().startswith("y"): # not working for some reason
+        if pilon.lower().startswith("y"):
             pilon="pilon"
     threads=while_not_nr("Please write the maximum threads available:\t", "0")
 
@@ -97,7 +97,7 @@ def command_generator(frst,scnd,one_or_sev):
             f"{chosen_tools[1]} {chosen_tools[2]} {chosen_db} {cov} {gen_siz} {pilon} {threads}"
     else:
         command=f"AMR_Assembly_Pipeline.py {path}/{frst} {path}/{scnd} {pos} {chosen_tools[0]} "+\
-            f"{chosen_tools[1]} {chosen_tools[2]} {chosen_db} {cov} {gen_siz} {pilon} {threads}" #if they enter the filename this is innacurate
+            f"{chosen_tools[1]} {chosen_tools[2]} {chosen_db} {cov} {gen_siz} {pilon} {threads}" 
 
     command += " " + while_not_nr("What amount of RAM is needed?","0")
     return  command
