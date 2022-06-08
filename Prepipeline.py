@@ -133,7 +133,7 @@ def main():
 
 
     a=while_yn(f"Your command is: \n {command}\n\nDo you wish to run the pipeline imemdiately? y/[n]","no")
-    if a.lower is "y":
+    if a.lower().startswith("y"):
         os.system(command)
     else:
         print("Command generation finished. Bye!")
